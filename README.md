@@ -33,7 +33,7 @@ Dự án được xây dựng bằng C#, mang lại trải nghiệm ổn định
 - **Cơ sở dữ liệu**: SQL Server để lưu trữ thông tin người dùng và lịch sử trò chuyện.
 - **Dịch vụ tích hợp**:
   - Twilio hoặc WebRTC cho gọi video/âm thanh.
-  - Thanh toán trực tuyến với Stripe hoặc PayPal.
+  - Thanh toán trực tuyến với các ngân hàng.
 
 ## 📋 **Lộ trình phát triển**
 - [ ] Xây dựng chức năng kết nối ẩn danh cơ bản.
