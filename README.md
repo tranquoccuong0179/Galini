@@ -51,7 +51,7 @@ Hãy gửi email nếu bạn muốn đóng góp cho dự án. Chúng tôi rất 
 
 📞 Liên hệ
 - Tác giả: Trần Quốc Cường & Tạ Ngọc An
-- Email: tranquoccuong0179@gmail.com
-- GitHub: https://github.com/tranquoccuong0179
-- Facebook: https://www.facebook.com/tranquoccuong107
+- Email: tranquoccuong0179@gmail.com & ngocan2003krp@gmail.com
+- GitHub: https://github.com/tranquoccuong0179 & https://github.com/ffsasa
+- Facebook: https://www.facebook.com/tranquoccuong107 & https://www.facebook.com/an.tangoc.5623
 - Linkedln: https://www.linkedin.com/in/c%C6%B0%E1%BB%9Dng-tr%E1%BA%A7n-2bb22a332
