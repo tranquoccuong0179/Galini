@@ -1,6 +1,8 @@
 ﻿using Galini.Models.Entity;
 using Galini.Repository.Implement;
 using Galini.Repository.Interface;
+using Galini.Services.Implement;
+using Galini.Services.Interface;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +25,7 @@ namespace Galini.API
 
         public static IServiceCollection AddCustomServices(this IServiceCollection services)
         {
+            services.AddScoped<IUserService, UserService>();
             return services;
         }
         public static IServiceCollection AddHttpClientServices(this IServiceCollection services)
