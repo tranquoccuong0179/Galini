@@ -1,4 +1,6 @@
 ﻿using Galini.Models.Paginate;
+using Galini.Models.Request.Booking;
+using Galini.Models.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,13 +9,14 @@ using System.Threading.Tasks;
 
 namespace Galini.Services.Interface
 {
-    internal interface IBookingService
+    public interface IBookingService
     {
-        public Task<CreateBookingResponse> CreateBooking(CreateBookingRequest request, Guid subjectId);
-        public Task<IPaginate<GetChapterResponse>> GetListChapter(int page, int size);
-        public Task<IPaginate<GetTopicResponse>> GetListTopic(Guid id, int page, int size);
-        public Task<GetChapterResponse> GetChapterById(Guid id);
-        public Task<bool> UpdateChapter(Guid id, UpdateChapterRequest request, Guid subjectId);
-        public Task<bool> RemoveChapter(Guid id);
+        public Task<BaseResponse> CreateBooking(CreateBookingRequest request, Guid workShiftId);
+        public Task<BaseResponse> GetAllBookings(int page, int size);
+        public Task<BaseResponse> GetUserBookings(Guid userId, int page, int size);
+        public Task<BaseResponse> GetListenerBookings(Guid listenerId, int page, int size);
+        public Task<BaseResponse> GetBookingById(Guid bookingId);
+        public Task<BaseResponse> UpdateBooking(Guid bookingId, CreateBookingRequest request);
+        public Task<BaseResponse> RemoveBooking(Guid bookingId);
     }
 }

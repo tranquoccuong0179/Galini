@@ -25,10 +25,6 @@ public partial class Account
 
     public string? AvatarUrl { get; set; }
 
-    public string IdentifyIp { get; set; } = null!;
-
-    public int Weight { get; set; }
-
     public bool IsActive { get; set; }
 
     public DateTime CreateAt { get; set; }

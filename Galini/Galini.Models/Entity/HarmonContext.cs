@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace Galini.Models.Entity;
 
@@ -29,6 +28,8 @@ public partial class HarmonContext : DbContext
     public virtual DbSet<DirectChatParticipant> DirectChatParticipants { get; set; }
 
     public virtual DbSet<FriendShip> FriendShips { get; set; }
+
+    public virtual DbSet<Identification> Identifications { get; set; }
 
     public virtual DbSet<ListenerInfo> ListenerInfos { get; set; }
 
@@ -58,22 +59,9 @@ public partial class HarmonContext : DbContext
 
     public virtual DbSet<WorkShift> WorkShifts { get; set; }
 
-//    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-//    {
-//        if (!optionsBuilder.IsConfigured)
-//        {
-//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-//            optionsBuilder.UseSqlServer(GetConnectionString());
-//        }
-//    }
-
-//    private string GetConnectionString()
-//    {
-//        IConfiguration configuration = new ConfigurationBuilder()
-//            .SetBasePath(Directory.GetCurrentDirectory())
-//            .AddJsonFile("appsettings.json", true, true).Build();
-//        return configuration.GetConnectionString("DefautDB");
-//    }
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Server=DESKTOP-75RNH8M\\AN;Uid=sa;Pwd=12345;Database=Harmon;TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -88,9 +76,6 @@ public partial class HarmonContext : DbContext
             entity.Property(e => e.Email).HasMaxLength(100);
             entity.Property(e => e.FullName).HasMaxLength(100);
             entity.Property(e => e.Gender).HasMaxLength(15);
-            entity.Property(e => e.IdentifyIp)
-                .HasMaxLength(50)
-                .HasColumnName("IdentifyIP");
             entity.Property(e => e.Password).HasMaxLength(50);
             entity.Property(e => e.Phone).HasMaxLength(50);
             entity.Property(e => e.Role).HasMaxLength(50);
@@ -200,6 +185,13 @@ public partial class HarmonContext : DbContext
                 .HasConstraintName("FK_FriendShip_User");
         });
 
+        modelBuilder.Entity<Identification>(entity =>
+        {
+            entity.ToTable("Identification");
+
+            entity.Property(e => e.IdentificationCode).HasMaxLength(50);
+        });
+
         modelBuilder.Entity<ListenerInfo>(entity =>
         {
             entity.ToTable("ListenerInfo");
@@ -225,6 +217,7 @@ public partial class HarmonContext : DbContext
             entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.CreateAt).HasColumnType("datetime");
             entity.Property(e => e.DeleteAt).HasColumnType("datetime");
+            entity.Property(e => e.Type).HasMaxLength(50);
             entity.Property(e => e.UpdateAt).HasColumnType("datetime");
 
             entity.HasOne(d => d.DirectChat).WithMany(p => p.Messages)

@@ -13,6 +13,8 @@ public partial class Message
 
     public string Content { get; set; } = null!;
 
+    public string Type { get; set; } = null!;
+
     public bool IsActive { get; set; }
 
     public DateTime CreateAt { get; set; }
