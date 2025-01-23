@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Galini.Models.Request.Notification;
+using Galini.Models.Response;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +8,13 @@ using System.Threading.Tasks;
 
 namespace Galini.Services.Interface
 {
-    internal interface INotificationService
+    public interface INotificationService
     {
+        public Task<BaseResponse> CreateNotification(CreateNotificationRequest request, Guid accountId);
+        public Task<BaseResponse> GetAllNotification(int page, int size);
+        public Task<BaseResponse> GetNotificationoById(Guid notificationId);
+        public Task<BaseResponse> GetNotificationByAccountId(Guid accountId);
+        public Task<BaseResponse> UpdateNotification(Guid notificationId, CreateNotificationRequest request);
+        public Task<BaseResponse> RemoveNotification(Guid notificationId);
     }
 }

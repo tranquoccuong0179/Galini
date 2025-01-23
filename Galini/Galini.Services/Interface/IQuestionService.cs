@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Galini.Models.Request.Question;
+using Galini.Models.Response;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +8,12 @@ using System.Threading.Tasks;
 
 namespace Galini.Services.Interface
 {
-    internal interface IQuestionService
+    public interface IQuestionService
     {
+        public Task<BaseResponse> CreateQuestion(CreateQuestionRequest request);
+        public Task<BaseResponse> GetAllQuestion(int page, int size);
+        public Task<BaseResponse> GetQuestionById(Guid questionId);
+        public Task<BaseResponse> UpdateQuestion(Guid questionId, CreateQuestionRequest request);
+        public Task<BaseResponse> RemoveQuestion(Guid questionId);
     }
 }
