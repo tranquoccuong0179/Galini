@@ -85,17 +85,17 @@ public class UserService : BaseService<UserService>, IUserService
         }   
         
         
-        var isIPExist = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
-            predicate: u => u.IdentifyIp.Equals(ipAddress));
-        if (isIPExist != null)
-        {
-            return new BaseResponse()
-            {
-                status = StatusCodes.Status400BadRequest.ToString(),
-                message = "Địa chỉ IP đã tồn tại",
-                data = null
-            };
-        }
+        //var isIPExist = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+        //    predicate: u => u.IdentifyIp.Equals(ipAddress));
+        //if (isIPExist != null)
+        //{
+        //    return new BaseResponse()
+        //    {
+        //        status = StatusCodes.Status400BadRequest.ToString(),
+        //        message = "Địa chỉ IP đã tồn tại",
+        //        data = null
+        //    };
+        //}
 
         Account account = new Account()
         {
@@ -108,9 +108,9 @@ public class UserService : BaseService<UserService>, IUserService
             FullName = request.FullName,
             DateOfBirth = request.DateOfBirth,
             Phone = request.Phone,
-            Weight = request.Weight,
+            //Weight = request.Weight,
             AvatarUrl = request.AvatarUrl,
-            IdentifyIp = ipAddress,
+            //IdentifyIp = ipAddress,
             IsActive = true,
             CreateAt = TimeUtil.GetCurrentSEATime(),
             UpdateAt = TimeUtil.GetCurrentSEATime()
