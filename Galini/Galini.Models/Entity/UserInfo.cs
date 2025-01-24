@@ -11,7 +11,9 @@ public partial class UserInfo
 
     public Guid PremiumId { get; set; }
 
-    public int TimeRemaining { get; set; }
+    public DateTime DateStart { get; set; }
+
+    public DateTime DateEnd { get; set; }
 
     public bool IsActive { get; set; }
 
