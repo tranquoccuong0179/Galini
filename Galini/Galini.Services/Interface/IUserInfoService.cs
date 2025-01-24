@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Galini.Models.Request.UserCall;
+using Galini.Models.Response;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +8,14 @@ using System.Threading.Tasks;
 
 namespace Galini.Services.Interface
 {
-    internal interface IUserInfoService
+    public interface IUserInfoService
     {
+        public Task<BaseResponse> CreateUserInfo(CreateUserCallRequest request, Guid accountId);
+        public Task<BaseResponse> GetAllUserInfo(int page, int size);
+        public Task<BaseResponse> GetUserInfoById(Guid userInfoId);
+        public Task<BaseResponse> GetUserInfoByAccountId(Guid accountId);
+        public Task<BaseResponse> UpdateUserInfo(Guid userInfoId, CreateUserCallRequest request);
+        public Task<BaseResponse> UpdatePremium(Guid userInfoId, CreateUserCallRequest request);
+        public Task<BaseResponse> RemoveUserInfo(Guid userInfoId);
     }
 }

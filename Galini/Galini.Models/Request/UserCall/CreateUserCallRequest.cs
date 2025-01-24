@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Galini.Services.Interface
+namespace Galini.Models.Request.UserCall
 {
-    public interface IUserPresenceService
+    public class CreateUserCallRequest
     {
     }
 }

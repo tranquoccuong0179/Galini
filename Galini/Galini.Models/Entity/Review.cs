@@ -9,6 +9,8 @@ public partial class Review
 
     public Guid BookingId { get; set; }
 
+    public Guid ListenerId { get; set; }
+
     public string? ReviewMessage { get; set; }
 
     public string? ReplyMessage { get; set; }
