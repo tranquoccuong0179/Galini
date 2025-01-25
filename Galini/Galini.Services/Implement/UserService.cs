@@ -4,6 +4,7 @@ using Galini.Models.Entity;
 using Galini.Models.Enum;
 using Galini.Models.Request.User;
 using Galini.Models.Response;
+using Galini.Models.Response.Account;
 using Galini.Repository.Interface;
 using Galini.Services.Interface;
 using Galini.Utils;
@@ -16,9 +17,11 @@ public class UserService : BaseService<UserService>, IUserService
 {
     
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IMapper _mapper;
     public UserService(IUnitOfWork<HarmonContext> unitOfWork, ILogger<UserService> logger, IMapper mapper, IHttpContextAccessor httpContextAccessor) : base(unitOfWork, logger, mapper, httpContextAccessor)
     {
         _httpContextAccessor = httpContextAccessor;
+        _mapper = mapper;
     }
 
     public async Task<BaseResponse> RegisterUser(RegisterUserRequest request)
@@ -82,9 +85,9 @@ public class UserService : BaseService<UserService>, IUserService
                 message = "Số điện thoại đã tồn tại",
                 data = null
             };
-        }   
-        
-        
+        }
+
+
         //var isIPExist = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
         //    predicate: u => u.IdentifyIp.Equals(ipAddress));
         //if (isIPExist != null)
@@ -97,24 +100,26 @@ public class UserService : BaseService<UserService>, IUserService
         //    };
         //}
 
-        Account account = new Account()
-        {
-            Id = Guid.NewGuid(),
-            UserName = request.UserName,
-            Email = request.Email,
-            Password = PasswordUtil.HashPassword(request.Password),
-            Role = RoleEnum.Customer.GetDescriptionFromEnum(),
-            Gender = request.Gender.GetDescriptionFromEnum(),
-            FullName = request.FullName,
-            DateOfBirth = request.DateOfBirth,
-            Phone = request.Phone,
-            //Weight = request.Weight,
-            AvatarUrl = request.AvatarUrl,
-            //IdentifyIp = ipAddress,
-            IsActive = true,
-            CreateAt = TimeUtil.GetCurrentSEATime(),
-            UpdateAt = TimeUtil.GetCurrentSEATime()
-        };
+        //Account account = new Account()
+        //{
+        //    Id = Guid.NewGuid(),
+        //    UserName = request.UserName,
+        //    Email = request.Email,
+        //    Password = PasswordUtil.HashPassword(request.Password),
+        //    Role = RoleEnum.Customer.GetDescriptionFromEnum(),
+        //    Gender = request.Gender.GetDescriptionFromEnum(),
+        //    FullName = request.FullName,
+        //    DateOfBirth = request.DateOfBirth,
+        //    Phone = request.Phone,
+        //    //Weight = request.Weight,
+        //    AvatarUrl = request.AvatarUrl,
+        //    //IdentifyIp = ipAddress,
+        //    IsActive = true,
+        //    CreateAt = TimeUtil.GetCurrentSEATime(),
+        //    UpdateAt = TimeUtil.GetCurrentSEATime()
+        //};
+
+        var account = _mapper.Map<Account>(request);
 
         await _unitOfWork.GetRepository<Account>().InsertAsync(account);
         bool isSuccessfully = await _unitOfWork.CommitAsync() > 0;
@@ -124,7 +129,7 @@ public class UserService : BaseService<UserService>, IUserService
             {
                 status = StatusCodes.Status201Created.ToString(),
                 message = "Đăng kí tài khoản thành công",
-                data = account
+                data = _mapper.Map<GetAccountResponse>(account)
             };
         }
 
