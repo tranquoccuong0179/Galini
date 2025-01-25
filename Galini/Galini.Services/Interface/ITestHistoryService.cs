@@ -1,5 +1,5 @@
-﻿using Galini.Models.Request.TestHistory;
-using Galini.Models.Response;
+﻿using Galini.Models.Payload.Request.TestHistory;
+using Galini.Models.Payload.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;

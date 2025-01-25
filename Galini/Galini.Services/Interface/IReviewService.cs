@@ -1,5 +1,5 @@
-﻿using Galini.Models.Request.Review;
-using Galini.Models.Response;
+﻿using Galini.Models.Payload.Request.Review;
+using Galini.Models.Payload.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;

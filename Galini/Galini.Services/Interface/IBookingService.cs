@@ -1,6 +1,6 @@
 ﻿using Galini.Models.Paginate;
-using Galini.Models.Request.Booking;
-using Galini.Models.Response;
+using Galini.Models.Payload.Request.Booking;
+using Galini.Models.Payload.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;

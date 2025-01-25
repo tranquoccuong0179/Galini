@@ -1,5 +1,5 @@
-﻿using Galini.Models.Request.FriendShip;
-using Galini.Models.Response;
+﻿using Galini.Models.Payload.Request.FriendShip;
+using Galini.Models.Payload.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;

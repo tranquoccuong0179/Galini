@@ -1,5 +1,5 @@
-using Galini.Models.Request.User;
-using Galini.Models.Response;
+using Galini.Models.Payload.Request.User;
+using Galini.Models.Payload.Response;
 
 namespace Galini.Services.Interface;
 

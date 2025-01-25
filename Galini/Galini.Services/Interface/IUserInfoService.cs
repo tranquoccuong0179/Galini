@@ -1,5 +1,5 @@
-﻿using Galini.Models.Request.UserCall;
-using Galini.Models.Response;
+﻿using Galini.Models.Payload.Request.UserCall;
+using Galini.Models.Payload.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;

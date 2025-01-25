@@ -1,6 +1,6 @@
 using Galini.API.Constants;
-using Galini.Models.Request.User;
-using Galini.Models.Response;
+using Galini.Models.Payload.Request.User;
+using Galini.Models.Payload.Response;
 using Galini.Services.Interface;
 using Microsoft.AspNetCore.Mvc;
 
