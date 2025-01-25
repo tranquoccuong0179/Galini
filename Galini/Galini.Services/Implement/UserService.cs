@@ -129,7 +129,7 @@ public class UserService : BaseService<UserService>, IUserService
             {
                 status = StatusCodes.Status201Created.ToString(),
                 message = "Đăng kí tài khoản thành công",
-                data = _mapper.Map<GetAccountResponse>(account)
+                data = _mapper.Map<RegisterUserResponse>(account)
             };
         }
 

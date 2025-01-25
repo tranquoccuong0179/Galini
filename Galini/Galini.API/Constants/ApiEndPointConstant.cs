@@ -12,7 +12,7 @@
         
         public static class User
         {
-            public const string UserEndPoint = ApiEndpoint + "user";
+            public const string UserEndPoint = ApiEndpoint + "/user";
             public const string RegisterUser = UserEndPoint;
         }
     }

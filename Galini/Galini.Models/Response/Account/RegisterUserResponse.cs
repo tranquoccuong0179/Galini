@@ -7,7 +7,7 @@ using Galini.Models.Enum;
 
 namespace Galini.Models.Response.Account
 {
-    public class GetAccountResponse
+    public class RegisterUserResponse
     {
         public string? UserName { get; set; }
 
