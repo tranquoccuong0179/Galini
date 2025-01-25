@@ -25,7 +25,7 @@ namespace Galini.Models.Mapper
             .ForMember(dest => dest.CreateAt, opt => opt.MapFrom(src => TimeUtil.GetCurrentSEATime()))
             .ForMember(dest => dest.UpdateAt, opt => opt.MapFrom(src => TimeUtil.GetCurrentSEATime()));
 
-            CreateMap<Account, GetAccountResponse>();
+            CreateMap<Account, RegisterUserResponse>();
         }
     }
 }
