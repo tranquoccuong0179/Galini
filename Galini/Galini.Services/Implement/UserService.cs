@@ -13,7 +13,6 @@ using Galini.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
-using static System.Net.WebRequestMethods;
 
 namespace Galini.Services.Implement;
 
