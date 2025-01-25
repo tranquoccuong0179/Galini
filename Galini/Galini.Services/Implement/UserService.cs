@@ -1,15 +1,19 @@
 using System.Text.RegularExpressions;
 using AutoMapper;
+using Azure.Messaging;
 using Galini.Models.Entity;
 using Galini.Models.Enum;
-using Galini.Models.Request.User;
-using Galini.Models.Response;
-using Galini.Models.Response.Account;
+using Galini.Models.Payload.Request.User;
+using Galini.Models.Payload.Response;
+using Galini.Models.Payload.Response.Account;
+using Galini.Models.Utils;
 using Galini.Repository.Interface;
 using Galini.Services.Interface;
 using Galini.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
+using static System.Net.WebRequestMethods;
 
 namespace Galini.Services.Implement;
 
@@ -18,10 +22,14 @@ public class UserService : BaseService<UserService>, IUserService
     
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IMapper _mapper;
-    public UserService(IUnitOfWork<HarmonContext> unitOfWork, ILogger<UserService> logger, IMapper mapper, IHttpContextAccessor httpContextAccessor) : base(unitOfWork, logger, mapper, httpContextAccessor)
+    private readonly IConnectionMultiplexer _redis;
+    private readonly IEmailService _emailService;
+    public UserService(IUnitOfWork<HarmonContext> unitOfWork, ILogger<UserService> logger, IMapper mapper, IHttpContextAccessor httpContextAccessor, IEmailService emailService, IConnectionMultiplexer redis) : base(unitOfWork, logger, mapper, httpContextAccessor)
     {
         _httpContextAccessor = httpContextAccessor;
         _mapper = mapper;
+        _emailService = emailService;
+        _redis = redis;
     }
 
     public async Task<BaseResponse> RegisterUser(RegisterUserRequest request)
@@ -119,10 +127,18 @@ public class UserService : BaseService<UserService>, IUserService
         //    UpdateAt = TimeUtil.GetCurrentSEATime()
         //};
 
+        string otp = OtpUtil.GenerateOtp();
+
+        await SendOtpEmail(request.Email, otp);
+
         var account = _mapper.Map<Account>(request);
 
         await _unitOfWork.GetRepository<Account>().InsertAsync(account);
         bool isSuccessfully = await _unitOfWork.CommitAsync() > 0;
+        var redisDb = _redis.GetDatabase();
+        if (redisDb == null) throw new RedisServerException("");
+        var key = "emailOtp:" + request.Email;
+        await redisDb.StringSetAsync(key, otp, TimeSpan.FromMinutes(5));
         if (isSuccessfully)
         {
             return new BaseResponse()
@@ -139,5 +155,24 @@ public class UserService : BaseService<UserService>, IUserService
             message = "Đăng kí tài khoản thất bại",
             data = null
         };
+    }
+    private async Task SendOtpEmail(string email, string otp)
+    {
+        try
+        {
+            // Tạo subject cho email
+            var subject = "Welcome to Harmon";
+
+            // Tạo nội dung email, bao gồm OTP
+            var messageBody = $"Your OTP code is: {otp}. This code is valid for 5 minutes.";
+
+            // Gọi hàm SendEmailAsync từ _emailSender (đã được cấu hình trước đó)
+            await _emailService.SendEmailAsync(email, subject, messageBody);
+        }
+        catch (Exception ex)
+        {
+            // Xử lý lỗi khi gửi email
+            Console.WriteLine($"Error sending OTP email: {ex.Message}");
+        }
     }
 }
