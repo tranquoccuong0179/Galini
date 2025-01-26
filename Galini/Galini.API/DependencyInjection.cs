@@ -28,6 +28,7 @@ namespace Galini.API
         {
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IUserInfoService, UserInfoService>();
             services.AddScoped<INotificationService, NotificationService>();
             return services;
         }

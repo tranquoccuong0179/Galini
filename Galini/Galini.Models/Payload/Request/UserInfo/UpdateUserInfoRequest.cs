@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace Galini.Models.Payload.Request.UserInfo
 {
-    public class CreateUserInfoRequest
+    public class UpdateUserInfoRequest
     {
-        public DateTime DateStart { get; set; } 
-        public DateTime DateEnd { get; set; } 
+        public DateTime DateStart { get; set; }
+        public DateTime DateEnd { get; set; }
+        public bool IsActive { get; set; }
     }
 }

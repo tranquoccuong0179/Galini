@@ -26,5 +26,16 @@
             public const string RemoveNotification = NotificationEndPoint + "/{id}";
             public const string MarkNotificationAsRead = NotificationEndPoint + "/{id}/mark-as-read";
         }
+
+        public static class UserInfo
+        {
+            public const string UserEndPoint = ApiEndpoint + "/userinfo";
+            public const string CreateUserInfo = UserEndPoint;
+            public const string GetAllUserInfo = UserEndPoint;
+            public const string RemoveUserInfo = UserEndPoint + "/{id}";
+            public const string UpdateUserInfo = UserEndPoint + "/{id}";
+            public const string GetUserInfoByAccountId = UserEndPoint + "/account/{id}";
+            public const string GetUserInfoById = UserEndPoint + "/{id}";
+        }
     }
 }
