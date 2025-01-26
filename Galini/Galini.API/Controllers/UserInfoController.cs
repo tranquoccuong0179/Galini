@@ -70,6 +70,7 @@ namespace Galini.API.Controllers
             var response = await _userInfoService.GetUserInfoById(id);
             return StatusCode(int.Parse(response.status), response);
         }
+
         [HttpPatch(ApiEndPointConstant.UserInfo.UpdateUserInfo)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]

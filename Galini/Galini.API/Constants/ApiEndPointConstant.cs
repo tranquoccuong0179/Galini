@@ -18,13 +18,23 @@
 
         public static class UserInfo
         {
-            public const string UserEndPoint = ApiEndpoint + "/userinfo";
-            public const string CreateUserInfo = UserEndPoint;
-            public const string GetAllUserInfo = UserEndPoint;
-            public const string RemoveUserInfo = UserEndPoint + "/{id}";
-            public const string UpdateUserInfo = UserEndPoint + "/{id}";
-            public const string GetUserInfoByAccountId = UserEndPoint + "/account/{id}";
-            public const string GetUserInfoById = UserEndPoint + "/{id}";
+            public const string UserInfoEndPoint = ApiEndpoint + "/userinfo";
+            public const string CreateUserInfo = UserInfoEndPoint;
+            public const string GetAllUserInfo = UserInfoEndPoint;
+            public const string RemoveUserInfo = UserInfoEndPoint + "/{id}";
+            public const string UpdateUserInfo = UserInfoEndPoint + "/{id}";
+            public const string GetUserInfoByAccountId = UserInfoEndPoint + "/account/{id}";
+            public const string GetUserInfoById = UserInfoEndPoint + "/{id}";
+        }
+
+        public static class Premium
+        {
+            public const string PremiumEndPoint = ApiEndpoint + "/premium";
+            public const string CreatePremium = PremiumEndPoint;
+            public const string GetAllPremium = PremiumEndPoint;
+            public const string RemovePremium = PremiumEndPoint + "/{id}";
+            public const string UpdatePremium = PremiumEndPoint + "/{id}";
+            public const string GetPremiumById = PremiumEndPoint + "/{id}";
         }
     }
 }
