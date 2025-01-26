@@ -131,7 +131,7 @@ namespace Galini.Services.Implement
                 {
                     status = StatusCodes.Status404NotFound.ToString(),
                     message = "Không tìm thấy thông báo",
-                    data = null
+                    data = false
                 };
             }
 
@@ -159,9 +159,34 @@ namespace Galini.Services.Implement
             };
         }
 
-        public Task<BaseResponse> UpdateNotification(Guid notificationId, CreateNotificationRequest request)
+        public async Task<BaseResponse> MarkNotificationAsRead(Guid id)
         {
-            throw new NotImplementedException();
+            var notification = await _unitOfWork.GetRepository<Notification>().SingleOrDefaultAsync(
+                predicate: n => n.IsActive == true && n.Id.Equals(id));
+
+            if(notification == null)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status404NotFound.ToString(),
+                    message = "Không tìm thấy thông báo",
+                    data = false
+                };
+            }
+
+            notification.IsRead = true;
+            notification.UpdateAt = TimeUtil.GetCurrentSEATime();
+
+            _unitOfWork.GetRepository<Notification>().UpdateAsync(notification);
+            await _unitOfWork.CommitAsync();
+
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status200OK.ToString(),
+                message = "Đọc thông báo thành công",
+                data = true
+            };
+
         }
     }
 }

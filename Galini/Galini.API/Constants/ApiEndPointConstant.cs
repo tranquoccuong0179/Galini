@@ -23,6 +23,7 @@
             public const string GetNotifications = NotificationEndPoint;
             public const string GetNotification = NotificationEndPoint + "/{id}";
             public const string RemoveNotification = NotificationEndPoint + "/{id}";
+            public const string MarkNotificationAsRead = NotificationEndPoint + "/{id}/mark-as-read";
         }
     }
 }
