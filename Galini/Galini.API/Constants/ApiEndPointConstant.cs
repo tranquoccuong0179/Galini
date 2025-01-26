@@ -20,6 +20,9 @@
         {
             public const string NotificationEndPoint = ApiEndpoint + "/notification";
             public const string CreateNotification = NotificationEndPoint;
+            public const string GetNotifications = NotificationEndPoint;
+            public const string GetNotification = NotificationEndPoint + "/{id}";
+            public const string RemoveNotification = NotificationEndPoint + "/{id}";
         }
     }
 }

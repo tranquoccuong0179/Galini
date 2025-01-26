@@ -5,11 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Galini.Models.Entity;
+using Galini.Models.Paginate;
 using Galini.Models.Payload.Request.Notification;
 using Galini.Models.Payload.Response;
 using Galini.Models.Payload.Response.Notification;
 using Galini.Repository.Interface;
 using Galini.Services.Interface;
+using Galini.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
@@ -59,24 +61,102 @@ namespace Galini.Services.Implement
             };
         }
 
-        public Task<BaseResponse> GetAllNotification(int page, int size)
+        public async Task<BaseResponse> GetAllNotification(int page, int size)
         {
-            throw new NotImplementedException();
+            var response = await _unitOfWork.GetRepository<Notification>().GetPagingListAsync(
+                selector: n => _mapper.Map<GetNotificationResponse>(n),
+                predicate: n => n.IsActive == true,
+                page: page,
+                size: size);
+
+            int totalItems = response.Total;
+            int totalPages = (int)Math.Ceiling((double)totalItems / size);
+
+            if (response == null)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status200OK.ToString(),
+                    message = "Danh sách thông báo",
+                    data = new Paginate<Notification>()
+                    {
+                        Page = page,
+                        Size = size,
+                        Total = totalItems,
+                        TotalPages = totalPages,
+                        Items = new List<Notification>()
+                    }
+                };
+            }
+
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status200OK.ToString(),
+                message = "Danh sách thông báo",
+                data = response
+            };
         }
 
-        public Task<BaseResponse> GetNotificationByAccountId(Guid accountId)
+        public async Task<BaseResponse> GetNotificationoById(Guid id)
         {
-            throw new NotImplementedException();
+            var response = await _unitOfWork.GetRepository<Notification>().SingleOrDefaultAsync(
+                selector: n => _mapper.Map<GetNotificationResponse>(n),
+                predicate: n => n.IsActive == true && n.Id.Equals(id));
+            if (response == null)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status404NotFound.ToString(),
+                    message = "Không tìm thấy thông báo",
+                    data = null
+                };
+            }
+
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status200OK.ToString(),
+                message = "Thông báo",
+                data = response
+            };
         }
 
-        public Task<BaseResponse> GetNotificationoById(Guid notificationId)
+        public async Task<BaseResponse> RemoveNotification(Guid id)
         {
-            throw new NotImplementedException();
-        }
+            var notification = await _unitOfWork.GetRepository<Notification>().SingleOrDefaultAsync(
+                predicate: n => n.IsActive == true && n.Id.Equals(id));
 
-        public Task<BaseResponse> RemoveNotification(Guid notificationId)
-        {
-            throw new NotImplementedException();
+            if(notification == null)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status404NotFound.ToString(),
+                    message = "Không tìm thấy thông báo",
+                    data = null
+                };
+            }
+
+            notification.IsActive = false;
+            notification.DeleteAt = TimeUtil.GetCurrentSEATime();
+            notification.UpdateAt = TimeUtil.GetCurrentSEATime();
+
+            _unitOfWork.GetRepository<Notification>().UpdateAsync(notification);
+            bool isSuccessfully = await _unitOfWork.CommitAsync() > 0;
+
+            if (isSuccessfully)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status200OK.ToString(),
+                    message = "Xóa thông báo thành công",
+                    data = true
+                };
+            }
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status400BadRequest.ToString(),
+                message = "Xóa thông báo thất bại",
+                data = false
+            };
         }
 
         public Task<BaseResponse> UpdateNotification(Guid notificationId, CreateNotificationRequest request)

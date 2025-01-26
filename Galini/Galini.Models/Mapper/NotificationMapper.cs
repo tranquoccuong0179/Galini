@@ -23,6 +23,7 @@ namespace Galini.Models.Mapper
                 .ForMember(dest => dest.UpdateAt, opt => opt.MapFrom(src => TimeUtil.GetCurrentSEATime()));
 
             CreateMap<Notification, CreateNotificationResponse>();
+            CreateMap<Notification, GetNotificationResponse>();
         }
     }
 }
