@@ -59,5 +59,15 @@ namespace Galini.API.Controllers
             var response = await _notificationService.RemoveNotification(id);
             return StatusCode(int.Parse(response.status), response);
         }
+        
+        [HttpPut(ApiEndPointConstant.Notification.MarkNotificationAsRead)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status404NotFound)]
+        [ProducesErrorResponseType(typeof(ProblemDetails))]
+        public async Task<IActionResult> MarkNotificationAsRead([FromRoute] Guid id)
+        {
+            var response = await _notificationService.MarkNotificationAsRead(id);
+            return StatusCode(int.Parse(response.status), response);
+        }
     }
 }
