@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Galini.Models.Payload.Request.Premium
+namespace Galini.Models.Payload.Response.Premium
 {
-    public class CreatePremiumRequest
+    public class CreatePremiumResponse
     {
         public string Type { get; set; } = null!;
         public int Friend { get; set; }
