@@ -6,4 +6,5 @@ namespace Galini.Services.Interface;
 public interface IUserService
 {
     Task<BaseResponse> RegisterUser(RegisterUserRequest request);
+    Task<BaseResponse> VerifyOtp(string email, string otp);
 }

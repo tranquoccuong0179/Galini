@@ -10,11 +10,10 @@ namespace Galini.Services.Interface
 {
     public interface INotificationService
     {
-        public Task<BaseResponse> CreateNotification(CreateNotificationRequest request, Guid accountId);
+        public Task<BaseResponse> CreateNotification(CreateNotificationRequest request, Guid userId);
         public Task<BaseResponse> GetAllNotification(int page, int size);
-        public Task<BaseResponse> GetNotificationoById(Guid notificationId);
-        public Task<BaseResponse> GetNotificationByAccountId(Guid accountId);
-        public Task<BaseResponse> UpdateNotification(Guid notificationId, CreateNotificationRequest request);
-        public Task<BaseResponse> RemoveNotification(Guid notificationId);
+        public Task<BaseResponse> GetNotificationoById(Guid id);
+        public Task<BaseResponse> MarkNotificationAsRead(Guid id);
+        public Task<BaseResponse> RemoveNotification(Guid id);
     }
 }
