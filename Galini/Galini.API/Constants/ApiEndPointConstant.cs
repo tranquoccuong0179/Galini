@@ -15,5 +15,16 @@
             public const string UserEndPoint = ApiEndpoint + "/user";
             public const string RegisterUser = UserEndPoint;
         }
+
+        public static class UserInfo
+        {
+            public const string UserEndPoint = ApiEndpoint + "/userinfo";
+            public const string CreateUserInfo = UserEndPoint;
+            public const string GetAllUserInfo = UserEndPoint;
+            public const string RemoveUserInfo = UserEndPoint + "/{id}";
+            public const string UpdateUserInfo = UserEndPoint + "/{id}";
+            public const string GetUserInfoByAccountId = UserEndPoint + "/account/{id}";
+            public const string GetUserInfoById = UserEndPoint + "/{id}";
+        }
     }
 }
