@@ -23,4 +23,15 @@ public class AccountController : BaseController<AccountController>
         var response = await _userService.RegisterUser(request);
         return StatusCode(int.Parse(response.status), response);
     }
+    
+    [HttpPost(ApiEndPointConstant.User.VerifyOtp)]
+    [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status404NotFound)]
+    [ProducesErrorResponseType(typeof(ProblemDetails))]
+    public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequest request)
+    {
+        var response = await _userService.VerifyOtp(request.Email, request.Otp);
+        return StatusCode(int.Parse(response.status), response);
+    }
 }
