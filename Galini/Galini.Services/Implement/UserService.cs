@@ -13,7 +13,6 @@ using Galini.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
-using static System.Net.WebRequestMethods;
 
 namespace Galini.Services.Implement;
 
@@ -95,38 +94,6 @@ public class UserService : BaseService<UserService>, IUserService
             };
         }
 
-
-        //var isIPExist = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
-        //    predicate: u => u.IdentifyIp.Equals(ipAddress));
-        //if (isIPExist != null)
-        //{
-        //    return new BaseResponse()
-        //    {
-        //        status = StatusCodes.Status400BadRequest.ToString(),
-        //        message = "Địa chỉ IP đã tồn tại",
-        //        data = null
-        //    };
-        //}
-
-        //Account account = new Account()
-        //{
-        //    Id = Guid.NewGuid(),
-        //    UserName = request.UserName,
-        //    Email = request.Email,
-        //    Password = PasswordUtil.HashPassword(request.Password),
-        //    Role = RoleEnum.Customer.GetDescriptionFromEnum(),
-        //    Gender = request.Gender.GetDescriptionFromEnum(),
-        //    FullName = request.FullName,
-        //    DateOfBirth = request.DateOfBirth,
-        //    Phone = request.Phone,
-        //    //Weight = request.Weight,
-        //    AvatarUrl = request.AvatarUrl,
-        //    //IdentifyIp = ipAddress,
-        //    IsActive = true,
-        //    CreateAt = TimeUtil.GetCurrentSEATime(),
-        //    UpdateAt = TimeUtil.GetCurrentSEATime()
-        //};
-
         string otp = OtpUtil.GenerateOtp();
 
         await SendOtpEmail(request.Email, otp);
@@ -136,7 +103,7 @@ public class UserService : BaseService<UserService>, IUserService
         await _unitOfWork.GetRepository<Account>().InsertAsync(account);
         bool isSuccessfully = await _unitOfWork.CommitAsync() > 0;
         var redisDb = _redis.GetDatabase();
-        if (redisDb == null) throw new RedisServerException("");
+        if (redisDb == null) throw new RedisServerException("Không thể kết nối tới Redis");
         var key = "emailOtp:" + request.Email;
         await redisDb.StringSetAsync(key, otp, TimeSpan.FromMinutes(5));
         if (isSuccessfully)
@@ -156,6 +123,60 @@ public class UserService : BaseService<UserService>, IUserService
             data = null
         };
     }
+
+    public async Task<BaseResponse> VerifyOtp(string email, string otp)
+    {
+        var redisDb = _redis.GetDatabase();
+        if (redisDb == null) throw new RedisServerException("Không thể kết nối tới Redis");
+
+        var key = "emailOtp:" + email;
+        var storedOtp = await redisDb.StringGetAsync(key);
+        if (storedOtp.IsNullOrEmpty)
+        {
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status400BadRequest.ToString(),
+                message = "OTP đã hết hạn hoặc không tồn tại",
+                data = null
+            };
+        }
+
+        if (!storedOtp.Equals(otp))
+        {
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status400BadRequest.ToString(),
+                message = "OTP không chính xác",
+                data = null
+            };
+        }
+
+        var account = await _unitOfWork.GetRepository<Account>()
+            .SingleOrDefaultAsync(predicate: a => a.Email.Equals(email));
+        if (account == null)
+        {
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status404NotFound.ToString(),
+                message = "Tài khoản không tồn tại",
+                data = null
+            };
+        }
+
+        account.IsActive = true;
+        _unitOfWork.GetRepository<Account>().UpdateAsync(account);
+        await _unitOfWork.CommitAsync();
+
+        await redisDb.KeyDeleteAsync(key);
+
+        return new BaseResponse()
+        {
+            status = StatusCodes.Status200OK.ToString(),
+            message = "Tài khoản đã được xác thực thành công",
+            data = _mapper.Map<RegisterUserResponse>(account)
+        };
+    }
+
     private async Task SendOtpEmail(string email, string otp)
     {
         try
