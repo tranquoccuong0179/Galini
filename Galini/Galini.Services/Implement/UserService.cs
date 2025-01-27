@@ -124,6 +124,55 @@ public class UserService : BaseService<UserService>, IUserService
         };
     }
 
+    public async Task<BaseResponse> ResendOtp(string email)
+    {
+        string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+        if (!Regex.IsMatch(email, emailPattern))
+        {
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status400BadRequest.ToString(),
+                message = "Email không đúng định dạng",
+                data = false
+            };
+        }
+
+        var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+        predicate: u => u.Email.Equals(email));
+        if (account == null)
+        {
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status404NotFound.ToString(),
+                message = "Email không tồn tại trong hệ thống",
+                data = null
+            };
+        }
+
+        var redisDb = _redis.GetDatabase();
+        if (redisDb == null)
+            throw new RedisServerException("Không thể kết nối tới Redis");
+
+        var key = "emailOtp:" + email;
+
+        await redisDb.KeyDeleteAsync(key);
+
+        string otp = OtpUtil.GenerateOtp();
+
+        await SendOtpEmail(email, otp);
+
+        await redisDb.StringSetAsync(key, otp, TimeSpan.FromMinutes(5));
+
+        return new BaseResponse()
+        {
+            status = StatusCodes.Status200OK.ToString(),
+            message = "Gửi lại OTP thành công",
+            data = true
+        };
+
+
+    }
+
     public async Task<BaseResponse> VerifyOtp(string email, string otp)
     {
         var redisDb = _redis.GetDatabase();
