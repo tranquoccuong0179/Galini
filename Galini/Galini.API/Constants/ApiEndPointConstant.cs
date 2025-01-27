@@ -15,6 +15,7 @@
             public const string UserEndPoint = ApiEndpoint + "/user";
             public const string RegisterUser = UserEndPoint;
             public const string VerifyOtp = UserEndPoint + "/verify-otp";
+            public const string ResendOtp = UserEndPoint + "/resend-otp";
         }
 
         public static class Notification
