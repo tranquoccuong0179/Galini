@@ -5,10 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Galini.Models.Payload.Request.UserCall
+namespace Galini.Models.Payload.Response.UserCall
 {
-    public class CreateUserCallRequest
+    public class CreateUserCallResponse
     {
+        public Guid AccountId { get; set; }
+        public Guid CallHistoryId { get; set; }
         public CallRoleEnum CallRole { get; set; }
     }
 }

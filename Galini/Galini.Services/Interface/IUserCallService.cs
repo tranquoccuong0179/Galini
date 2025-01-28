@@ -14,7 +14,7 @@ namespace Galini.Services.Interface
         public Task<BaseResponse> GetAllUserCall(int page, int size);
         public Task<BaseResponse> GetUserCallById(Guid userCallId);
         public Task<BaseResponse> GetUserCallByAccountId(Guid accountId);
-        public Task<BaseResponse> UpdateUserCall(Guid userCallId, CreateUserCallRequest request);
+        public Task<BaseResponse> UpdateUserCall(Guid id, UpdateUserCallRequest request, Guid accountId, Guid callHistoryId);
         public Task<BaseResponse> RemoveUserCall(Guid userCallId);
     }
 }

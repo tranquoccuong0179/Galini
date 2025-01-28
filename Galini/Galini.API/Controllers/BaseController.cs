@@ -8,10 +8,16 @@ namespace Galini.API.Controllers
     public class BaseController<T> : ControllerBase where T : BaseController<T>
     {
         protected ILogger<T> _logger;
+        private ILogger<UserInfoController> logger;
 
         public BaseController(ILogger<T> logger)
         {
             _logger = logger;
+        }
+
+        public BaseController(ILogger<UserInfoController> logger)
+        {
+            this.logger = logger;
         }
     }
 }
