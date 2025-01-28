@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace Galini.Models.Payload.Request.UserCall
 {
-    public class CreateUserCallRequest
+    public class UpdateUserCallRequest
     {
         public CallRoleEnum CallRole { get; set; }
+        public bool IsActive { get; set; }
     }
 }

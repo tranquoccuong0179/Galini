@@ -31,6 +31,7 @@ namespace Galini.API
             services.AddScoped<IUserInfoService, UserInfoService>();
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IPremiumService, PremiumService>();
+            services.AddScoped<IUserCallService, UserCallService>();
             return services;
         }
         public static IServiceCollection AddHttpClientServices(this IServiceCollection services)

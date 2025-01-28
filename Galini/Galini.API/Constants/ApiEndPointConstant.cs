@@ -48,5 +48,16 @@
             public const string UpdatePremium = PremiumEndPoint + "/{id}";
             public const string GetPremiumById = PremiumEndPoint + "/{id}";
         }
+
+        public static class UserCall
+        {
+            public const string UserCallEndPoint = ApiEndpoint + "/usercall";
+            public const string CreateUserCall = UserCallEndPoint;
+            public const string GetAllUserCall = UserCallEndPoint;
+            public const string GetUserCallByAccountId = UserCallEndPoint + "/account/{id}";
+            public const string GetUserCallById = UserCallEndPoint + "/{id}";
+            public const string RemoveUserCall = UserCallEndPoint + "/{id}";
+            public const string UpdateUserCall = UserCallEndPoint + "/{id}";
+        }
     }
 }
