@@ -65,6 +65,7 @@ namespace Galini.Services.Implement
         {
             var response = await _unitOfWork.GetRepository<Notification>().GetPagingListAsync(
                 selector: n => _mapper.Map<GetNotificationResponse>(n),
+                orderBy: n => n.OrderByDescending(n => n.CreateAt),
                 predicate: n => n.IsActive == true,
                 page: page,
                 size: size);
