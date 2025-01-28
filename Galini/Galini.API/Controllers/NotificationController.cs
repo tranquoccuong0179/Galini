@@ -1,5 +1,6 @@
 ﻿
 using Galini.API.Constants;
+using Galini.Models.Enum;
 using Galini.Models.Payload.Request.Notification;
 using Galini.Models.Payload.Request.User;
 using Galini.Models.Payload.Response;
@@ -31,7 +32,11 @@ namespace Galini.API.Controllers
         [HttpGet(ApiEndPointConstant.Notification.GetNotifications)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesErrorResponseType(typeof(ProblemDetails))]
-        public async Task<IActionResult> GetNotifications([FromQuery] int? page, [FromQuery] int? size)
+        public async Task<IActionResult> GetNotifications([FromQuery] int? page,
+                                                          [FromQuery] int? size,
+                                                          [FromQuery] TypeEnum? type,
+                                                          [FromQuery] DateOnly? startDate,
+                                                          [FromQuery] DateOnly? endDate)
         {
             int pageNumber = page ?? 1;
             int pageSize = size ?? 10;
