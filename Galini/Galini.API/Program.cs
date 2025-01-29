@@ -16,6 +16,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDatabase();
 builder.Services.AddUnitOfWork();
 builder.Services.AddCustomServices();
+builder.Services.AddJwtValidation();
 builder.Services.AddHttpClientServices();
 builder.Services.AddSwaggerGen(c =>
 {
