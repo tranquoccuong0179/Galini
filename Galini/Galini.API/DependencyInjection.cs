@@ -1,11 +1,14 @@
-﻿using Galini.Models.Entity;
+﻿using System.Text;
+using Galini.Models.Entity;
 using Galini.Repository.Implement;
 using Galini.Repository.Interface;
 using Galini.Services.Implement;
 using Galini.Services.Interface;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using StackExchange.Redis;
 
 namespace Galini.API
@@ -32,6 +35,7 @@ namespace Galini.API
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IPremiumService, PremiumService>();
             services.AddScoped<IUserCallService, UserCallService>();
+            services.AddScoped<IAuthService, AuthService>();
             return services;
         }
         public static IServiceCollection AddHttpClientServices(this IServiceCollection services)
@@ -52,8 +56,36 @@ namespace Galini.API
                 : base(() => serviceProvider.GetRequiredService<T>())
             {
             }
-
         }
+
+
+        public static IServiceCollection AddJwtValidation(this IServiceCollection services)
+        {
+            IConfiguration configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .Build();
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidIssuer = "HarmonSystem",
+                    ValidateIssuer = true,
+                    ValidateAudience = false,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey =
+                        new SymmetricSecurityKey(Convert.FromHexString("0102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F00"))
+                };
+            });
+
+            return services;
+        }
+
 
         public static IServiceCollection AddRedis(this IServiceCollection services)
         {

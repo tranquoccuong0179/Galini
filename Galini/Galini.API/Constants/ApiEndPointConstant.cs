@@ -9,6 +9,12 @@
         public const string RootEndPoint = "/api";
         public const string ApiVersion = "/v1";
         public const string ApiEndpoint = RootEndPoint + ApiVersion;
+
+        public static class Authentication
+        {
+            public const string AuthenticationEndPoint = ApiEndpoint + "/auth";
+            public const string Authenticate = AuthenticationEndPoint;
+        }
         
         public static class User
         {
