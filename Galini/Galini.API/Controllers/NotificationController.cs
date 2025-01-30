@@ -1,5 +1,6 @@
 ﻿
 using Galini.API.Constants;
+using Galini.API.Infrastructure;
 using Galini.Models.Enum;
 using Galini.Models.Payload.Request.Notification;
 using Galini.Models.Payload.Request.User;
@@ -28,7 +29,9 @@ namespace Galini.API.Controllers
             var response = await _notificationService.CreateNotification(request, userId);
             return StatusCode(int.Parse(response.status), response);
         }
-        
+
+
+        [CustomAuthorize(roles: "Customer")]
         [HttpGet(ApiEndPointConstant.Notification.GetNotifications)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesErrorResponseType(typeof(ProblemDetails))]
