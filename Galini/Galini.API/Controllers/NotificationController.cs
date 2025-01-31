@@ -46,7 +46,8 @@ namespace Galini.API.Controllers
             var response = await _notificationService.GetAllNotification(pageNumber, pageSize);
             return StatusCode(int.Parse(response.status), response);
         }
-        
+
+        [CustomAuthorize(roles: "Customer")]
         [HttpGet(ApiEndPointConstant.Notification.GetNotification)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status404NotFound)]
@@ -56,7 +57,8 @@ namespace Galini.API.Controllers
             var response = await _notificationService.GetNotificationoById(id);
             return StatusCode(int.Parse(response.status), response);
         }
-        
+
+        [CustomAuthorize(roles: "Customer")]
         [HttpDelete(ApiEndPointConstant.Notification.RemoveNotification)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status404NotFound)]
@@ -67,7 +69,8 @@ namespace Galini.API.Controllers
             var response = await _notificationService.RemoveNotification(id);
             return StatusCode(int.Parse(response.status), response);
         }
-        
+
+        [CustomAuthorize(roles: "Customer")]
         [HttpPut(ApiEndPointConstant.Notification.MarkNotificationAsRead)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status404NotFound)]
