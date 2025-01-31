@@ -19,8 +19,10 @@ namespace Galini.Services.Implement
 {
     public class UserInfoService : BaseService<UserInfoService>, IUserInfoService
     {
+        private readonly IMapper _mapper;
         public UserInfoService(IUnitOfWork<HarmonContext> unitOfWork, ILogger<UserInfoService> logger, IMapper mapper, IHttpContextAccessor httpContextAccessor) : base(unitOfWork, logger, mapper, httpContextAccessor)
         {
+            _mapper = mapper;
         }
 
         public async Task<BaseResponse> CreateUserInfo(CreateUserInfoRequest request, Guid accountId, Guid premiumId)
@@ -90,13 +92,7 @@ namespace Galini.Services.Implement
             }
 
             var listUserInfo = await _unitOfWork.GetRepository<UserInfo>().GetPagingListAsync(
-                selector: a => new CreateUserInfoResponse
-                {
-                    AccountId = a.AccountId,
-                    PremiumId = a.PremiumId,
-                    DateEnd = a.DateEnd,
-                    DateStart = a.DateStart
-                },
+                selector: a => _mapper.Map<CreateUserInfoResponse>(a),
                 predicate: a => a.IsActive,
                 page: page,
                 size: size);
@@ -186,6 +182,7 @@ namespace Galini.Services.Implement
 
             userInfo.IsActive = false;
             userInfo.DeleteAt = TimeUtil.GetCurrentSEATime();
+            userInfo.UpdateAt = TimeUtil.GetCurrentSEATime();
             _unitOfWork.GetRepository<UserInfo>().UpdateAsync(userInfo);
 
             bool isSuccessfully = await _unitOfWork.CommitAsync() > 0;

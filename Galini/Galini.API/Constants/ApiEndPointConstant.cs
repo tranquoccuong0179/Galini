@@ -65,5 +65,27 @@
             public const string RemoveUserCall = UserCallEndPoint + "/{id}";
             public const string UpdateUserCall = UserCallEndPoint + "/{id}";
         }
+
+        public static class CallHistory
+        {
+            public const string CallHistoryEndPoint = ApiEndpoint + "/callhistory";
+            public const string CreateCallHistory = CallHistoryEndPoint;
+            public const string GetAllCallHistory = CallHistoryEndPoint;
+            public const string GetCallHistoryById = CallHistoryEndPoint + "/{id}";
+            public const string RemoveCallHistory = CallHistoryEndPoint + "/{id}";
+            public const string UpdateCallHistory = CallHistoryEndPoint + "/{id}";
+        }
+
+        public static class FriendShip
+        {
+            public const string FriendShipEndPoint = ApiEndpoint + "/friendship";
+            public const string CreateFriendShip = FriendShipEndPoint;
+            public const string GetAllFriendShip = FriendShipEndPoint;
+            public const string GetFriendShipById = FriendShipEndPoint + "/{id}";
+            public const string GetFriendShipByAccountIdAndStatus = FriendShipEndPoint + "/account/{id}/status";
+            public const string GetFriendByAccountId = FriendShipEndPoint + "/account/{id}";
+            public const string UpdateFriendShip = FriendShipEndPoint + "/{id}";
+            public const string RemoveFriendShip = FriendShipEndPoint + "/{id}";
+        }
     }
 }

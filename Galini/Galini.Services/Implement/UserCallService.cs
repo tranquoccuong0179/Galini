@@ -20,8 +20,10 @@ namespace Galini.Services.Implement
 {
     public class UserCallService : BaseService<UserCallService>, IUserCallService
     {
+        private readonly IMapper _mapper;
         public UserCallService(IUnitOfWork<HarmonContext> unitOfWork, ILogger<UserCallService> logger, IMapper mapper, IHttpContextAccessor httpContextAccessor) : base(unitOfWork, logger, mapper, httpContextAccessor)
         {
+            _mapper = mapper;
         }
 
         public async Task<BaseResponse> CreateUserCall(CreateUserCallRequest request, Guid accountId, Guid callHistoryId)
@@ -91,12 +93,7 @@ namespace Galini.Services.Implement
             }
 
             var listUserCall = await _unitOfWork.GetRepository<UserCall>().GetPagingListAsync(
-                selector: a => new CreateUserCallResponse
-                {
-                    AccountId = a.AccountId,
-                    CallHistoryId = a.CallHistoryId,  
-                    CallRole = (CallRoleEnum)Enum.Parse(typeof(CallRoleEnum), a.CallRole, true)
-                },
+                selector: a => _mapper.Map<CreateUserCallResponse>(a),
                 predicate: a => a.IsActive,
                 page: page,
                 size: size);
@@ -186,6 +183,7 @@ namespace Galini.Services.Implement
 
             userCall.IsActive = false;
             userCall.DeleteAt = TimeUtil.GetCurrentSEATime();
+            userCall.UpdateAt = TimeUtil.GetCurrentSEATime();
             _unitOfWork.GetRepository<UserCall>().UpdateAsync(userCall);
 
             bool isSuccessfully = await _unitOfWork.CommitAsync() > 0;
