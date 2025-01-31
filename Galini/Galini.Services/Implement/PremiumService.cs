@@ -19,8 +19,10 @@ namespace Galini.Services.Implement
 {
     public class PremiumService : BaseService<PremiumService>, IPremiumService
     {
+        private readonly IMapper _mapper;
         public PremiumService(IUnitOfWork<HarmonContext> unitOfWork, ILogger<PremiumService> logger, IMapper mapper, IHttpContextAccessor httpContextAccessor) : base(unitOfWork, logger, mapper, httpContextAccessor)
         {
+            _mapper = mapper;
         }
 
         public async Task<BaseResponse> CreatePremium(CreatePremiumRequest request)
@@ -60,13 +62,7 @@ namespace Galini.Services.Implement
             }
 
             var premium = await _unitOfWork.GetRepository<Premium>().GetPagingListAsync(
-                selector: a => new CreatePremiumResponse
-                {
-                    Type = a.Type,
-                    Friend = a.Friend,
-                    Timelimit = a.Timelimit,
-                    Match = a.Match
-                },
+                selector: a => _mapper.Map<CreatePremiumResponse>(a),
                 predicate: a => a.IsActive,
                 page: page,
                 size: size);
@@ -119,6 +115,7 @@ namespace Galini.Services.Implement
 
             premium.IsActive = false;
             premium.DeleteAt = TimeUtil.GetCurrentSEATime(); 
+            premium.UpdateAt = TimeUtil.GetCurrentSEATime(); 
             _unitOfWork.GetRepository<Premium>().UpdateAsync(premium);
 
             bool isSuccessfully = await _unitOfWork.CommitAsync() > 0;

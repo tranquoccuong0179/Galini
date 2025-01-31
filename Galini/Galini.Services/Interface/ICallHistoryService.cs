@@ -13,7 +13,7 @@ namespace Galini.Services.Interface
         public Task<BaseResponse> CreateCallHistory(CreateCallHistoryRequest request);
         public Task<BaseResponse> GetAllCallHistory(int page, int size);
         public Task<BaseResponse> GetCallHistoryById(Guid callHistoryId);
-        public Task<BaseResponse> UpdateCallHistory(Guid callHistoryId, CreateCallHistoryRequest request);
+        public Task<BaseResponse> UpdateCallHistory(Guid callHistoryId, UpdateCallHistoryRequest request);
         public Task<BaseResponse> RemoveCallHistory(Guid callHistoryId);
     }
 }

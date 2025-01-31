@@ -1,4 +1,5 @@
-﻿using Galini.Models.Payload.Request.FriendShip;
+﻿using Galini.Models.Enum;
+using Galini.Models.Payload.Request.FriendShip;
 using Galini.Models.Payload.Response;
 using System;
 using System.Collections.Generic;
@@ -10,14 +11,16 @@ namespace Galini.Services.Interface
 {
     public interface IFriendShipService
     {
-        public Task<BaseResponse> CreateFriendShip(CreateFriendShipRequest request, Guid userId, Guid friendId);
+        public Task<BaseResponse> CreateFriendShip(Guid userId, Guid friendId);
         public Task<BaseResponse> GetAllFriendShip(int page, int size);
         public Task<BaseResponse> GetFriendShipById(Guid friendShipId);
-        public Task<BaseResponse> GetFriendByAccountId(Guid accountId);
-        public Task<BaseResponse> GetBlockListByAccountId(Guid accountId);
-        public Task<BaseResponse> GetFriendRequestByAccountId(Guid accountId);
-        public Task<BaseResponse> GetSentFriendRequestByAccountId(Guid accountId);
-        public Task<BaseResponse> UpdateFriendShip(Guid friendShipId, CreateFriendShipRequest request);
+        public Task<BaseResponse> GetFriendShipByAccountIdAndStatus(Guid accountId, FriendShipEnum status, int page, int size);
+        public Task<BaseResponse> GetFriendByAccountId(Guid accountId, int page, int size);
+        //public Task<BaseResponse> GetFriendByAccountId(Guid accountId, int page, int size);
+        //public Task<BaseResponse> GetBlockListByAccountId(Guid accountId, int page, int size);
+        //public Task<BaseResponse> GetFriendRequestByAccountId(Guid accountId, int page, int size);
+        //public Task<BaseResponse> GetSentFriendRequestByAccountId(Guid accountId, int page, int size);
+        public Task<BaseResponse> UpdateFriendShip(Guid friendShipId, UpdateFriendShipRequest request);
         public Task<BaseResponse> RemoveFriendShip(Guid friendShipId);
     }
 }

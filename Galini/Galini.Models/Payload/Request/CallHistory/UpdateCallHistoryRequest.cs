@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace Galini.Models.Payload.Request.CallHistory
 {
-    public class CreateCallHistoryRequest
+    public class UpdateCallHistoryRequest
     {
         public DateTime TimeStart { get; set; }
         public DateTime TimeEnd { get; set; }
         public int Duration { get; set; }
-        public bool IsMissCall { get; set; }    
+        public bool IsMissCall { get; set; }
+        public bool IsActive { get; set; }
     }
 }
