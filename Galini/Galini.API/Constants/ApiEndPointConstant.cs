@@ -87,5 +87,11 @@
             public const string UpdateFriendShip = FriendShipEndPoint + "/{id}";
             public const string RemoveFriendShip = FriendShipEndPoint + "/{id}";
         }
+
+        public static class ListenerInfo
+        {
+            public const string ListenerInfoEndPoint = ApiEndpoint + "/listener";
+            public const string CreateListenerInfo = ListenerInfoEndPoint;
+        }
     }
 }
