@@ -1,7 +1,10 @@
 using Galini.API;
+using Galini.API.ConfigHub;
 using Galini.API.Constants;
 using Galini.Models.Enum;
 using Galini.Models.Payload;
+using Galini.Services.Interface;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 
@@ -60,6 +63,7 @@ builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddRedis();
+builder.Services.AddSignalR();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddCors(options =>
 {
@@ -81,6 +85,15 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
+
+app.MapPost("broadcast", async (string message, IHubContext<ChatHub, IChatClient> context) => {
+    await context.Clients.All.ReceiveMessage(message);
+
+    return Results.NoContent();
+});
+
 app.MapControllers();
+
+app.MapHub<ChatHub>("chat-hub");
 
 app.Run();
