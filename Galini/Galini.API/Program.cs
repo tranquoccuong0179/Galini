@@ -55,6 +55,13 @@ builder.Services.AddSwaggerGen(c =>
                .Select(name => new OpenApiString(name) as IOpenApiAny)
                .ToList()
     });
+    c.MapType<FriendShipEnum>(() => new OpenApiSchema
+    {
+        Type = "string",
+        Enum = Enum.GetNames(typeof(FriendShipEnum))
+                   .Select(name => new OpenApiString(name) as IOpenApiAny)
+                   .ToList()
+    });
 });
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
