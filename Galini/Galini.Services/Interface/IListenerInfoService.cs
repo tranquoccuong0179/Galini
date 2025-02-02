@@ -13,9 +13,9 @@ namespace Galini.Services.Interface
     {
         public Task<BaseResponse> CreateListenerInfo(RegisterUserRequest registerRequest, CreateListenerInfoRequest request);
         public Task<BaseResponse> GetAllListenerInfo(int page, int size);
-        public Task<BaseResponse> GetListenerInfoById(Guid listenerInfoId);
+        public Task<BaseResponse> GetListenerInfoById(Guid id);
         public Task<BaseResponse> GetListenerInfoByAccountId(Guid accountId);
-        public Task<BaseResponse> UpdateListenerInfo(Guid listenerInfoId, CreateListenerInfoRequest request);
-        public Task<BaseResponse> RemoveListenerInfo(Guid listenerInfoId);
+        public Task<BaseResponse> UpdateListenerInfo(Guid id, UpdateListenerInfoRequest request);
+        public Task<BaseResponse> RemoveListenerInfo(Guid id);
     }
 }
