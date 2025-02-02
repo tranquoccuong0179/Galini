@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Galini.Models.Payload.Request.Topic
+namespace Galini.Services.Interface
 {
-    public class CreateTopicRequest
+    public interface IChatClient
     {
-        public string Name { get; set; } = null!;
+        Task ReceiveMessage(string message);
     }
 }

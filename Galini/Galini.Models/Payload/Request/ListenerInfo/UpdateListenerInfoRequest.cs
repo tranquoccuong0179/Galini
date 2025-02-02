@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Galini.Models.Payload.Request.ListenerInfo
 {
-    public class CreateListenerInfoRequest
+    public class UpdateListenerInfoRequest
     {
-        public string Description { get; set; } = null!;
+        public string? Description { get; set; }
 
         public decimal Price { get; set; }
     }

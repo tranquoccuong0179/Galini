@@ -87,5 +87,25 @@
             public const string UpdateFriendShip = FriendShipEndPoint + "/{id}";
             public const string RemoveFriendShip = FriendShipEndPoint + "/{id}";
         }
+
+        public static class ListenerInfo
+        {
+            public const string ListenerInfoEndPoint = ApiEndpoint + "/listener";
+            public const string CreateListenerInfo = ListenerInfoEndPoint;
+            public const string GetListListenerInfo = ListenerInfoEndPoint;
+            public const string GetListenerInfo = ListenerInfoEndPoint + "/{id}";
+            public const string UpdateListenerInfo = ListenerInfoEndPoint + "/{id}";
+            public const string DeleteListenerInfo = ListenerInfoEndPoint + "/{id}";
+        }
+        
+        public static class Topic
+        {
+            public const string TopicEndPoint = ApiEndpoint + "/topic";
+            public const string CreateTopic = TopicEndPoint;
+            public const string GetListTopic = TopicEndPoint;
+            public const string GetTopic = TopicEndPoint + "/{id}";
+            public const string UpdateTopic = TopicEndPoint + "/{id}";
+            public const string DeleteTopic = TopicEndPoint + "/{id}";
+        }
     }
 }
