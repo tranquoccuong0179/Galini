@@ -96,7 +96,9 @@ public class UserService : BaseService<UserService>, IUserService
 
         string otp = OtpUtil.GenerateOtp();
 
-        await SendOtpEmail(request.Email, otp);
+        string maskedUsername = MaskUsername(request.UserName);
+
+        await SendOtpEmail(request.Email, otp, maskedUsername);
 
         var account = _mapper.Map<Account>(request);
 
@@ -157,9 +159,11 @@ public class UserService : BaseService<UserService>, IUserService
 
         await redisDb.KeyDeleteAsync(key);
 
+        string maskedUsername = MaskUsername(account.UserName);
+
         string otp = OtpUtil.GenerateOtp();
 
-        await SendOtpEmail(email, otp);
+        await SendOtpEmail(email, otp, maskedUsername);
 
         await redisDb.StringSetAsync(key, otp, TimeSpan.FromMinutes(5));
 
@@ -226,7 +230,13 @@ public class UserService : BaseService<UserService>, IUserService
         };
     }
 
-    private async Task SendOtpEmail(string email, string otp)
+    private string MaskUsername(string username)
+    {
+        if (username.Length <= 2) return username;
+        return username[0] + new string('*', username.Length - 2) + username[^1];
+    }
+
+    private async Task SendOtpEmail(string email, string otp, string username)
     {
         try
         {
@@ -234,10 +244,10 @@ public class UserService : BaseService<UserService>, IUserService
             var subject = "Welcome to Harmon";
 
             // Tạo nội dung email, bao gồm OTP
-            var messageBody = $"Your OTP code is: {otp}. This code is valid for 5 minutes.";
+            var messageBody = $"Mã xác minh của bạn là: {otp}. Mã có hiệu lực trong 5 phút.";
 
             // Gọi hàm SendEmailAsync từ _emailSender (đã được cấu hình trước đó)
-            await _emailService.SendEmailAsync(email, subject, messageBody);
+            await _emailService.SendEmailAsync(email, subject, messageBody, username);
         }
         catch (Exception ex)
         {
@@ -245,4 +255,5 @@ public class UserService : BaseService<UserService>, IUserService
             Console.WriteLine($"Error sending OTP email: {ex.Message}");
         }
     }
+    
 }
