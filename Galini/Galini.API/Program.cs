@@ -106,6 +106,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapHub<CallHub>("/callhub");
+app.MapHub<CallHub>("callhub");
 
 app.Run();
