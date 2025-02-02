@@ -72,11 +72,21 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddRedis();
 builder.Services.AddSignalR();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: CorsConstant.PolicyName,
-        policy => { policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod(); });
+        policy =>
+        {
+            policy.WithOrigins("http://127.0.0.1:5500", "http://localhost:5500", "http://localhost:5173", "http://127.0.0.1")
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials(); 
+        });
 });
+
+builder.Services.AddSignalR();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -90,17 +100,12 @@ app.UseCors(CorsConstant.PolicyName);
 
 app.UseHttpsRedirection();
 
+app.UseRouting();
+
 app.UseAuthorization();
-
-
-app.MapPost("broadcast", async (string message, IHubContext<ChatHub, IChatClient> context) => {
-    await context.Clients.All.ReceiveMessage(message);
-
-    return Results.NoContent();
-});
 
 app.MapControllers();
 
-app.MapHub<ChatHub>("chat-hub");
+app.MapHub<CallHub>("callhub");
 
 app.Run();

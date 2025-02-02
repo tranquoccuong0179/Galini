@@ -13,6 +13,6 @@ namespace Galini.Services.Interface
 
         public Task RemoveUser(string connectionId);
 
-        public Task<string?> GetRandomUser();
+        public Task<string?> GetRandomUser(string currentConnectionId);
     }
 }
