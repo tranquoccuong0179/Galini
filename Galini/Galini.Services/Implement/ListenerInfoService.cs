@@ -8,6 +8,7 @@ using AutoMapper;
 using Azure;
 using Galini.Models.Entity;
 using Galini.Models.Enum;
+using Galini.Models.Paginate;
 using Galini.Models.Payload.Request.ListenerInfo;
 using Galini.Models.Payload.Request.User;
 using Galini.Models.Payload.Response;
@@ -17,6 +18,7 @@ using Galini.Repository.Interface;
 using Galini.Services.Interface;
 using Galini.Utils;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Galini.Services.Implement
@@ -109,9 +111,42 @@ namespace Galini.Services.Implement
             };
         }
 
-        public Task<BaseResponse> GetAllListenerInfo(int page, int size)
+        public async Task<BaseResponse> GetAllListenerInfo(int page, int size)
         {
-            throw new NotImplementedException();
+            var listenerInfo = await _unitOfWork.GetRepository<ListenerInfo>().GetPagingListAsync(
+                selector: l => _mapper.Map<GetListenerInfoResponse>(l),
+                orderBy: l => l.OrderByDescending(l => l.CreateAt),
+                predicate: l => l.IsActive == true,
+                include: l => l.Include(l => l.Account),
+                page: page,
+                size: size);
+
+            int totalItems = listenerInfo.Total;
+            int totalPages = (int)Math.Ceiling((double)totalItems / size);
+
+            if (listenerInfo == null)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status200OK.ToString(),
+                    message = "Danh sách người nghe",
+                    data = new Paginate<ListenerInfo>()
+                    {
+                        Page = page,
+                        Size = size,
+                        Total = totalItems,
+                        TotalPages = totalPages,
+                        Items = new List<ListenerInfo>()
+                    }
+                };
+            }
+
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status200OK.ToString(),
+                message = "Danh sách người nghe",
+                data = listenerInfo
+            };
         }
 
         public Task<BaseResponse> GetListenerInfoByAccountId(Guid accountId)
@@ -119,19 +154,106 @@ namespace Galini.Services.Implement
             throw new NotImplementedException();
         }
 
-        public Task<BaseResponse> GetListenerInfoById(Guid listenerInfoId)
+        public async Task<BaseResponse> GetListenerInfoById(Guid id)
         {
-            throw new NotImplementedException();
+            var listenerInfo = await _unitOfWork.GetRepository<ListenerInfo>().SingleOrDefaultAsync(
+                predicate: l => l.Id.Equals(id) && l.IsActive == true,
+                include: l => l.Include(l => l.Account));
+
+            if(listenerInfo == null)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status404NotFound.ToString(),
+                    message = "Không tìm thấy người nghe",
+                    data = null
+                };
+            }
+
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status200OK.ToString(),
+                message = "Thông tin người nghe",
+                data = _mapper.Map<GetListenerInfoResponse>(listenerInfo)
+            };
         }
 
-        public Task<BaseResponse> RemoveListenerInfo(Guid listenerInfoId)
+        public async Task<BaseResponse> RemoveListenerInfo(Guid id)
         {
-            throw new NotImplementedException();
+            var listenerInfo = await _unitOfWork.GetRepository<ListenerInfo>().SingleOrDefaultAsync(
+                predicate: l => l.Id.Equals(id) && l.IsActive == true);
+
+            if (listenerInfo == null)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status404NotFound.ToString(),
+                    message = "Không tìm thấy người nghe",
+                    data = false
+                };
+            }
+
+            listenerInfo.IsActive = false;
+            listenerInfo.DeleteAt = TimeUtil.GetCurrentSEATime();
+            listenerInfo.UpdateAt = TimeUtil.GetCurrentSEATime();
+
+            _unitOfWork.GetRepository<ListenerInfo>().UpdateAsync(listenerInfo);
+            bool isSuccessfully = await _unitOfWork.CommitAsync() > 0;
+
+            if (isSuccessfully)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status200OK.ToString(),
+                    message = "Xóa người nghe thành công",
+                    data = true
+                };
+            }
+
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status400BadRequest.ToString(),
+                message = "Xóa người nghe thất bại",
+                data = false
+            };
         }
 
-        public Task<BaseResponse> UpdateListenerInfo(Guid listenerInfoId, CreateListenerInfoRequest request)
+        public async Task<BaseResponse> UpdateListenerInfo(Guid id, UpdateListenerInfoRequest request)
         {
-            throw new NotImplementedException();
+            var listenerInfo = await _unitOfWork.GetRepository<ListenerInfo>().SingleOrDefaultAsync(
+                predicate: l => l.Id.Equals(id) && l.IsActive == true,
+                include: l => l.Include(l => l.Account));
+
+            if (listenerInfo == null)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status404NotFound.ToString(),
+                    message = "Không tìm thấy người nghe",
+                    data = null
+                };
+            }
+
+            _mapper.Map(request, listenerInfo);
+            _unitOfWork.GetRepository<ListenerInfo>().UpdateAsync(listenerInfo);
+            bool isSuccessfully = await _unitOfWork.CommitAsync() > 0;
+
+            if (isSuccessfully)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status200OK.ToString(),
+                    message = "Cập nhật người nghe thành công",
+                    data = _mapper.Map<GetListenerInfoResponse>(listenerInfo)
+                };
+            }
+
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status400BadRequest.ToString(),
+                message = "Cập nhật người nghe thất bại",
+                data = null
+            };
         }
     }
 }

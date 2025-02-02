@@ -92,6 +92,10 @@
         {
             public const string ListenerInfoEndPoint = ApiEndpoint + "/listener";
             public const string CreateListenerInfo = ListenerInfoEndPoint;
+            public const string GetListListenerInfo = ListenerInfoEndPoint;
+            public const string GetListenerInfo = ListenerInfoEndPoint + "/{id}";
+            public const string UpdateListenerInfo = ListenerInfoEndPoint + "/{id}";
+            public const string DeleteListenerInfo = ListenerInfoEndPoint + "/{id}";
         }
     }
 }

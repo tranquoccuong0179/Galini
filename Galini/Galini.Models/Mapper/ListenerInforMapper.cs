@@ -19,12 +19,20 @@ namespace Galini.Models.Mapper
             CreateMap<CreateListenerInfoRequest, ListenerInfo>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid()))
                 .ForMember(dest => dest.Star, opt => opt.MapFrom(src => 0))
-                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => false))
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true))
                 .ForMember(dest => dest.CreateAt, opt => opt.MapFrom(src => TimeUtil.GetCurrentSEATime()))
                 .ForMember(dest => dest.UpdateAt, opt => opt.MapFrom(src => TimeUtil.GetCurrentSEATime()));
 
             CreateMap<ListenerInfo, CreateListenerInfoResponse>()
                 .ForMember(dest => dest.Account, opt => opt.MapFrom(src => src.Account));
+
+            CreateMap<ListenerInfo, GetListenerInfoResponse>()
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.Account.FullName));
+
+            CreateMap<UpdateListenerInfoRequest, ListenerInfo>()
+                .ForMember(dest => dest.Description, opt => opt.Condition(src => src.Description != null))
+                .ForMember(dest => dest.Price, opt => opt.Condition(src => src.Price != 0))
+                .ForMember(dest => dest.UpdateAt, opt => opt.MapFrom(src => TimeUtil.GetCurrentSEATime()));
         }
     }
 }
