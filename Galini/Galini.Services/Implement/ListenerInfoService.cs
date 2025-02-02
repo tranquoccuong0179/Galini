@@ -83,6 +83,7 @@ namespace Galini.Services.Implement
             }
 
             var account = _mapper.Map<Account>(registerRequest);
+            account.IsActive = true;
             account.Role = RoleEnum.Listener.GetDescriptionFromEnum();
 
             await _unitOfWork.GetRepository<Account>().InsertAsync(account);
