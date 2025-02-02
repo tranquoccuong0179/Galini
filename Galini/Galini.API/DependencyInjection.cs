@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Galini.API.ConfigHub;
 using Galini.Models.Entity;
 using Galini.Repository.Implement;
 using Galini.Repository.Interface;
@@ -39,6 +40,7 @@ namespace Galini.API
             services.AddScoped<ICallHistoryService, CallHistoryService>();
             services.AddScoped<IFriendShipService, FriendShipService>();
             services.AddScoped<IUserStatusService, UserStatusService>();
+            services.AddScoped<CallHub>();
             return services;
         }
         public static IServiceCollection AddHttpClientServices(this IServiceCollection services)
