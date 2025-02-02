@@ -31,7 +31,8 @@ namespace Galini.Services.Implement
             Expression<Func<Account, bool>> searchFilter = p =>
                   p.UserName.Equals(request.Username) &&
                   p.Password.Equals(PasswordUtil.HashPassword(request.Password)) &&
-                  (p.Role == RoleEnum.Customer.GetDescriptionFromEnum());
+                  (p.Role == RoleEnum.Customer.GetDescriptionFromEnum()||
+                  p.Role == RoleEnum.Listener.GetDescriptionFromEnum());
             Account account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: searchFilter);
             if (account == null)
             {

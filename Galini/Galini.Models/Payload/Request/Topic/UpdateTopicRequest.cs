@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Galini.Models.Payload.Request.Topic
 {
-    public class CreateTopicRequest
+    public class UpdateTopicRequest
     {
-        public string Name { get; set; } = null!;
+        public string? Name { get; set; }
     }
 }

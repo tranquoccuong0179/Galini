@@ -3,7 +3,8 @@ using Galini.API.ConfigHub;
 using Galini.API.Constants;
 using Galini.Models.Enum;
 using Galini.Models.Payload;
-using Galini.Services.Implement;
+using Galini.Services.Interface;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 
@@ -69,6 +70,7 @@ builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddRedis();
+builder.Services.AddSignalR();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
 builder.Services.AddCors(options =>
@@ -104,9 +106,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapHub<CallHub>("/callhub");
-});
+app.MapHub<CallHub>("/callhub");
 
 app.Run();
