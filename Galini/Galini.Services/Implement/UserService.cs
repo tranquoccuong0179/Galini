@@ -244,7 +244,7 @@ public class UserService : BaseService<UserService>, IUserService
             var subject = "Welcome to Harmon";
 
             // Tạo nội dung email, bao gồm OTP
-            var messageBody = $"Mã xác minh của bạn là: {otp}. Mã có hiệu lực trong 5 phút.";
+            var messageBody = $"{otp}";
 
             // Gọi hàm SendEmailAsync từ _emailSender (đã được cấu hình trước đó)
             await _emailService.SendEmailAsync(email, subject, messageBody, username);

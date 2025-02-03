@@ -55,7 +55,7 @@ namespace Galini.Services.Implement
 <head>
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>Email</title>
+    <title>Xác nhận OTP</title>
     <style>
         body {{
             font-family: Arial, sans-serif;
@@ -66,55 +66,63 @@ namespace Galini.Services.Implement
         }}
         .container {{
             background: white;
-            color: #333;
             padding: 20px;
             border-radius: 10px;
             max-width: 600px;
             margin: auto;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }}
         .logo {{
             width: 120px;
-            margin: 0 auto 20px;
-            display: block;
+            margin-bottom: 20px;
         }}
         .header {{
-            font-size: 26px;
+            font-size: 24px;
             font-weight: bold;
             color: #A259FF;
             margin-bottom: 20px;
+        }}
+        .otp-container {{
+            display: flex;
+            justify-content: center;
+            align-items: center;
             text-align: center;
+            width: 100%;
         }}
         .otp {{
-            font-size: 40px;
+            font-size: 36px;
             font-weight: bold;
             color: #A259FF;
-            margin: 20px 0;
+            background: linear-gradient(135deg, #F8F0FF, #EAD6FF);
+            box-shadow: 0 4px 8px rgba(162, 89, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: inline-block;
             text-align: center;
+            width: auto;
+            letter-spacing: 10px;
         }}
         .note {{
             font-size: 14px;
             color: #888;
             margin-top: 20px;
-            text-align: center;
         }}
         .footer {{
             font-size: 12px;
             color: #777;
             margin-top: 20px;
-            text-align: center;
         }}
         .social-icons {{
-            text-align: center;
             margin-top: 20px;
         }}
-        .social-icons a{{
+        .social-icons a {{
             display: inline-block;
+            margin: 0 10px;
         }}
         .social-icons img {{
             width: 40px;
             height: 40px;
-            margin: 0 10px;
         }}
     </style>
 </head>
@@ -122,12 +130,12 @@ namespace Galini.Services.Implement
     <div class='container'>
         <img src='cid:logo' alt='Logo' class='logo'>
         <div class='header'>Xác nhận mã OTP của bạn</div>
-        <div class='content'>
-            <p>Xin chào, {username}</p>
-            <p>Bạn đã yêu cầu mã OTP để xác thực. Vui lòng sử dụng mã OTP bên dưới:</p>
-            <div class='otp'>{otp}</div>
-            <p class='note'>Xin lưu ý: Không chia sẻ mã này cho bất kỳ ai để đảm bảo an toàn tài khoản của bạn.</p>
+        <p>Xin chào, {username}</p>
+        <p>Bạn đã yêu cầu mã OTP để xác thực. Vui lòng sử dụng mã OTP bên dưới:</p>
+        <div class='otp-container'>
+            <div class='otp'>{string.Join("&nbsp;", otp.ToCharArray())}</div>
         </div>
+        <p class='note'>Không chia sẻ mã này cho bất kỳ ai để bảo vệ tài khoản của bạn.</p>
         <div class='footer'>
             <p>Nếu bạn không yêu cầu mã OTP, vui lòng bỏ qua email này hoặc liên hệ với chúng tôi để được hỗ trợ.</p>
             <hr />
@@ -153,6 +161,7 @@ namespace Galini.Services.Implement
             smtpClient.Authenticate(_emailAddress, _appPassword);
             await smtpClient.SendAsync(email);
         }
+
 
 
     }
