@@ -84,11 +84,9 @@ namespace Galini.Services.Implement
             margin-bottom: 20px;
         }}
         .otp-container {{
-            display: flex;
-            justify-content: center;
-            align-items: center;
             text-align: center;
             width: 100%;
+            margin-top: 20px;
         }}
         .otp {{
             font-size: 36px;
@@ -99,9 +97,8 @@ namespace Galini.Services.Implement
             padding: 10px 20px;
             border-radius: 10px;
             display: inline-block;
-            text-align: center;
-            width: auto;
             letter-spacing: 10px;
+            text-align: center;
         }}
         .note {{
             font-size: 14px;
