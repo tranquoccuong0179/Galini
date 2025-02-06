@@ -74,12 +74,13 @@ public partial class HarmonContext : DbContext
             .AddJsonFile("appsettings.json", true, true).Build();
         return configuration.GetConnectionString("DefautDB");
     }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Account>(entity =>
         {
             entity.ToTable("Account");
+
+            entity.HasIndex(e => e.UserName, "UQ_Account_UserName").IsUnique();
 
             entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.CreateAt).HasColumnType("datetime");
