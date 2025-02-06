@@ -8,6 +8,7 @@ using Galini.Repository.Interface;
 using Galini.Services.Interface;
 using Galini.Utils;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
