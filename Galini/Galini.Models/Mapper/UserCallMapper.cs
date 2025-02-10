@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Galini.Models.Entity;
+using Galini.Models.Enum;
 using Galini.Models.Payload.Request.UserCall;
 using Galini.Models.Payload.Response.UserCall;
 using Galini.Utils;
@@ -23,6 +24,7 @@ namespace Galini.Models.Mapper
                 .ForMember(dest => dest.UpdateAt, opt => opt.MapFrom(src => TimeUtil.GetCurrentSEATime()));
 
             CreateMap<UpdateUserCallRequest, UserCall>()
+                .ForMember(dest => dest.CallRole, opt => opt.Condition(src => src.CallRole != CallRoleEnum.None))
                 .ForMember(dest => dest.UpdateAt, opt => opt.MapFrom(src => TimeUtil.GetCurrentSEATime()));
 
             CreateMap<UserCall, CreateUserCallResponse>();

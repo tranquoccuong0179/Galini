@@ -8,6 +8,7 @@ namespace Galini.Models.Enum
 {
     public enum CallRoleEnum
     {
+        None,
         Caller,
         Callee
     }
