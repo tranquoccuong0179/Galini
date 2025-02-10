@@ -22,7 +22,9 @@ namespace Galini.Models.Mapper
                 .ForMember(dest => dest.UpdateAt, opt => opt.MapFrom(src => TimeUtil.GetCurrentSEATime()));
 
             CreateMap<UpdateUserInfoRequest, UserInfo>()
-                .ForMember(dest => dest.UpdateAt, opt => opt.MapFrom(src => TimeUtil.GetCurrentSEATime()));
+                .ForMember(dest => dest.UpdateAt, opt => opt.MapFrom(src => TimeUtil.GetCurrentSEATime()))
+                .ForMember(dest => dest.DateStart, opt => opt.Condition(src => src.DateStart != default))
+                .ForMember(dest => dest.DateEnd, opt => opt.Condition(src => src.DateEnd != default));
 
             CreateMap<UserInfo, CreateUserInfoResponse>();
         }

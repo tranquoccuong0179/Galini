@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
 using Galini.Models.Entity;
-using Galini.Models.Payload.Request.Premium;
-using Galini.Models.Payload.Request.UserInfo;
-using Galini.Models.Payload.Response.Premium;
-using Galini.Models.Payload.Response.UserInfo;
+using Galini.Models.Payload.Request.Message;
+using Galini.Models.Payload.Response.Message;
 using Galini.Utils;
 using System;
 using System.Collections.Generic;
@@ -13,23 +11,22 @@ using System.Threading.Tasks;
 
 namespace Galini.Models.Mapper
 {
-    public class PremiumMapper : Profile
+    public class MessageMapper : Profile
     {
-        public PremiumMapper()
+        public MessageMapper()
         {
-            CreateMap<CreatePremiumRequest, Premium>()
+            CreateMap<CreateMessageRequest, Message>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid()))
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true))
                 .ForMember(dest => dest.CreateAt, opt => opt.MapFrom(src => TimeUtil.GetCurrentSEATime()))
                 .ForMember(dest => dest.UpdateAt, opt => opt.MapFrom(src => TimeUtil.GetCurrentSEATime()));
 
-            CreateMap<UpdatePremiumRequest, Premium>()
-                .ForMember(dest => dest.Type, opt => opt.Condition(src => src.Type != null))
-                .ForMember(dest => dest.Friend, opt => opt.Condition(src => src.Friend != 0)) 
-                .ForMember(dest => dest.Match, opt => opt.Condition(src => src.Match != 0)) 
+            CreateMap<UpdateMessageRequest, Message>()
+                .ForMember(dest => dest.Content, opt => opt.Condition(src => src.Content != null))
                 .ForMember(dest => dest.UpdateAt, opt => opt.MapFrom(src => TimeUtil.GetCurrentSEATime()));
 
-            CreateMap<Premium, CreatePremiumResponse>();
+            CreateMap<Message, CreateMessageResponse>();
+
         }
     }
 }

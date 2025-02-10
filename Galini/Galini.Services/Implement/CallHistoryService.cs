@@ -116,7 +116,6 @@ namespace Galini.Services.Implement
 
             callHistory.IsActive = false;
             callHistory.DeleteAt = TimeUtil.GetCurrentSEATime();
-            callHistory.UpdateAt = TimeUtil.GetCurrentSEATime();
             _unitOfWork.GetRepository<CallHistory>().UpdateAsync(callHistory);
 
             bool isSuccessfully = await _unitOfWork.CommitAsync() > 0;
