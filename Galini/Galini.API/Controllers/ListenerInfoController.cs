@@ -37,7 +37,17 @@ namespace Galini.API.Controllers
             var response = await _listenerInfoService.GetAllListenerInfo(pageNumber, pageSize);
             return StatusCode(int.Parse(response.status), response);
         }
-        
+
+        [HttpGet(ApiEndPointConstant.ListenerInfo.GetListenerInfoByAccountId)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status404NotFound)]
+        [ProducesErrorResponseType(typeof(ProblemDetails))]
+        public async Task<IActionResult> GetListenerInfoByAccountId([FromRoute] Guid id)
+        {
+            var response = await _listenerInfoService.GetListenerInfoByAccountId(id);
+            return StatusCode(int.Parse(response.status), response);
+        }
+
         [HttpGet(ApiEndPointConstant.ListenerInfo.GetListenerInfo)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status404NotFound)]
