@@ -15,6 +15,13 @@
             public const string AuthenticationEndPoint = ApiEndpoint + "/auth";
             public const string Authenticate = AuthenticationEndPoint;
         }
+
+        public static class GoogleAuthentication
+        {
+            public const string GoogleAuthenticationEndPoint = ApiEndpoint + "/google-auth";
+            public const string GoogleLogin = GoogleAuthenticationEndPoint + "/login";
+            public const string GoogleSignIn = GoogleAuthenticationEndPoint + "/signin-google";
+        }
         
         public static class User
         {
