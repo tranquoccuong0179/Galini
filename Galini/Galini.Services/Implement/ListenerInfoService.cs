@@ -150,9 +150,41 @@ namespace Galini.Services.Implement
             };
         }
 
-        public Task<BaseResponse> GetListenerInfoByAccountId(Guid accountId)
+        public async Task<BaseResponse> GetListenerInfoByAccountId(Guid accountId)
         {
-            throw new NotImplementedException();
+            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+                predicate: l => l.Id.Equals(accountId) && l.IsActive);
+
+            if (account == null)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status404NotFound.ToString(),
+                    message = "Không tìm thấy người nghe",
+                    data = null
+                };
+            }
+
+            var listenerInfo = await _unitOfWork.GetRepository<ListenerInfo>().SingleOrDefaultAsync(
+                predicate: l => l.AccountId.Equals(accountId) && l.IsActive,
+                include: l => l.Include(l => l.Account));
+
+            if (listenerInfo == null)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status404NotFound.ToString(),
+                    message = "Không tìm thấy người nghe",
+                    data = null
+                };
+            }
+
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status200OK.ToString(),
+                message = "Thông tin người nghe",
+                data = _mapper.Map<GetListenerInfoResponse>(listenerInfo)
+            };
         }
 
         public async Task<BaseResponse> GetListenerInfoById(Guid id)
@@ -182,7 +214,7 @@ namespace Galini.Services.Implement
         public async Task<BaseResponse> RemoveListenerInfo(Guid id)
         {
             var listenerInfo = await _unitOfWork.GetRepository<ListenerInfo>().SingleOrDefaultAsync(
-                predicate: l => l.Id.Equals(id) && l.IsActive == true);
+                predicate: l => l.Id.Equals(id) && l.IsActive);
 
             if (listenerInfo == null)
             {
@@ -192,6 +224,20 @@ namespace Galini.Services.Implement
                     message = "Không tìm thấy người nghe",
                     data = false
                 };
+            }
+
+            var topics = await _unitOfWork.GetRepository<Topic>().GetListAsync(
+                predicate: t => t.ListenerInfoId.Equals(listenerInfo.Id) && t.IsActive);
+
+            if (topics != null)
+            {
+                foreach (var topic in topics)
+                {
+                    topic.IsActive = false;
+                    topic.UpdateAt = TimeUtil.GetCurrentSEATime();
+                    topic.DeleteAt = TimeUtil.GetCurrentSEATime();
+                    
+                }
             }
 
             listenerInfo.IsActive = false;
