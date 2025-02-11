@@ -107,5 +107,18 @@
             public const string UpdateTopic = TopicEndPoint + "/{id}";
             public const string DeleteTopic = TopicEndPoint + "/{id}";
         }
+
+        public static class Message
+        {
+            public const string MessageEndPoint = ApiEndpoint + "/message";
+            public const string CreateMessage = MessageEndPoint;
+            public const string CreateMessageCall = MessageEndPoint + "/call";
+            public const string GetAllMessage = MessageEndPoint;
+            public const string GetMessageByDirectChatId = MessageEndPoint + "/directchat/{id}";
+            public const string GetMessageById = MessageEndPoint + "/{id}";
+            public const string RemoveMessage = MessageEndPoint + "/{id}";
+            public const string SearchMessageByDirectChatId = MessageEndPoint + "search/{id}";
+            public const string UpdateMessage = MessageEndPoint + "/{id}";
+        }
     }
 }

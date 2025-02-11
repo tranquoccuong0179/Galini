@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Galini.Models.Paginate;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 
 namespace Galini.Repository.Interface
@@ -49,6 +50,8 @@ namespace Galini.Repository.Interface
             Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null,
             int page = 1,
             int size = 10);
+
+        Task<ICollection<TResult>> GetListLimitAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null, int? limit = null);
 
         #endregion
 
