@@ -66,7 +66,7 @@ namespace Galini.Services.Implement
             }
 
             var existingAccount = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
-        predicate: u => u.UserName == registerRequest.UserName || u.Email == registerRequest.Email || u.Phone == registerRequest.Phone);
+                predicate: u => u.UserName == registerRequest.UserName || u.Email == registerRequest.Email || u.Phone == registerRequest.Phone);
 
             if (existingAccount != null)
             {

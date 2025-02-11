@@ -11,13 +11,13 @@ namespace Galini.Services.Interface
 {
     public interface IMessageService
     {
-        public Task<BaseResponse> CreateLMessage(CreateMessageRequest request, Guid directChatId);
-        public Task<BaseResponse> CreateLMessageCall(CreateMessageRequest request, Guid directChatId);
+        public Task<BaseResponse> CreateMessage(CreateMessageRequest request, Guid directChatId);
+        public Task<BaseResponse> CreateMessageCall(CreateMessageRequest request, Guid directChatId);
         public Task<BaseResponse> GetAllMessage(int page, int size);
         public Task<BaseResponse> GetMessageById(Guid messageId);
-        public Task<BaseResponse> GetMessageByDirectChatId(Guid directChatId);
-        public Task<BaseResponse> SearchMessageByDirectChatId(Guid directChatId, string keyWord);
-        public Task<BaseResponse> UpdateMessage(Guid messageId, CreateMessageRequest request);
+        public Task<BaseResponse> GetMessageByDirectChatId(Guid directChatId, DateTime? beforeCursor);
+        public Task<BaseResponse> SearchMessageByDirectChatId(Guid directChatId, string keyWord, int page, int size);
+        public Task<BaseResponse> UpdateMessage(Guid messageId, UpdateMessageRequest request);
         public Task<BaseResponse> RemoveMessage(Guid messageId);
     }
 }
