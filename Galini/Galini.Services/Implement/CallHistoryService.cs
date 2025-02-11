@@ -114,6 +114,20 @@ namespace Galini.Services.Implement
                 };
             }
 
+            var userCalls = await _unitOfWork.GetRepository<UserCall>().GetListAsync(
+                predicate: x => x.CallHistoryId.Equals(callHistory.Id) && x.IsActive);
+
+            if (userCalls != null)
+            {
+                foreach (var userCall in userCalls)
+                {
+                    userCall.IsActive = false;
+                    userCall.UpdateAt = TimeUtil.GetCurrentSEATime();
+                    userCall.DeleteAt = TimeUtil.GetCurrentSEATime();
+                    _unitOfWork.GetRepository<UserCall>().UpdateAsync(userCall);
+                }
+            }
+
             callHistory.IsActive = false;
             callHistory.DeleteAt = TimeUtil.GetCurrentSEATime();
             callHistory.UpdateAt = TimeUtil.GetCurrentSEATime();
