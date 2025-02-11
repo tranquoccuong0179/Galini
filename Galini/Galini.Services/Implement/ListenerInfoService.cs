@@ -236,7 +236,7 @@ namespace Galini.Services.Implement
                     topic.IsActive = false;
                     topic.UpdateAt = TimeUtil.GetCurrentSEATime();
                     topic.DeleteAt = TimeUtil.GetCurrentSEATime();
-                    
+                    _unitOfWork.GetRepository<Topic>().UpdateAsync(topic);
                 }
             }
 
