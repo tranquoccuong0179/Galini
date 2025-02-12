@@ -23,10 +23,22 @@ namespace Galini.API.ConfigHub
             await _userStatusService.RemoveUser(Context.ConnectionId); // Khi user ngắt kết nối -> Xóa khỏi danh sách
         }
 
-        public async Task StartCall()
+        public async Task GetRandomUser()
         {
             var targetConnectionId = await _userStatusService.GetRandomUser(Context.ConnectionId);
 
+            if (!string.IsNullOrEmpty(targetConnectionId))
+            {
+                await Clients.Client(Context.ConnectionId).SendAsync("RandomUserSelected", targetConnectionId);
+            }
+            else
+            {
+                await Clients.Client(Context.ConnectionId).SendAsync("NoAvailableUsers");
+            }
+        }
+
+        public async Task StartCall(string targetConnectionId)
+        {
             if (!string.IsNullOrEmpty(targetConnectionId))
             {
                 await Clients.Client(targetConnectionId).SendAsync("IncomingCall", Context.ConnectionId);
