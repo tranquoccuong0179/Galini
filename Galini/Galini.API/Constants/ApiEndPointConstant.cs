@@ -107,5 +107,11 @@
             public const string UpdateTopic = TopicEndPoint + "/{id}";
             public const string DeleteTopic = TopicEndPoint + "/{id}";
         }
+
+        public static class Wallet
+        {
+            public const string WalletEndPoint = ApiEndpoint + "/wallet";
+            public const string CreateLink = WalletEndPoint;
+        }
     }
 }

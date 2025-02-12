@@ -42,6 +42,7 @@ namespace Galini.API
             services.AddScoped<IUserStatusService, UserStatusService>();
             services.AddScoped<IListenerInfoService, ListenerInfoService>();
             services.AddScoped<ITopicService, TopicService>();
+            services.AddScoped<IWalletService, WalletService>();
             services.AddScoped<CallHub>();
             return services;
         }
