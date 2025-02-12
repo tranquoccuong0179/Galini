@@ -4,14 +4,17 @@ using Azure.Messaging;
 using Galini.Models.Entity;
 using Galini.Models.Enum;
 using Galini.Models.Payload.Request.User;
+using Galini.Models.Payload.Request.UserInfo;
 using Galini.Models.Payload.Response;
 using Galini.Models.Payload.Response.Account;
+using Galini.Models.Payload.Response.GoogleAuthentication;
 using Galini.Models.Utils;
 using Galini.Repository.Interface;
 using Galini.Services.Interface;
 using Galini.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using MimeKit.Utils;
 using StackExchange.Redis;
 
 namespace Galini.Services.Implement;
@@ -255,5 +258,75 @@ public class UserService : BaseService<UserService>, IUserService
             Console.WriteLine($"Error sending OTP email: {ex.Message}");
         }
     }
-    
+
+    public async Task<string> CreateTokenByEmail(string email)
+    {
+        if (string.IsNullOrEmpty(email))
+        {
+            throw new ArgumentException("Username cannot be null or empty", nameof(email));
+        }
+        var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+            predicate: p => p.Email.Equals(email)
+        );
+        if (account == null) throw new BadHttpRequestException("Account not found");
+        var guidClaim = new Tuple<string, Guid>("userId", account.Id);
+        var token = JwtUtil.GenerateJwtToken(account, guidClaim);
+        return token;
+    }
+
+    public async Task<bool> GetAccountByEmail(string email)
+    {
+        if (email == null) throw new BadHttpRequestException("Email cannot be null");
+
+        var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+            predicate: p => p.Email.Equals(email)
+        );
+        return account != null;
+    }
+    public async Task<BaseResponse> CreateNewUserAccountByGoogle(GoogleAuthResponse request)
+    {
+        var existingUser = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+            predicate: u => u.Email.Equals(request.Email) &&
+                            u.IsActive == true);
+
+        if (existingUser != null)
+        {
+            return new BaseResponse
+            {
+                status = StatusCodes.Status400BadRequest.ToString(),
+                message = "User account already exists.",
+                data = new RegisterUserResponse
+                {
+                    Email = existingUser.Email,
+                    FullName = existingUser.FullName
+                }
+            };
+        }
+
+        var newUser = new Account()
+        {
+            Id = Guid.NewGuid(),
+            Email = request.Email,
+            FullName = request.FullName,
+            UserName = request.Email.Split("@")[0],
+            Role = RoleEnum.Customer.GetDescriptionFromEnum(),
+            IsActive = true,
+            Password = PasswordUtil.HashPassword("12345678"),
+        };
+
+        await _unitOfWork.GetRepository<Account>().InsertAsync(newUser);
+        await _unitOfWork.CommitAsync();
+
+        return new BaseResponse
+        {
+            status = StatusCodes.Status201Created.ToString(),
+            message = "User account created successfully.",
+            data = new RegisterUserResponse
+            {
+                Email = newUser.Email,
+                FullName = newUser.FullName
+            }
+        };
+    }
+
 }

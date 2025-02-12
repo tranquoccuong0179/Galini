@@ -6,13 +6,10 @@ using System.Threading.Tasks;
 
 namespace Galini.Models.Enum
 {
-    public enum FriendShipEnum
+    public enum MessageEnum
     {
-        None = 0,
-        Block,
-        Request,
-        Requested,
-        Accepted,
-        Declined
+        Call,
+        Message,
+        Deleted
     }
 }

@@ -43,6 +43,7 @@ namespace Galini.API
             services.AddScoped<IListenerInfoService, ListenerInfoService>();
             services.AddScoped<ITopicService, TopicService>();
             services.AddScoped<IWalletService, WalletService>();
+            services.AddScoped<IGoogleAuthenticationService, GoogleAuthenticationService>();
             services.AddScoped<CallHub>();
             return services;
         }
@@ -64,6 +65,20 @@ namespace Galini.API
                 : base(() => serviceProvider.GetRequiredService<T>())
             {
             }
+        }
+
+        private static string CreateClientId(IConfiguration configuration)
+        {
+            var clientId = Environment.GetEnvironmentVariable("GOOGLE_OAUTH_CLIENT_ID")
+                           ?? configuration.GetValue<string>("Oauth:ClientId");
+            return clientId;
+        }
+
+        private static string CreateClientSecret(IConfiguration configuration)
+        {
+            var clientSecret = Environment.GetEnvironmentVariable("GOOGLE_OAUTH_CLIENT_SECRET")
+                               ?? configuration.GetValue<string>("Oauth:ClientSecret");
+            return clientSecret;
         }
 
 
@@ -89,10 +104,31 @@ namespace Galini.API
                     IssuerSigningKey =
                         new SymmetricSecurityKey(Convert.FromHexString("0102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F00"))
                 };
+            }).AddCookie(
+                options =>
+                {
+                    options.Cookie.HttpOnly = true;
+                    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                    options.Cookie.SameSite = SameSiteMode.None;
+                })
+            .AddGoogle(options =>
+            {
+                options.ClientId = CreateClientId(configuration);
+                options.ClientSecret = CreateClientSecret(configuration);
+                options.SaveTokens = true;
+                options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+
             });
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+                options.Secure = CookieSecurePolicy.Always;
+            }); ;
 
             return services;
         }
+
+
 
 
         public static IServiceCollection AddRedis(this IServiceCollection services)

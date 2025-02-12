@@ -100,6 +100,21 @@ namespace Galini.Repository.Implement
             return query.AsNoTracking().Select(selector).ToPaginateAsync(page, size, 1);
         }
 
+        public virtual async Task<ICollection<TResult>> GetListLimitAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null, int? limit = null)
+        {
+            IQueryable<T> query = _dbSet;
+
+            if (include != null) query = include(query);
+
+            if (predicate != null) query = query.Where(predicate);
+
+            if (orderBy != null) query = orderBy(query); 
+
+            if (limit.HasValue) return await query.Take(limit.Value).AsNoTracking().Select(selector).ToListAsync(); 
+
+            return await query.AsNoTracking().Select(selector).ToListAsync();
+        }
+
         #endregion
 
         #region Insert

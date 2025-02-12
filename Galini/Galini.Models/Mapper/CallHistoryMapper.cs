@@ -24,7 +24,10 @@ namespace Galini.Models.Mapper
                 .ForMember(dest => dest.UpdateAt, opt => opt.MapFrom(src => TimeUtil.GetCurrentSEATime()));
 
             CreateMap<UpdateCallHistoryRequest, CallHistory>()
-                .ForMember(dest => dest.UpdateAt, opt => opt.MapFrom(src => TimeUtil.GetCurrentSEATime()));
+                .ForMember(dest => dest.UpdateAt, opt => opt.MapFrom(src => TimeUtil.GetCurrentSEATime()))
+                .ForMember(dest => dest.TimeStart, opt => opt.Condition(src => src.TimeStart != default))
+                .ForMember(dest => dest.TimeEnd, opt => opt.Condition(src => src.TimeEnd != default))
+                .ForMember(dest => dest.Duration, opt => opt.Condition(src => src.Duration != 0));
 
             CreateMap<CallHistory, CreateCallHistoryResponse>();
         }

@@ -15,6 +15,13 @@
             public const string AuthenticationEndPoint = ApiEndpoint + "/auth";
             public const string Authenticate = AuthenticationEndPoint;
         }
+
+        public static class GoogleAuthentication
+        {
+            public const string GoogleAuthenticationEndPoint = ApiEndpoint + "/google-auth";
+            public const string GoogleLogin = GoogleAuthenticationEndPoint + "/login";
+            public const string GoogleSignIn = GoogleAuthenticationEndPoint + "/signin-google";
+        }
         
         public static class User
         {
@@ -112,6 +119,19 @@
         {
             public const string WalletEndPoint = ApiEndpoint + "/wallet";
             public const string CreateLink = WalletEndPoint;
+        }
+
+        public static class Message
+        {
+            public const string MessageEndPoint = ApiEndpoint + "/message";
+            public const string CreateMessage = MessageEndPoint;
+            public const string CreateMessageCall = MessageEndPoint + "/call";
+            public const string GetAllMessage = MessageEndPoint;
+            public const string GetMessageByDirectChatId = MessageEndPoint + "/directchat/{id}";
+            public const string GetMessageById = MessageEndPoint + "/{id}";
+            public const string RemoveMessage = MessageEndPoint + "/{id}";
+            public const string SearchMessageByDirectChatId = MessageEndPoint + "search/{id}";
+            public const string UpdateMessage = MessageEndPoint + "/{id}";
         }
     }
 }
