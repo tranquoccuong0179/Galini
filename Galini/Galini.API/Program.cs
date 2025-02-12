@@ -3,6 +3,7 @@ using Galini.API.ConfigHub;
 using Galini.API.Constants;
 using Galini.Models.Enum;
 using Galini.Models.Payload;
+using Galini.Models.Payload.Response.Wallet;
 using Galini.Services.Interface;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.OpenApi.Any;
@@ -72,6 +73,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddRedis();
 builder.Services.AddSignalR();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.Configure<PayOSSettings>(builder.Configuration.GetSection("PayOS"));
 
 builder.Services.AddCors(options =>
 {
