@@ -38,6 +38,16 @@ namespace Galini.Services.Implement
                 var user = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
                     predicate: u => u.Id.Equals(id) && u.IsActive == true);
 
+                if (user == null)
+                {
+                    return new BaseResponse()
+                    {
+                        status = StatusCodes.Status404NotFound.ToString(),
+                        message = "Không tìm người dùng với ID này",
+                        data = null
+                    };
+                }
+
 
                 string buyerName = user.FullName;
                 string buyerPhone = user.Phone;
