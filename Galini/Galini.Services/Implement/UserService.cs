@@ -323,6 +323,8 @@ public class UserService : BaseService<UserService>, IUserService
         };
 
         await _unitOfWork.GetRepository<Account>().InsertAsync(newUser);
+        var wallet = _mapper.Map<Wallet>(newUser);
+        await _unitOfWork.GetRepository<Wallet>().InsertAsync(wallet);
         await _unitOfWork.CommitAsync();
 
         return new BaseResponse
