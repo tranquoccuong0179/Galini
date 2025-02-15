@@ -91,6 +91,8 @@ namespace Galini.Services.Implement
             var listenerInfo = _mapper.Map<ListenerInfo>(request);
             listenerInfo.AccountId = account.Id;
             await _unitOfWork.GetRepository<ListenerInfo>().InsertAsync(listenerInfo);
+            var wallet = _mapper.Map<Wallet>(account);
+            await _unitOfWork.GetRepository<Wallet>().InsertAsync(wallet);
 
             bool isSuccessfully = await _unitOfWork.CommitAsync() > 0;
 
