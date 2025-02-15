@@ -30,6 +30,11 @@ namespace Galini.Services.Implement
             _payOS = new PayOS(_payOSSettings.ClientId, _payOSSettings.ApiKey, _payOSSettings.ChecksumKey);
         }
 
+        public Task<BaseResponse> ConfirmWebhook(string webhookUrl)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<BaseResponse> CreatePaymentUrlRegisterCreator(decimal balance)
         {
             try
