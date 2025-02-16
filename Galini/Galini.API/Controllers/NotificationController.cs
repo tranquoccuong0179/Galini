@@ -38,12 +38,12 @@ namespace Galini.API.Controllers
         public async Task<IActionResult> GetNotifications([FromQuery] int? page,
                                                           [FromQuery] int? size,
                                                           [FromQuery] TypeEnum? type,
-                                                          [FromQuery] DateOnly? startDate,
-                                                          [FromQuery] DateOnly? endDate)
+                                                          [FromQuery] int? daysAgo,
+                                                          [FromQuery] int? monthsAgo)
         {
             int pageNumber = page ?? 1;
             int pageSize = size ?? 10;
-            var response = await _notificationService.GetAllNotification(pageNumber, pageSize);
+            var response = await _notificationService.GetAllNotification(pageNumber, pageSize, type, daysAgo, monthsAgo);
             return StatusCode(int.Parse(response.status), response);
         }
 
