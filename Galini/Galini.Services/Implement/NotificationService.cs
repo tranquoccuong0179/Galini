@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Galini.Models.Entity;
+using Galini.Models.Enum;
 using Galini.Models.Paginate;
 using Galini.Models.Payload.Request.Notification;
 using Galini.Models.Payload.Response;
@@ -61,12 +62,15 @@ namespace Galini.Services.Implement
             };
         }
 
-        public async Task<BaseResponse> GetAllNotification(int page, int size)
+        public async Task<BaseResponse> GetAllNotification(int page, int size, TypeEnum? type, int? daysAgo, int? monthsAgo)
         {
             var response = await _unitOfWork.GetRepository<Notification>().GetPagingListAsync(
                 selector: n => _mapper.Map<GetNotificationResponse>(n),
                 orderBy: n => n.OrderByDescending(n => n.CreateAt),
-                predicate: n => n.IsActive == true,
+                predicate: n => n.IsActive == true
+                && (!type.HasValue || n.Type.Equals(type.GetDescriptionFromEnum()))
+                && (!daysAgo.HasValue || n.CreateAt >= DateTime.Today.AddDays(-daysAgo.Value))
+                && (!monthsAgo.HasValue || n.CreateAt >= DateTime.Today.AddMonths(-monthsAgo.Value)),
                 page: page,
                 size: size);
 
