@@ -12,7 +12,7 @@ namespace Galini.Services.Interface
     public interface IListenerInfoService
     {
         public Task<BaseResponse> CreateListenerInfo(RegisterUserRequest registerRequest, CreateListenerInfoRequest request);
-        public Task<BaseResponse> GetAllListenerInfo(int page, int size);
+        public Task<BaseResponse> GetAllListenerInfo(int page, int size, string? name, bool? sortByName, bool? sortByPrice, bool? sortByStar);
         public Task<BaseResponse> GetListenerInfoById(Guid id);
         public Task<BaseResponse> GetListenerInfoByAccountId(Guid accountId);
         public Task<BaseResponse> UpdateListenerInfo(Guid id, UpdateListenerInfoRequest request);
