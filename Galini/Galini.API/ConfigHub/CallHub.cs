@@ -62,6 +62,7 @@ namespace Galini.API.ConfigHub
         {
             await Clients.Client(callerConnectionId).SendAsync("CallRejected");
             await _userStatusService.AddUser(callerConnectionId);
+            await _userStatusService.AddUser(Context.ConnectionId);
         }
 
         public async Task EndCall()
