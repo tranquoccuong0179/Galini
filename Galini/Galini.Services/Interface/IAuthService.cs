@@ -11,5 +11,6 @@ namespace Galini.Services.Interface
     public interface IAuthService
     {
         Task<BaseResponse> Authenticate(AuthenticateRequest request);
+        Task<BaseResponse> AutheticateWithRefreshToken(string refreshTokenRequest);
     }
 }

@@ -55,5 +55,15 @@ namespace Galini.Models.Utils
                 );
             return jwtHandler.WriteToken(token);
         }
+
+        public static string GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32]; 
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber); 
+            }
+            return Convert.ToBase64String(randomNumber); 
+        }
     }
 }

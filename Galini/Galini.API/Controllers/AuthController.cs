@@ -26,5 +26,15 @@ namespace Galini.API.Controllers
             var response = await _authService.Authenticate(request);
             return StatusCode(int.Parse(response.status), response);
         }
+
+        [HttpPost(ApiEndPointConstant.Authentication.AutheticateWithRefreshToken)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesErrorResponseType(typeof(ProblemDetails))]
+        public async Task<IActionResult> AutheticateWithRefreshToken([FromBody] string request)
+        {
+            var response = await _authService.AutheticateWithRefreshToken(request);
+            return StatusCode(int.Parse(response.status), response);
+        }
     }
 }
