@@ -1,4 +1,6 @@
-﻿namespace Galini.API.Constants
+﻿using Galini.Models.Payload.Response;
+
+namespace Galini.API.Constants
 {
     public static class ApiEndPointConstant
     {
@@ -14,6 +16,7 @@
         {
             public const string AuthenticationEndPoint = ApiEndpoint + "/auth";
             public const string Authenticate = AuthenticationEndPoint;
+            public const string AutheticateWithRefreshToken = AuthenticationEndPoint + "/refresh-token";
         }
 
         public static class GoogleAuthentication

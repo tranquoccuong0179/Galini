@@ -49,6 +49,8 @@ public partial class Account
 
     public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 
+    public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+
     public virtual ICollection<TestHistory> TestHistories { get; set; } = new List<TestHistory>();
 
     public virtual ICollection<UserCall> UserCalls { get; set; } = new List<UserCall>();
