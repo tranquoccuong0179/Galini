@@ -220,6 +220,8 @@ public class UserService : BaseService<UserService>, IUserService
         }
 
         account.IsActive = true;
+        var wallet = _mapper.Map<Wallet>(account);
+        await _unitOfWork.GetRepository<Wallet>().InsertAsync(wallet);
         _unitOfWork.GetRepository<Account>().UpdateAsync(account);
         await _unitOfWork.CommitAsync();
 
@@ -312,9 +314,17 @@ public class UserService : BaseService<UserService>, IUserService
             Role = RoleEnum.Customer.GetDescriptionFromEnum(),
             IsActive = true,
             Password = PasswordUtil.HashPassword("12345678"),
+            Phone = "0000000000",
+            DateOfBirth = TimeUtil.GetCurrentSEATime(),
+            Gender = GenderEnum.Male.GetDescriptionFromEnum(),
+            AvatarUrl = string.Empty,
+            CreateAt = TimeUtil.GetCurrentSEATime(),
+            UpdateAt = TimeUtil.GetCurrentSEATime(),
         };
 
         await _unitOfWork.GetRepository<Account>().InsertAsync(newUser);
+        var wallet = _mapper.Map<Wallet>(newUser);
+        await _unitOfWork.GetRepository<Wallet>().InsertAsync(wallet);
         await _unitOfWork.CommitAsync();
 
         return new BaseResponse
