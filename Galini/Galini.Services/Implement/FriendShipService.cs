@@ -88,7 +88,7 @@ namespace Galini.Services.Implement
             };
         }
 
-        public async Task<BaseResponse> GetAllFriendShip(int page, int size, string status, bool? sortByStatus)
+        public async Task<BaseResponse> GetAllFriendShip(int page, int size, string? status, bool? sortByStatus)
         {
             if (page < 1 || size < 1)
             {
