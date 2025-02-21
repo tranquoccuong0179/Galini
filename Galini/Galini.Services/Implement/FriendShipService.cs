@@ -88,7 +88,7 @@ namespace Galini.Services.Implement
             };
         }
 
-        public async Task<BaseResponse> GetAllFriendShip(int page, int size)
+        public async Task<BaseResponse> GetAllFriendShip(int page, int size, string status, bool? sortByStatus)
         {
             if (page < 1 || size < 1)
             {
@@ -102,7 +102,8 @@ namespace Galini.Services.Implement
 
             var friendShip = await _unitOfWork.GetRepository<FriendShip>().GetPagingListAsync(
                 selector: a => _mapper.Map<CreateFriendShipResponse>(a),
-                predicate: a => a.IsActive,
+                predicate: a => a.IsActive && (string.IsNullOrEmpty(status) || a.Status.Equals(status)),
+                orderBy: l => sortByStatus.HasValue ? (sortByStatus.Value ? l.OrderBy(l => l.Status) : l.OrderByDescending(l => l.Status)) : l.OrderBy(l => l.CreateAt),
                 page: page,
                 size: size);
 

@@ -12,14 +12,10 @@ namespace Galini.Services.Interface
     public interface IFriendShipService
     {
         public Task<BaseResponse> CreateFriendShip(Guid userId, Guid friendId);
-        public Task<BaseResponse> GetAllFriendShip(int page, int size);
+        public Task<BaseResponse> GetAllFriendShip(int page, int size, string status, bool? sortByStatus);
         public Task<BaseResponse> GetFriendShipById(Guid friendShipId);
         public Task<BaseResponse> GetFriendShipByAccountIdAndStatus(Guid accountId, FriendShipEnum status, int page, int size);
         public Task<BaseResponse> GetFriendByAccountId(Guid accountId, int page, int size);
-        //public Task<BaseResponse> GetFriendByAccountId(Guid accountId, int page, int size);
-        //public Task<BaseResponse> GetBlockListByAccountId(Guid accountId, int page, int size);
-        //public Task<BaseResponse> GetFriendRequestByAccountId(Guid accountId, int page, int size);
-        //public Task<BaseResponse> GetSentFriendRequestByAccountId(Guid accountId, int page, int size);
         public Task<BaseResponse> UpdateFriendShip(Guid friendShipId, UpdateFriendShipRequest request);
         public Task<BaseResponse> RemoveFriendShip(Guid friendShipId);
     }
