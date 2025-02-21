@@ -30,11 +30,12 @@ namespace Galini.API.Controllers
         [HttpGet(ApiEndPointConstant.ListenerInfo.GetListListenerInfo)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesErrorResponseType(typeof(ProblemDetails))]
-        public async Task<IActionResult> GetListListenerInfo([FromQuery] int? page, [FromQuery] int? size)
+        public async Task<IActionResult> GetListListenerInfo([FromQuery] int? page, [FromQuery] int? size, 
+                                                            [FromQuery] string? name, [FromQuery] bool? sortByName, [FromQuery] bool? sortByPrice, [FromQuery] bool? sortByStar)
         {
             int pageNumber = page ?? 1;
             int pageSize = size ?? 10;
-            var response = await _listenerInfoService.GetAllListenerInfo(pageNumber, pageSize);
+            var response = await _listenerInfoService.GetAllListenerInfo(pageNumber, pageSize, name, sortByName, sortByPrice, sortByStar);
             return StatusCode(int.Parse(response.status), response);
         }
 

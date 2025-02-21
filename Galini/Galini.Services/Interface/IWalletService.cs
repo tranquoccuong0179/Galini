@@ -10,5 +10,6 @@ namespace Galini.Services.Interface
     public interface IWalletService
     {
         Task<BaseResponse> CreatePaymentUrlRegisterCreator(decimal balance);
+        Task<BaseResponse> ConfirmWebhook(string webhookUrl);
     }
 }

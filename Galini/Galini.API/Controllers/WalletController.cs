@@ -23,5 +23,13 @@ namespace Galini.API.Controllers
             var response = await _walletService.CreatePaymentUrlRegisterCreator(balance);
             return StatusCode(int.Parse(response.status), response);
         }
+
+        [HttpPost("confirm-webhook")]
+        public async Task<IActionResult> ConfirmWebhook()
+        {
+            var webhookLink = "https://yourapi/api/v1/wallet/webhook";
+            var result = await _walletService.ConfirmWebhook(webhookLink);
+            return Ok(result);
+        }
     }
 }
