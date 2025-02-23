@@ -32,11 +32,11 @@ namespace Galini.API.Controllers
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
         [ProducesErrorResponseType(typeof(ProblemDetails))]
-        public async Task<IActionResult> GetAllFriendShip([FromQuery] int? page, [FromQuery] int? size)
+        public async Task<IActionResult> GetAllFriendShip([FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? status, [FromQuery] bool? sortByStatus)
         {
             int pageNumber = page ?? 1;
             int pageSize = size ?? 10;
-            var response = await _friendShipService.GetAllFriendShip(pageNumber, pageSize);
+            var response = await _friendShipService.GetAllFriendShip(pageNumber, pageSize, status, sortByStatus);
 
             return StatusCode(int.Parse(response.status), response);
         }

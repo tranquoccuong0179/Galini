@@ -40,11 +40,20 @@ namespace Galini.API.Controllers
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
         [ProducesErrorResponseType(typeof(ProblemDetails))]
-        public async Task<IActionResult> GetAllPremium([FromQuery] int? page, [FromQuery] int? size)
+        public async Task<IActionResult> GetAllPremium([FromQuery] int? page, [FromQuery] int? size,
+                                                                            [FromQuery] int? friend,
+                                                                            [FromQuery] bool? timelimit,
+                                                                            [FromQuery] int? match,
+                                                                            [FromQuery] double? minPrice,
+                                                                            [FromQuery] double? maxPrice,
+                                                                            [FromQuery] bool? sortByFriend,
+                                                                            [FromQuery] bool? sortByMatch,
+                                                                            [FromQuery] bool? sortByPrice,
+                                                                            [FromQuery] bool? sortByTimelimit)
         {
             int pageNumber = page ?? 1;
             int pageSize = size ?? 10;
-            var response = await _premiumService.GetAllPremium(pageNumber, pageSize);
+            var response = await _premiumService.GetAllPremium(pageNumber, pageSize, friend, timelimit, match, minPrice, maxPrice, sortByFriend, sortByMatch, sortByPrice, sortByTimelimit);
 
             return StatusCode(int.Parse(response.status), response);
         }

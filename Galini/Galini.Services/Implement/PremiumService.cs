@@ -50,7 +50,15 @@ namespace Galini.Services.Implement
             };
         }
 
-        public async Task<BaseResponse> GetAllPremium(int page, int size)
+        public async Task<BaseResponse> GetAllPremium(int page, int size, int? friend,
+                                                                            bool? timelimit,
+                                                                            int? match,
+                                                                            double? minPrice,
+                                                                            double? maxPrice,
+                                                                            bool? sortByFriend,
+                                                                            bool? sortByMatch,
+                                                                            bool? sortByPrice,
+                                                                            bool? sortByTimelimit)
         {
             if (page < 1 || size < 1)
             {
@@ -64,7 +72,17 @@ namespace Galini.Services.Implement
 
             var premium = await _unitOfWork.GetRepository<Premium>().GetPagingListAsync(
                 selector: a => _mapper.Map<CreatePremiumResponse>(a),
-                predicate: a => a.IsActive,
+                predicate: a => a.IsActive &&                        
+                         (!friend.HasValue || a.Friend >= friend.Value) &&
+                         (!timelimit.HasValue || a.Timelimit == timelimit.Value) &&
+                         (!match.HasValue || a.Match >= match.Value) &&
+                         (!minPrice.HasValue || a.Price >= minPrice.Value) &&
+                         (!maxPrice.HasValue || a.Price <= maxPrice.Value),
+                orderBy: l => sortByFriend.HasValue ? (sortByFriend.Value ? l.OrderBy(x => x.Friend) : l.OrderByDescending(x => x.Friend)) :
+                              sortByPrice.HasValue ? (sortByPrice.Value ? l.OrderBy(x => x.Price) : l.OrderByDescending(x => x.Price)) :
+                              sortByMatch.HasValue ? (sortByMatch.Value ? l.OrderBy(x => x.Match) : l.OrderByDescending(x => x.Match)) :
+                              sortByTimelimit.HasValue ? (sortByTimelimit.Value ? l.OrderBy(x => x.Timelimit) : l.OrderByDescending(x => x.Timelimit)) :
+                              l.OrderBy(x => x.CreateAt),
                 page: page,
                 size: size);
 

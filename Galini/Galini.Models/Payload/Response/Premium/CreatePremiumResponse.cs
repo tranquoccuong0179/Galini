@@ -12,5 +12,6 @@ namespace Galini.Models.Payload.Response.Premium
         public int Friend { get; set; }
         public bool Timelimit { get; set; }
         public int Match { get; set; }
+        public double Price { get; set; }
     }
 }
