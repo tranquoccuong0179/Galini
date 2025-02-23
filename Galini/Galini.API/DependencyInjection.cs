@@ -43,6 +43,8 @@ namespace Galini.API
             services.AddScoped<IListenerInfoService, ListenerInfoService>();
             services.AddScoped<ITopicService, TopicService>();
             services.AddScoped<IWalletService, WalletService>();
+            services.AddScoped<IMessageService, MessageService>();
+            services.AddScoped<IReviewService, ReviewService>();
             services.AddScoped<IGoogleAuthenticationService, GoogleAuthenticationService>();
             services.AddScoped<CallHub>();
             return services;
