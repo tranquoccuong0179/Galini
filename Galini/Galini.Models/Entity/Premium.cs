@@ -15,6 +15,8 @@ public partial class Premium
 
     public int Match { get; set; }
 
+    public double Price { get; set; }
+
     public bool IsActive { get; set; }
 
     public DateTime CreateAt { get; set; }
