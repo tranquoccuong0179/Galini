@@ -42,11 +42,11 @@ namespace Galini.API.Controllers
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
         [ProducesErrorResponseType(typeof(ProblemDetails))]
-        public async Task<IActionResult> GetAllUserInfo([FromQuery] int? page, [FromQuery] int? size)
+        public async Task<IActionResult> GetAllUserInfo([FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? premium, [FromQuery] bool? sortByPremium)
         {
             int pageNumber = page ?? 1;
             int pageSize = size ?? 10;
-            var response = await _userInfoService.GetAllUserInfo(pageNumber, pageSize);
+            var response = await _userInfoService.GetAllUserInfo(pageNumber, pageSize, premium, sortByPremium);
 
             return StatusCode(int.Parse(response.status), response);
         }
