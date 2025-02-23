@@ -79,7 +79,7 @@ namespace Galini.Services.Implement
             };
         }
 
-        public async Task<BaseResponse> GetAllUserInfo(int page, int size)
+        public async Task<BaseResponse> GetAllUserInfo(int page, int size, string? premium, bool? sortByPremium)
         {
             if (page < 1 || size < 1) 
             {
@@ -93,7 +93,8 @@ namespace Galini.Services.Implement
 
             var listUserInfo = await _unitOfWork.GetRepository<UserInfo>().GetPagingListAsync(
                 selector: a => _mapper.Map<CreateUserInfoResponse>(a),
-                predicate: a => a.IsActive,
+                predicate: a => a.IsActive && (string.IsNullOrEmpty(premium) || a.Premium.Type.Equals(premium)),
+                orderBy: l => sortByPremium.HasValue ? (sortByPremium.Value ? l.OrderBy(l => l.Premium.Type) : l.OrderByDescending(l => l.Premium.Type)) : l.OrderBy(l => l.CreateAt),
                 page: page,
                 size: size);
 

@@ -40,11 +40,14 @@ namespace Galini.API.Controllers
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
         [ProducesErrorResponseType(typeof(ProblemDetails))]
-        public async Task<IActionResult> GetAllCallHistory([FromQuery] int? page, [FromQuery] int? size)
+        public async Task<IActionResult> GetAllCallHistory([FromQuery] int? page, [FromQuery] int? size, 
+                                                           [FromQuery] DateTime? timeStart, [FromQuery] DateTime? timeEnd, 
+                                                           [FromQuery] int? duration, [FromQuery] bool? isMissCall, 
+                                                           [FromQuery] bool? sortByTimeStart, [FromQuery] bool? sortByTimeEnd,                                  [FromQuery] bool? sortByDuration, [FromQuery] bool? sortByMissCall)
         {
             int pageNumber = page ?? 1;
             int pageSize = size ?? 10;
-            var response = await _callHistoryService.GetAllCallHistory(pageNumber, pageSize);
+            var response = await _callHistoryService.GetAllCallHistory(pageNumber, pageSize, timeStart, timeEnd, duration, isMissCall, sortByTimeStart, sortByTimeEnd, sortByDuration, sortByMissCall);
 
             return StatusCode(int.Parse(response.status), response);
         }

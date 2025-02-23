@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Galini.Models.Payload.Request.Review
 {
-    public class CreateReviewRequest
+    public class UpdateReviewRequest
     {
         public string? ReviewMessage { get; set; }
         public string? ReplyMessage { get; set; }

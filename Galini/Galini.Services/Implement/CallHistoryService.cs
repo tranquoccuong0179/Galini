@@ -49,7 +49,7 @@ namespace Galini.Services.Implement
             };
         }
 
-        public async Task<BaseResponse> GetAllCallHistory(int page, int size)
+        public async Task<BaseResponse> GetAllCallHistory(int page, int size, DateTime? timeStart, DateTime? timeEnd, int? duration, bool? isMissCall, bool? sortByTimeStart, bool? sortByTimeEnd, bool? sortByDuration, bool? sortByMissCall)
         {
             if (page < 1 || size < 1)
             {
@@ -63,7 +63,15 @@ namespace Galini.Services.Implement
 
             var callHistory = await _unitOfWork.GetRepository<CallHistory>().GetPagingListAsync(
                 selector: a => _mapper.Map<CreateCallHistoryResponse>(a),
-                predicate: a => a.IsActive,
+                predicate: a => a.IsActive &&
+                                (!timeStart.HasValue || a.TimeStart.Date == timeStart.Value.Date) &&
+                                (!timeEnd.HasValue || a.TimeStart.Date == timeEnd.Value.Date) &&
+                                (!isMissCall.HasValue || a.IsMissCall == isMissCall),
+                orderBy: l => sortByMissCall.HasValue ? (sortByMissCall.Value ? l.OrderBy(l => l.IsMissCall) : l.OrderByDescending(l => l.IsMissCall)) :
+                              sortByTimeStart.HasValue ? (sortByTimeStart.Value ? l.OrderBy(l => l.TimeStart) : l.OrderByDescending(l => l.TimeStart)) :
+                              sortByTimeEnd.HasValue ? (sortByTimeEnd.Value ? l.OrderBy(l => l.TimeEnd) : l.OrderByDescending(l => l.TimeEnd)) :
+                              sortByDuration.HasValue ? (sortByDuration.Value ? l.OrderBy(l => l.Duration) : l.OrderByDescending(l => l.Duration)) :
+                              l.OrderByDescending(l => l.CreateAt),
                 page: page,
                 size: size);
 
