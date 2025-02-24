@@ -137,5 +137,16 @@ namespace Galini.API.Constants
             public const string SearchMessageByDirectChatId = MessageEndPoint + "search/{id}";
             public const string UpdateMessage = MessageEndPoint + "/{id}";
         }
+
+        public static class Review
+        {
+            public const string ReviewEndPoint = ApiEndpoint + "/review";
+            public const string CreateReview = ReviewEndPoint;
+            public const string GetAllReview = ReviewEndPoint;
+            public const string GetAllReviewByListenerId = ReviewEndPoint + "/listener/{id}";
+            public const string GetReviewById = ReviewEndPoint + "/{id}";
+            public const string UpdateReview = ReviewEndPoint + "/{id}";
+            public const string RemoveReview = ReviewEndPoint + "/{id}";
+        }
     }
 }
