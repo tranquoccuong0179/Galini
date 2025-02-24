@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Galini.Models.Payload.Response.Question
 {
-    public class CreateRequestResponse
+    public class CreateQuestionResponse
     {
         public Guid? Id { get; set; }
 
