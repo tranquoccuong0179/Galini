@@ -30,10 +30,10 @@ namespace Galini.Services.Implement
             _httpContextAccessor = httpContextAccessor; 
         }
 
-        public async Task<BaseResponse> CreateReview(CreateReviewRequest request, Guid bookingId)
+        public async Task<BaseResponse> CreateReview(CreateReviewRequest request, Guid id)
         {
             var bookingExist = await _unitOfWork.GetRepository<Booking>().SingleOrDefaultAsync(
-                predicate: l => l.Id.Equals(bookingId) && l.IsActive == true);
+                predicate: l => l.Id.Equals(id) && l.IsActive == true);
 
             if (bookingExist == null)
             {
@@ -59,7 +59,7 @@ namespace Galini.Services.Implement
             }
 
             var review = _mapper.Map<CreateReviewRequest, Review>(request);
-            review.BookingId = bookingId;
+            review.BookingId = id;
             review.ListenerId = listener.Id;
 
             var data = _mapper.Map<CreateTopicResponse>(review);
@@ -86,7 +86,7 @@ namespace Galini.Services.Implement
             };
         }
 
-        public async Task<BaseResponse> GetAllReview(int page, int size, int? star, bool? sortByStar, Guid? bookingId)
+        public async Task<BaseResponse> GetAllReview(int page, int size, int? star, bool? sortByStar, Guid? id)
         {
             if (page < 1 || size < 1)
             {
@@ -100,7 +100,7 @@ namespace Galini.Services.Implement
 
             var review = await _unitOfWork.GetRepository<Review>().GetPagingListAsync(
                 selector: a => _mapper.Map<CreateReviewResponse>(a),
-                predicate: a => a.IsActive && (!star.HasValue || a.Star >= star) && (!bookingId.HasValue || a.BookingId.Equals(bookingId)),
+                predicate: a => a.IsActive && (!star.HasValue || a.Star >= star) && (!id.HasValue || a.BookingId.Equals(id)),
                 orderBy: l => sortByStar.HasValue ? (sortByStar.Value ? l.OrderBy(l => l.Star) : l.OrderByDescending(l => l.Star)) : l.OrderBy(l => l.CreateAt),
                 page: page,
                 size: size);
@@ -113,11 +113,38 @@ namespace Galini.Services.Implement
             };
         }
 
-        public async Task<BaseResponse> GetReviewById(Guid reviewId)
+        public async Task<BaseResponse> GetAllReviewByListenerId(int page, int size, int? star, bool? sortByStar, Guid id)
+        {
+            if (page < 1 || size < 1)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status400BadRequest.ToString(),
+                    message = "Page hoặc size không hợp lệ.",
+                    data = null
+                };
+            }
+
+            var review = await _unitOfWork.GetRepository<Review>().GetPagingListAsync(
+                selector: a => _mapper.Map<CreateReviewResponse>(a),
+                predicate: a => a.IsActive && (!star.HasValue || a.Star >= star) && a.ListenerId.Equals(id),
+                orderBy: l => sortByStar.HasValue ? (sortByStar.Value ? l.OrderBy(l => l.Star) : l.OrderByDescending(l => l.Star)) : l.OrderBy(l => l.CreateAt),
+                page: page,
+                size: size);
+
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status200OK.ToString(),
+                message = "Lấy đánh giá thành công",
+                data = review
+            };
+        }
+
+        public async Task<BaseResponse> GetReviewById(Guid id)
         {          
             var review = await _unitOfWork.GetRepository<Review>().SingleOrDefaultAsync(
                 selector: t => _mapper.Map<CreateReviewResponse>(t),
-                predicate: t => t.Id.Equals(reviewId) && t.IsActive == true);
+                predicate: t => t.Id.Equals(id) && t.IsActive == true);
 
             if (review == null)
             {
@@ -137,10 +164,10 @@ namespace Galini.Services.Implement
             };
         }
 
-        public async Task<BaseResponse> RemoveReview(Guid reviewId)
+        public async Task<BaseResponse> RemoveReview(Guid id)
         {
             var review = await _unitOfWork.GetRepository<Review>().SingleOrDefaultAsync(
-                predicate: t => t.Id.Equals(reviewId) && t.IsActive == true);
+                predicate: t => t.Id.Equals(id) && t.IsActive == true);
 
             if (review == null)
             {
@@ -177,10 +204,10 @@ namespace Galini.Services.Implement
             };
         }
 
-        public async Task<BaseResponse> UpdateReview(Guid reviewId, UpdateReviewRequest request)
+        public async Task<BaseResponse> UpdateReview(Guid id, UpdateReviewRequest request)
         {
             var review = await _unitOfWork.GetRepository<Review>().SingleOrDefaultAsync(
-                predicate: t => t.Id.Equals(reviewId) && t.IsActive == true);
+                predicate: t => t.Id.Equals(id) && t.IsActive == true);
 
             if (review == null)
             {

@@ -10,10 +10,11 @@ namespace Galini.Services.Interface
 {
     public interface IReviewService
     {
-        public Task<BaseResponse> CreateReview(CreateReviewRequest request, Guid bookingId);
-        public Task<BaseResponse> GetAllReview(int page, int size, int? star, bool? sortByStar, Guid? bookingId);
-        public Task<BaseResponse> GetReviewById(Guid reviewId);
-        public Task<BaseResponse> UpdateReview(Guid reviewId, UpdateReviewRequest request);
-        public Task<BaseResponse> RemoveReview(Guid reviewId);
+        public Task<BaseResponse> CreateReview(CreateReviewRequest request, Guid id);
+        public Task<BaseResponse> GetAllReview(int page, int size, int? star, bool? sortByStar, Guid? id);
+        Task<BaseResponse> GetAllReviewByListenerId(int page, int size, int? star, bool? sortByStar, Guid id);
+        public Task<BaseResponse> GetReviewById(Guid id);
+        public Task<BaseResponse> UpdateReview(Guid id, UpdateReviewRequest request);
+        public Task<BaseResponse> RemoveReview(Guid id);
     }
 }
