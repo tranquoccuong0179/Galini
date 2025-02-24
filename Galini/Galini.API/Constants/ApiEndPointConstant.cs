@@ -148,5 +148,15 @@ namespace Galini.API.Constants
             public const string UpdateReview = ReviewEndPoint + "/{id}";
             public const string RemoveReview = ReviewEndPoint + "/{id}";
         }
+
+        public static class Question
+        {
+            public const string QuestionEndPoint = ApiEndpoint + "/question";
+            public const string CreateQuestion = QuestionEndPoint;
+            public const string GetAllQuestion = QuestionEndPoint;
+            public const string GetQuestionById = QuestionEndPoint + "/{id}";
+            public const string UpdateQuestion = QuestionEndPoint + "/{id}";
+            public const string RemoveQuestion = QuestionEndPoint + "/{id}";
+        }
     }
 }

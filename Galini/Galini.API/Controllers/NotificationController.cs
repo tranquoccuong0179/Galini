@@ -52,7 +52,7 @@ namespace Galini.API.Controllers
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status404NotFound)]
         [ProducesErrorResponseType(typeof(ProblemDetails))]
-        public async Task<IActionResult> CreateNotification([FromRoute] Guid id)
+        public async Task<IActionResult> GetNotification([FromRoute] Guid id)
         {
             var response = await _notificationService.GetNotificationoById(id);
             return StatusCode(int.Parse(response.status), response);

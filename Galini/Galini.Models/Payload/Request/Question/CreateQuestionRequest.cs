@@ -8,5 +8,6 @@ namespace Galini.Models.Payload.Request.Question
 {
     public class CreateQuestionRequest
     {
+        public string Content { get; set; } = null!;
     }
 }
