@@ -32,9 +32,50 @@ namespace Galini.Services.Implement
             _payOS = new PayOS(_payOSSettings.ClientId, _payOSSettings.ApiKey, _payOSSettings.ChecksumKey);
         }
 
-        public Task<BaseResponse> ConfirmWebhook(string webhookUrl)
+        public async Task<BaseResponse> ConfirmWebhook(WebhookType payload)
         {
-            throw new NotImplementedException();
+            string code = payload.code;
+            bool success = payload.success;
+            var transaction = await _unitOfWork.GetRepository<Models.Entity.Transaction>().SingleOrDefaultAsync(
+                predicate: t => t.OrderCode == payload.data.orderCode);
+            if (success && code == "00")
+            {
+                await HandleSuccessPayment(transaction);
+            }
+            else
+            {
+                await HandleFailedPayment(transaction);
+            }
+
+            await _unitOfWork.CommitAsync();
+            return new BaseResponse
+            {
+                status = StatusCodes.Status200OK.ToString(),
+                message = "Thành công",
+                data = true
+            };
+        }
+
+        public async Task HandleSuccessPayment(Models.Entity.Transaction transaction)
+        {
+            transaction.UpdateAt = TimeUtil.GetCurrentSEATime();
+            var wallet = await _unitOfWork.GetRepository<Wallet>().SingleOrDefaultAsync(
+                predicate: w => w.Id.Equals(transaction.WalletId));
+            if (wallet == null)
+            {
+                throw new Exception("Không tìm thấy ví người dùng");
+            }
+
+            wallet.Balance += transaction.Amount;
+            wallet.UpdateAt = TimeUtil.GetCurrentSEATime();
+            _unitOfWork.GetRepository<Models.Entity.Transaction>().UpdateAsync(transaction);
+            _unitOfWork.GetRepository<Wallet>().UpdateAsync(wallet);
+        }
+
+        public async Task HandleFailedPayment(Models.Entity.Transaction transaction)
+        {
+            transaction.UpdateAt = TimeUtil.GetCurrentSEATime();
+            _unitOfWork.GetRepository<Models.Entity.Transaction>().UpdateAsync(transaction);
         }
 
         public async Task<BaseResponse> CreatePaymentUrlRegisterCreator(CreateDepositRequest request)

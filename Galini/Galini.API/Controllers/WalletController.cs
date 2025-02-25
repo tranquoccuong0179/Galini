@@ -5,6 +5,8 @@ using Galini.Models.Payload.Request.Topic;
 using Galini.Models.Payload.Response;
 using Galini.Services.Interface;
 using Microsoft.AspNetCore.Mvc;
+using Net.payOS.Types;
+using Newtonsoft.Json;
 
 namespace Galini.API.Controllers
 {
@@ -25,12 +27,50 @@ namespace Galini.API.Controllers
             return StatusCode(int.Parse(response.status), response);
         }
 
-        [HttpPost("confirm-webhook")]
-        public async Task<IActionResult> ConfirmWebhook()
+        [HttpPost("api/v1/webhook-url")]// Đặt route cụ thể cho action method
+        public IActionResult HandleWebhook(WebhookType payload)
         {
-            var webhookLink = "https://yourapi/api/v1/wallet/webhook";
-            var result = await _walletService.ConfirmWebhook(webhookLink);
-            return Ok(result);
+            //try
+            //{
+            //    // Đọc body của request
+            //    using (var reader = new StreamReader(Request.Body))
+            //    {
+            //        var jsonBody = reader.ReadToEnd();
+            //        var data = JsonConvert.DeserializeObject<dynamic>(jsonBody);
+
+            //        // Xử lý dữ liệu webhook ở đây
+            //        // Ví dụ: lấy orderCode từ dữ liệu webhook
+            //        var orderCode = data?["orderCode"]?.ToString();
+            //        Console.WriteLine($"Received webhook for order: {orderCode}");
+
+            //        // Trả về response thành công
+            //        return Ok(new
+            //        {
+            //            code = "00",
+            //            message = "success"
+            //        });
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    // Log lỗi (nếu cần)
+            //    Console.WriteLine($"Error processing webhook: {ex.Message}");
+
+            //    // Trả về response với status code 200 ngay cả khi có lỗi
+            //    return Ok(new
+            //    {
+            //        code = "00",
+            //        message = "success"
+            //    });
+            //}
+
+            var response = _walletService.ConfirmWebhook(payload);
+
+
+            return Ok(response);
+
         }
+
+
     }
 }
