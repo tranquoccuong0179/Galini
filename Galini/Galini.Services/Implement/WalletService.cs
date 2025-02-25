@@ -6,11 +6,13 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Galini.Models.Entity;
+using Galini.Models.Payload.Request.Deposit;
 using Galini.Models.Payload.Response;
 using Galini.Models.Payload.Response.Wallet;
 using Galini.Models.Utils;
 using Galini.Repository.Interface;
 using Galini.Services.Interface;
+using Galini.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -35,7 +37,7 @@ namespace Galini.Services.Implement
             throw new NotImplementedException();
         }
 
-        public async Task<BaseResponse> CreatePaymentUrlRegisterCreator(decimal balance)
+        public async Task<BaseResponse> CreatePaymentUrlRegisterCreator(CreateDepositRequest request)
         {
             try
             {
@@ -53,6 +55,19 @@ namespace Galini.Services.Implement
                     };
                 }
 
+                var wallet = await _unitOfWork.GetRepository<Wallet>().SingleOrDefaultAsync(
+                    predicate: w => w.AccountId.Equals(user.Id) && w.IsActive == true);
+
+                if (wallet == null)
+                {
+                    return new BaseResponse()
+                    {
+                        status = StatusCodes.Status404NotFound.ToString(),
+                        message = "Không tìm thấy ví của người này",
+                        data = null
+                    };
+                }
+
 
                 string buyerName = user.FullName;
                 string buyerPhone = user.Phone;
@@ -63,7 +78,7 @@ namespace Galini.Services.Implement
                 var description = "VQRIO123";
                 var signatureData = new Dictionary<string, object>
                 {
-                    { "amount", balance },
+                    { "amount", request.Amount },
                     { "cancelUrl", _payOSSettings.ReturnUrlFail },
                     { "description", description },
                     { "expiredAt", DateTimeOffset.Now.AddMinutes(10).ToUnixTimeSeconds() },
@@ -79,7 +94,7 @@ namespace Galini.Services.Implement
 
                 var paymentData = new PaymentData(
                     orderCode: orderCode,
-                    amount: (int)balance,
+                    amount: (int)request.Amount,
                     description: description,
                     items: null,
                     cancelUrl: _payOSSettings.ReturnUrlFail,
@@ -93,14 +108,43 @@ namespace Galini.Services.Implement
                     expiredAt: (int)expiredAt.ToUnixTimeSeconds()
                 );
 
+                var deposit = _mapper.Map<Deposit>(request);
+                deposit.Code = orderCode.ToString();
+                deposit.AccountId = user.Id;
+                await _unitOfWork.GetRepository<Deposit>().InsertAsync(deposit);
 
-                // Gọi API tạo thanh toán
+                var transaction = new Models.Entity.Transaction()
+                {
+                    Id = Guid.NewGuid(),
+                    Amount = request.Amount,
+                    DepositId = deposit.Id,
+                    WalletId = wallet.Id,
+                    IsActive = true,
+                    CreateAt = TimeUtil.GetCurrentSEATime(),
+                    UpdateAt = TimeUtil.GetCurrentSEATime(),
+                };
+                await _unitOfWork.GetRepository< Models.Entity.Transaction>().InsertAsync(transaction);
+
+                bool isSuccessfully = await _unitOfWork.CommitAsync() > 0;
+
                 var paymentResult = await _payOS.createPaymentLink(paymentData);
+
+
+
+                if (isSuccessfully)
+                {
+                    return new BaseResponse()
+                    {
+                        status = StatusCodes.Status200OK.ToString(),
+                        message = "Tạo link thanh toán thành công",
+                        data = paymentResult,
+                    };
+                }
 
                 return new BaseResponse()
                 {
-                    status = StatusCodes.Status200OK.ToString(),
-                    message = "Tạo link thanh toán thành công",
+                    status = StatusCodes.Status400BadRequest.ToString(),
+                    message = "Tạo link thanh toán thất bại",
                     data = paymentResult,
                 };
             }

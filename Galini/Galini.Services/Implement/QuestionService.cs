@@ -26,6 +26,18 @@ namespace Galini.Services.Implement
 
         public async Task<BaseResponse> CreateQuestion(CreateQuestionRequest request)
         {
+            var questionExist = await _unitOfWork.GetRepository<Question>().SingleOrDefaultAsync(
+                predicate: q => q.Content.Equals(request.Content));
+            if(questionExist != null)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status400BadRequest.ToString(),
+                    message = "Nội dung câu hỏi đã tồn tại",
+                    data = null
+                };
+            }
+
             var question = _mapper.Map<Question>(request);
             await _unitOfWork.GetRepository<Question>().InsertAsync(question);
             bool isSuccessfully = await _unitOfWork.CommitAsync() > 0;
@@ -145,9 +157,40 @@ namespace Galini.Services.Implement
             };
         }
 
-        public Task<BaseResponse> UpdateQuestion(Guid id, CreateQuestionRequest request)
+        public async Task<BaseResponse> UpdateQuestion(Guid id, UpdateQuestionRequest request)
         {
-            throw new NotImplementedException();
+            var question = await _unitOfWork.GetRepository<Question>().SingleOrDefaultAsync(
+                predicate: q => q.Id.Equals(id) && q.IsActive == true);
+            if (question == null)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status404NotFound.ToString(),
+                    message = "Không tìm thấy câu hỏi",
+                    data = null
+                };
+            }
+
+            _mapper.Map(request, question);
+            _unitOfWork.GetRepository<Question>().UpdateAsync(question);
+            bool isSuccessfully = await _unitOfWork.CommitAsync() > 0;
+
+            if (isSuccessfully)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status200OK.ToString(),
+                    message = "Cập nhật câu hỏi thành công",
+                    data = _mapper.Map<GetQuestionResponse>(question)
+                };
+            }
+
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status400BadRequest.ToString(),
+                message = "Cập nhật câu hỏi thất bại",
+                data = null
+            };
         }
     }
 }

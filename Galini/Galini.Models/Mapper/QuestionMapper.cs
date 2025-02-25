@@ -23,6 +23,10 @@ namespace Galini.Models.Mapper
 
             CreateMap<Question, CreateQuestionResponse>();
             CreateMap<Question, GetQuestionResponse>();
+
+            CreateMap<UpdateQuestionRequest, Question>()
+                .ForMember(dest => dest.Content, opt => opt.Condition(src => src.Content != null))
+                .ForMember(dest => dest.UpdateAt, opt => opt.MapFrom(src => TimeUtil.GetCurrentSEATime()));
         }
     }
 }

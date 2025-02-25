@@ -20,7 +20,6 @@ namespace Galini.API.Controllers
         [HttpPost(ApiEndPointConstant.Question.CreateQuestion)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status404NotFound)]
         [ProducesErrorResponseType(typeof(ProblemDetails))]
         public async Task<IActionResult> CreateQuestion([FromBody] CreateQuestionRequest request)
         {
@@ -59,6 +58,17 @@ namespace Galini.API.Controllers
         public async Task<IActionResult> RemoveQuestion([FromRoute] Guid id)
         {
             var response = await _questionService.RemoveQuestion(id);
+            return StatusCode(int.Parse(response.status), response);
+        }
+        
+        [HttpPut(ApiEndPointConstant.Question.UpdateQuestion)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesErrorResponseType(typeof(ProblemDetails))]
+        public async Task<IActionResult> UpdateQuestion([FromRoute] Guid id, [FromBody] UpdateQuestionRequest request)
+        {
+            var response = await _questionService.UpdateQuestion(id, request);
             return StatusCode(int.Parse(response.status), response);
         }
     }

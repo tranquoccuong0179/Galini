@@ -1,5 +1,6 @@
 ﻿
 using Galini.API.Constants;
+using Galini.Models.Payload.Request.Deposit;
 using Galini.Models.Payload.Request.Topic;
 using Galini.Models.Payload.Response;
 using Galini.Services.Interface;
@@ -18,9 +19,9 @@ namespace Galini.API.Controllers
         [HttpPost(ApiEndPointConstant.Wallet.CreateLink)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesErrorResponseType(typeof(ProblemDetails))]
-        public async Task<IActionResult> CreateTopic([FromQuery] decimal balance)
+        public async Task<IActionResult> CreateLink([FromBody] CreateDepositRequest request)
         {
-            var response = await _walletService.CreatePaymentUrlRegisterCreator(balance);
+            var response = await _walletService.CreatePaymentUrlRegisterCreator(request);
             return StatusCode(int.Parse(response.status), response);
         }
 
