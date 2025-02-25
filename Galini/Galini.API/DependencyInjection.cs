@@ -31,6 +31,7 @@ namespace Galini.API
         public static IServiceCollection AddCustomServices(this IServiceCollection services)
         {
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<ITestHistoryService, TestHistoryService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IUserInfoService, UserInfoService>();
             services.AddScoped<INotificationService, NotificationService>();

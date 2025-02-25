@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace Galini.Models.Payload.Request.TestHistory
 {
-    public class CreateTestHistoryRequest
+    public class UpdateTestHistoryRequest
     {
         public int Grade { get; set; }
 
         public string Status { get; set; }
+
+        public bool IsActive { get; set; }
     }
 }
