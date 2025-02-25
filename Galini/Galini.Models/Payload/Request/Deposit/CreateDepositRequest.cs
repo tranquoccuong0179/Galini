@@ -8,5 +8,7 @@ namespace Galini.Models.Payload.Request.Deposit
 {
     public class CreateDepositRequest
     {
+        public decimal Amount { get; set; }
+        public string Description { get; set; } = null!;
     }
 }
