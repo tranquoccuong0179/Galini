@@ -13,6 +13,8 @@ public partial class Transaction
 
     public decimal Amount { get; set; }
 
+    public long? OrderCode { get; set; }
+
     public bool IsActive { get; set; }
 
     public DateTime CreateAt { get; set; }
