@@ -4,12 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Galini.Models.Payload.Request.TestHistory
+namespace Galini.Models.Payload.Response.TestHistory
 {
-    public class CreateTestHistoryRequest
+    public class CreateTestHistoryResponse
     {
         public int Grade { get; set; }
 
         public string Status { get; set; }
+
+        public string Name { get; set; }
     }
 }

@@ -78,7 +78,7 @@ namespace Galini.API.Constants
 
         public static class CallHistory
         {
-            public const string CallHistoryEndPoint = ApiEndpoint + "/callhistory";
+            public const string CallHistoryEndPoint = ApiEndpoint + "/call-history";
             public const string CreateCallHistory = CallHistoryEndPoint;
             public const string GetAllCallHistory = CallHistoryEndPoint;
             public const string GetCallHistoryById = CallHistoryEndPoint + "/{id}";
@@ -157,6 +157,17 @@ namespace Galini.API.Constants
             public const string GetQuestionById = QuestionEndPoint + "/{id}";
             public const string UpdateQuestion = QuestionEndPoint + "/{id}";
             public const string RemoveQuestion = QuestionEndPoint + "/{id}";
+        }
+
+        public static class TestHistory
+        {
+            public const string TestHistoryEndPoint = "api/test-history";
+            public const string GetAllTestHistory = TestHistoryEndPoint;
+            public const string GetTestHistoryById = TestHistoryEndPoint + "/{id}";
+            public const string GetTestHistoryByAccountId = TestHistoryEndPoint + "/account";
+            public const string CreateTestHistory = TestHistoryEndPoint;
+            public const string UpdateTestHistory = TestHistoryEndPoint + "/{id}";
+            public const string RemoveTestHistory = TestHistoryEndPoint + "/{id}";
         }
     }
 }
