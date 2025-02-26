@@ -170,5 +170,15 @@ namespace Galini.API.Constants
             public const string UpdateTestHistory = TestHistoryEndPoint + "/{id}";
             public const string RemoveTestHistory = TestHistoryEndPoint + "/{id}";
         }
+        public static class UserPresence
+        {
+            public const string UserPresenceEndPoint = "api/user-presence";
+            public const string GetAllUserPresence = UserPresenceEndPoint;
+            public const string GetUserPresenceById = UserPresenceEndPoint + "/{id}";
+            public const string GetUserPresenceByAccountId = UserPresenceEndPoint + "/account/{id}";
+            public const string CreateUserPresence = UserPresenceEndPoint + "/account/{id}";
+            public const string UpdateUserPresence = UserPresenceEndPoint + "/{id}";
+            public const string RemoveUserPresence = UserPresenceEndPoint + "/{id}";
+        }
     }
 }
