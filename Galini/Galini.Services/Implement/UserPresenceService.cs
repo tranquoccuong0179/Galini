@@ -78,7 +78,7 @@ namespace Galini.Services.Implement
                 };
             }
 
-            var userPresence = await _unitOfWork.GetRepository<Review>().GetPagingListAsync(
+            var userPresence = await _unitOfWork.GetRepository<UserPresence>().GetPagingListAsync(
                 selector: a => _mapper.Map<CreateUserPresenceResponse>(a),
                 predicate: a => a.IsActive,
                 orderBy: a => a.OrderBy(a => a.CreateAt),
@@ -124,9 +124,9 @@ namespace Galini.Services.Implement
 
             return new BaseResponse()
             {
-                status = StatusCodes.Status400BadRequest.ToString(),
-                message = "Lấy user presence thất bại",
-                data = null
+                status = StatusCodes.Status200OK.ToString(),
+                message = "Lấy user presence thành công",
+                data = userPresence
             };
         }
 
@@ -148,9 +148,9 @@ namespace Galini.Services.Implement
 
             return new BaseResponse()
             {
-                status = StatusCodes.Status400BadRequest.ToString(),
-                message = "Lấy user presence thất bại",
-                data = null
+                status = StatusCodes.Status200OK.ToString(),
+                message = "Lấy user presence thành công",
+                data = userPresence
             };
         }
 
@@ -164,16 +164,16 @@ namespace Galini.Services.Implement
                 return new BaseResponse()
                 {
                     status = StatusCodes.Status404NotFound.ToString(),
-                    message = "Không tìm thấy câu hỏi",
+                    message = "Không tìm thấy user presence",
                     data = false
                 };
             }
 
-            question.IsActive = false;
-            question.DeleteAt = TimeUtil.GetCurrentSEATime();
-            question.UpdateAt = TimeUtil.GetCurrentSEATime();
+            userPresence.IsActive = false;
+            userPresence.DeleteAt = TimeUtil.GetCurrentSEATime();
+            userPresence.UpdateAt = TimeUtil.GetCurrentSEATime();
 
-            _unitOfWork.GetRepository<Question>().UpdateAsync(question);
+            _unitOfWork.GetRepository<UserPresence>().UpdateAsync(userPresence);
             bool isSuccessfully = await _unitOfWork.CommitAsync() > 0;
 
             if (isSuccessfully)
@@ -181,21 +181,54 @@ namespace Galini.Services.Implement
                 return new BaseResponse()
                 {
                     status = StatusCodes.Status200OK.ToString(),
-                    message = "Xóa câu hỏi thành công",
+                    message = "Xóa user presence thành công",
                     data = true
                 };
             }
             return new BaseResponse()
             {
                 status = StatusCodes.Status400BadRequest.ToString(),
-                message = "Xóa câu hỏi thất bại",
+                message = "Xóa user presence thất bại",
                 data = false
             };
         }
 
-        public Task<BaseResponse> UpdateUserPresence(Guid id, UpdateUserPresenceRequest request)
+        public async Task<BaseResponse> UpdateUserPresence(Guid id, UpdateUserPresenceRequest request)
         {
-            throw new NotImplementedException();
+            var userPresence = await _unitOfWork.GetRepository<UserPresence>().SingleOrDefaultAsync(
+                predicate: t => t.Id.Equals(id) && t.IsActive
+                );
+
+            if (userPresence == null)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status404NotFound.ToString(),
+                    message = "Không tìm thấy user presence này",
+                    data = null
+                };
+            }
+
+            _mapper.Map(request, userPresence);
+            _unitOfWork.GetRepository<UserPresence>().UpdateAsync(userPresence);
+            bool isSuccessfully = await _unitOfWork.CommitAsync() > 0;
+
+            if (isSuccessfully)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status200OK.ToString(),
+                    message = "Cập nhật user presence thành công",
+                    data = _mapper.Map<CreateUserPresenceResponse>(userPresence)
+                };
+            }
+
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status400BadRequest.ToString(),
+                message = "Cập nhật user presence thất bại",
+                data = null
+            };
         }
     }
 }

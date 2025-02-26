@@ -34,7 +34,7 @@ namespace Galini.Services.Implement
         {
             Guid? id = UserUtil.GetAccountId(_httpContextAccessor.HttpContext);
             var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
-                predicate: l => l.Id.Equals(id) && l.IsActive == true);
+                predicate: l => l.Id.Equals(id) && l.IsActive);
 
             if (account == null)
             {
@@ -101,7 +101,7 @@ namespace Galini.Services.Implement
         {
             Guid? id = UserUtil.GetAccountId(_httpContextAccessor.HttpContext);
             var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
-                predicate: l => l.Id.Equals(id) && l.IsActive == true);
+                predicate: l => l.Id.Equals(id) && l.IsActive);
 
             if (account == null)
             {
@@ -142,7 +142,7 @@ namespace Galini.Services.Implement
         {
             var testHistory = await _unitOfWork.GetRepository<TestHistory>().SingleOrDefaultAsync(
                 selector: t => _mapper.Map<CreateTestHistoryResponse>(t),
-                predicate: t => t.Id.Equals(testHistoryId) && t.IsActive == true);
+                predicate: t => t.Id.Equals(testHistoryId) && t.IsActive);
 
             if (testHistory == null)
             {
@@ -165,7 +165,7 @@ namespace Galini.Services.Implement
         public async Task<BaseResponse> RemoveTestHistory(Guid testHistoryId)
         {
             var testHistory = await _unitOfWork.GetRepository<TestHistory>().SingleOrDefaultAsync(
-                predicate: t => t.Id.Equals(testHistoryId) && t.IsActive == true);
+                predicate: t => t.Id.Equals(testHistoryId) && t.IsActive);
 
             if (testHistory == null)
             {
@@ -205,7 +205,8 @@ namespace Galini.Services.Implement
         public async Task<BaseResponse> UpdateTestHistory(Guid testHistoryId, UpdateTestHistoryRequest request)
         {
             var testHistory = await _unitOfWork.GetRepository<TestHistory>().SingleOrDefaultAsync(
-                predicate: t => t.Id.Equals(testHistoryId) && t.IsActive == true);
+                predicate: t => t.Id.Equals(testHistoryId) && t.IsActive
+                );
 
             if (testHistory == null)
             {

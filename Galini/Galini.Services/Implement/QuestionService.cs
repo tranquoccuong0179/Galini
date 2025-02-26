@@ -63,7 +63,7 @@ namespace Galini.Services.Implement
             var response = await _unitOfWork.GetRepository<Question>().GetPagingListAsync(
                 selector: q => _mapper.Map<GetQuestionResponse>(q),
                 orderBy: q => q.OrderByDescending(q => q.CreateAt),
-                predicate: q => q.IsActive == true,
+                predicate: q => q.IsActive,
                 page: page,
                 size: size);
 
@@ -99,7 +99,7 @@ namespace Galini.Services.Implement
         {
             var response = await _unitOfWork.GetRepository<Question>().SingleOrDefaultAsync(
                 selector: q => _mapper.Map<GetQuestionResponse>(q),
-                predicate: q => q.IsActive == true && q.Id.Equals(id));
+                predicate: q => q.IsActive && q.Id.Equals(id));
             if (response == null)
             {
                 return new BaseResponse()
@@ -121,7 +121,7 @@ namespace Galini.Services.Implement
         public async Task<BaseResponse> RemoveQuestion(Guid id)
         {
             var question = await _unitOfWork.GetRepository<Question>().SingleOrDefaultAsync(
-                predicate: q => q.IsActive == true && q.Id.Equals(id));
+                predicate: q => q.IsActive && q.Id.Equals(id));
 
             if (question == null)
             {
@@ -160,7 +160,7 @@ namespace Galini.Services.Implement
         public async Task<BaseResponse> UpdateQuestion(Guid id, UpdateQuestionRequest request)
         {
             var question = await _unitOfWork.GetRepository<Question>().SingleOrDefaultAsync(
-                predicate: q => q.Id.Equals(id) && q.IsActive == true);
+                predicate: q => q.Id.Equals(id) && q.IsActive);
             if (question == null)
             {
                 return new BaseResponse()
