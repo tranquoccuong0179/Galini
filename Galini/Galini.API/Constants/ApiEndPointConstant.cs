@@ -124,6 +124,7 @@ namespace Galini.API.Constants
             public const string WalletEndPoint = ApiEndpoint + "/wallet";
             public const string CreateLink = WalletEndPoint;
             public const string Webhook = WalletEndPoint + "/webhook-url";
+            public const string GetWallet = WalletEndPoint;
         }
 
         public static class Message

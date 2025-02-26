@@ -210,5 +210,43 @@ namespace Galini.Services.Implement
                 return BitConverter.ToString(hash).Replace("-", "").ToLower();
             }
         }
+
+        public async Task<BaseResponse> GetWallet()
+        {
+            Guid? id = UserUtil.GetAccountId(_httpContextAccessor.HttpContext);
+            var user = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+                predicate: u => u.Id.Equals(id) && u.IsActive == true);
+
+            if (user == null)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status404NotFound.ToString(),
+                    message = "Không tìm người dùng với ID này",
+                    data = null
+                };
+            }
+
+            var wallet = await _unitOfWork.GetRepository<Wallet>().SingleOrDefaultAsync(
+                selector: w => _mapper.Map<GetWalletResponse>(w),
+                predicate: w => w.AccountId.Equals(user.Id) && w.IsActive == true);
+            if (wallet == null)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status404NotFound.ToString(),
+                    message = "Không tìm thấy ví tiền",
+                    data = null
+                };
+            }
+
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status200OK.ToString(),
+                message = "Thông tin ví tiền",
+                data = wallet
+            };
+
+        }
     }
 }
