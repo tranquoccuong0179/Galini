@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Galini.Models.Entity;
+using Galini.Models.Enum;
 using Galini.Models.Payload.Request.Deposit;
 using Galini.Models.Payload.Response;
 using Galini.Models.Payload.Response.Wallet;
@@ -46,8 +47,6 @@ namespace Galini.Services.Implement
             {
                 await HandleFailedPayment(transaction);
             }
-
-            await _unitOfWork.CommitAsync();
             return new BaseResponse
             {
                 status = StatusCodes.Status200OK.ToString(),
@@ -59,6 +58,7 @@ namespace Galini.Services.Implement
         public async Task HandleSuccessPayment(Models.Entity.Transaction transaction)
         {
             transaction.UpdateAt = TimeUtil.GetCurrentSEATime();
+            transaction.Status = TransactionStatusEnum.SUCCESS.ToString();
             var wallet = await _unitOfWork.GetRepository<Wallet>().SingleOrDefaultAsync(
                 predicate: w => w.Id.Equals(transaction.WalletId));
             if (wallet == null)
@@ -70,12 +70,15 @@ namespace Galini.Services.Implement
             wallet.UpdateAt = TimeUtil.GetCurrentSEATime();
             _unitOfWork.GetRepository<Models.Entity.Transaction>().UpdateAsync(transaction);
             _unitOfWork.GetRepository<Wallet>().UpdateAsync(wallet);
+            await _unitOfWork.CommitAsync();
         }
 
         public async Task HandleFailedPayment(Models.Entity.Transaction transaction)
         {
             transaction.UpdateAt = TimeUtil.GetCurrentSEATime();
+            transaction.Status = TransactionStatusEnum.FAILED.ToString();
             _unitOfWork.GetRepository<Models.Entity.Transaction>().UpdateAsync(transaction);
+            await _unitOfWork.CommitAsync();
         }
 
         public async Task<BaseResponse> CreatePaymentUrlRegisterCreator(CreateDepositRequest request)
@@ -160,7 +163,10 @@ namespace Galini.Services.Implement
                     Amount = request.Amount,
                     DepositId = deposit.Id,
                     WalletId = wallet.Id,
+                    OrderCode = orderCode,
                     IsActive = true,
+                    Status = TransactionStatusEnum.PENDING.GetDescriptionFromEnum(),
+                    Type = TransactionTypeEnum.DEPOSIT.GetDescriptionFromEnum(),
                     CreateAt = TimeUtil.GetCurrentSEATime(),
                     UpdateAt = TimeUtil.GetCurrentSEATime(),
                 };
