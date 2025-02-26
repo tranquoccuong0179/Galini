@@ -27,8 +27,8 @@ namespace Galini.API.Controllers
             return StatusCode(int.Parse(response.status), response);
         }
 
-        [HttpPost("api/v1/webhook-url")]// Đặt route cụ thể cho action method
-        public IActionResult HandleWebhook(WebhookType payload)
+        [HttpPost(ApiEndPointConstant.Wallet.Webhook)]
+        public async Task<IActionResult> HandleWebhook([FromBody] WebhookType payload)
         {
             //try
             //{
@@ -64,10 +64,26 @@ namespace Galini.API.Controllers
             //    });
             //}
 
-            var response = _walletService.ConfirmWebhook(payload);
+            try
+            {
+                var signatureFromPayOs = payload.signature; // Lấy signature từ body
+                var requestBody = JsonConvert.SerializeObject(payload);
+                var result = await _walletService.ConfirmWebhook(payload);
+                //if (result.IsSuccess)
+                //{
+                //    return Ok();
+                //}
+                //return BadRequest(result.ErrorMessage);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while handling webhook in controller.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing the webhook.");
+            }
+            //var response = _walletService.ConfirmWebhook(payload);
 
 
-            return Ok(response);
 
         }
 

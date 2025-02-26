@@ -220,7 +220,15 @@ public class UserService : BaseService<UserService>, IUserService
         }
 
         account.IsActive = true;
-        var wallet = _mapper.Map<Wallet>(account);
+        var wallet = new Wallet()
+        {
+            Id = Guid.NewGuid(),
+            AccountId = account.Id,
+            Balance = 0,
+            CreateAt = TimeUtil.GetCurrentSEATime(),
+            UpdateAt = TimeUtil.GetCurrentSEATime(),
+            IsActive = true
+        };
         await _unitOfWork.GetRepository<Wallet>().InsertAsync(wallet);
         _unitOfWork.GetRepository<Account>().UpdateAsync(account);
         await _unitOfWork.CommitAsync();
