@@ -80,6 +80,16 @@ namespace Galini.API.Controllers
 
         }
 
+        [HttpGet(ApiEndPointConstant.Wallet.GetWallet)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status404NotFound)]
+        [ProducesErrorResponseType(typeof(ProblemDetails))]
+        public async Task<IActionResult> GetWallet()
+        {
+            var response = await _walletService.GetWallet();
+            return StatusCode(int.Parse(response.status), response);
+        }
+
 
     }
 }
