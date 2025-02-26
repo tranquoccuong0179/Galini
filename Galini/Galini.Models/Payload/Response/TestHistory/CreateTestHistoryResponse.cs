@@ -11,7 +11,5 @@ namespace Galini.Models.Payload.Response.TestHistory
         public int Grade { get; set; }
 
         public string Status { get; set; }
-
-        public string Name { get; set; }
     }
 }

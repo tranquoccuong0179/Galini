@@ -1,12 +1,8 @@
 ﻿using AutoMapper;
 using Galini.Models.Entity;
-using Galini.Models.Payload.Request.Premium;
 using Galini.Models.Payload.Request.Review;
 using Galini.Models.Payload.Response;
-using Galini.Models.Payload.Response.FriendShip;
 using Galini.Models.Payload.Response.Review;
-using Galini.Models.Payload.Response.Topic;
-using Galini.Models.Utils;
 using Galini.Repository.Interface;
 using Galini.Services.Interface;
 using Galini.Utils;
@@ -33,7 +29,7 @@ namespace Galini.Services.Implement
         public async Task<BaseResponse> CreateReview(CreateReviewRequest request, Guid id)
         {
             var bookingExist = await _unitOfWork.GetRepository<Booking>().SingleOrDefaultAsync(
-                predicate: l => l.Id.Equals(id) && l.IsActive == true);
+                predicate: l => l.Id.Equals(id) && l.IsActive);
 
             if (bookingExist == null)
             {
@@ -46,7 +42,7 @@ namespace Galini.Services.Implement
             }
 
             var listener = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
-                predicate: l => l.Id.Equals(bookingExist.ListenerId) && l.IsActive == true);
+                predicate: l => l.Id.Equals(bookingExist.ListenerId) && l.IsActive);
 
             if (listener == null)
             {
@@ -62,8 +58,8 @@ namespace Galini.Services.Implement
             review.BookingId = id;
             review.ListenerId = listener.Id;
 
-            var data = _mapper.Map<CreateTopicResponse>(review);
-            data.Name = listener.FullName;
+            var data = _mapper.Map<CreateReviewResponse>(review);
+            data.ListenerName = listener.FullName;
 
             await _unitOfWork.GetRepository<Review>().InsertAsync(review);
             bool isSuccessfully = await _unitOfWork.CommitAsync() > 0;
@@ -144,7 +140,7 @@ namespace Galini.Services.Implement
         {          
             var review = await _unitOfWork.GetRepository<Review>().SingleOrDefaultAsync(
                 selector: t => _mapper.Map<CreateReviewResponse>(t),
-                predicate: t => t.Id.Equals(id) && t.IsActive == true);
+                predicate: t => t.Id.Equals(id) && t.IsActive);
 
             if (review == null)
             {
@@ -167,7 +163,7 @@ namespace Galini.Services.Implement
         public async Task<BaseResponse> RemoveReview(Guid id)
         {
             var review = await _unitOfWork.GetRepository<Review>().SingleOrDefaultAsync(
-                predicate: t => t.Id.Equals(id) && t.IsActive == true);
+                predicate: t => t.Id.Equals(id) && t.IsActive);
 
             if (review == null)
             {
@@ -207,7 +203,7 @@ namespace Galini.Services.Implement
         public async Task<BaseResponse> UpdateReview(Guid id, UpdateReviewRequest request)
         {
             var review = await _unitOfWork.GetRepository<Review>().SingleOrDefaultAsync(
-                predicate: t => t.Id.Equals(id) && t.IsActive == true);
+                predicate: t => t.Id.Equals(id) && t.IsActive);
 
             if (review == null)
             {
