@@ -66,14 +66,9 @@ namespace Galini.API.Controllers
 
             try
             {
-                var signatureFromPayOs = payload.signature; // Lấy signature từ body
+                var signatureFromPayOs = payload.signature;
                 var requestBody = JsonConvert.SerializeObject(payload);
                 var result = await _walletService.ConfirmWebhook(payload);
-                //if (result.IsSuccess)
-                //{
-                //    return Ok();
-                //}
-                //return BadRequest(result.ErrorMessage);
                 return Ok();
             }
             catch (Exception ex)
@@ -81,8 +76,6 @@ namespace Galini.API.Controllers
                 _logger.LogError(ex, "An error occurred while handling webhook in controller.");
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing the webhook.");
             }
-            //var response = _walletService.ConfirmWebhook(payload);
-
 
 
         }
