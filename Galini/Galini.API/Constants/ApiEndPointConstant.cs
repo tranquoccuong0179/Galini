@@ -181,5 +181,13 @@ namespace Galini.API.Constants
             public const string UpdateUserPresence = UserPresenceEndPoint + "/{id}";
             public const string RemoveUserPresence = UserPresenceEndPoint + "/{id}";
         }
+
+        public static class Transaction
+        {
+            public const string TransactionEndPoint = ApiEndpoint + "/transaction";
+            public const string GetTransactions = TransactionEndPoint;
+            public const string GetTransactionsForAdmin = TransactionEndPoint + "/admin";
+            public const string GetTransactionById = TransactionEndPoint + "/{id}";
+        }
     }
 }
