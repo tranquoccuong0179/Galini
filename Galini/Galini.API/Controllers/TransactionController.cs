@@ -1,5 +1,6 @@
 ﻿
 using Galini.API.Constants;
+using Galini.Models.Enum;
 using Galini.Models.Payload.Response;
 using Galini.Services.Implement;
 using Galini.Services.Interface;
@@ -18,11 +19,15 @@ namespace Galini.API.Controllers
         [HttpGet(ApiEndPointConstant.Transaction.GetTransactions)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesErrorResponseType(typeof(ProblemDetails))]
-        public async Task<IActionResult> GetTransactions([FromQuery] int? page, [FromQuery] int? size)
+        public async Task<IActionResult> GetTransactions([FromQuery] int? page, 
+                                                         [FromQuery] int? size, 
+                                                         [FromQuery] int? daysAgo, 
+                                                         [FromQuery] int? weeksAgo, 
+                                                         [FromQuery] int? monthsAgo)
         {
             int pageNumber = page ?? 1;
             int pageSize = size ?? 10;
-            var response = await _transactionService.GetTransactions(pageNumber, pageSize);
+            var response = await _transactionService.GetTransactions(pageNumber, pageSize, daysAgo, weeksAgo, monthsAgo);
 
             return StatusCode(int.Parse(response.status), response);
         }
@@ -35,11 +40,16 @@ namespace Galini.API.Controllers
                                                                  [FromQuery] string? name,
                                                                  [FromQuery] string? email,
                                                                  [FromQuery] string? phone,
-                                                                 [FromQuery] bool? sortByPrice)
+                                                                 [FromQuery] TransactionStatusEnum? status,
+                                                                 [FromQuery] TransactionTypeEnum? type,
+                                                                 [FromQuery] bool? sortByPrice,
+                                                                 [FromQuery] int? daysAgo,
+                                                                 [FromQuery] int? weeksAgo,
+                                                                 [FromQuery] int? monthsAgo)
         {
             int pageNumber = page ?? 1;
             int pageSize = size ?? 10;
-            var response = await _transactionService.GetAllTransaction(pageNumber, pageSize, name, email, phone, sortByPrice);
+            var response = await _transactionService.GetAllTransaction(pageNumber, pageSize, name, email, phone, status, type, sortByPrice, daysAgo, weeksAgo, monthsAgo);
 
             return StatusCode(int.Parse(response.status), response);
         }
