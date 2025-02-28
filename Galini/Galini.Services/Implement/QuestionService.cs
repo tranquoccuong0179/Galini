@@ -58,12 +58,14 @@ namespace Galini.Services.Implement
             };
         }
 
-        public async Task<BaseResponse> GetAllQuestion(int page, int size)
+        public async Task<BaseResponse> GetAllQuestion(int page, int size, string? content, bool? sortByContent)
         {
             var response = await _unitOfWork.GetRepository<Question>().GetPagingListAsync(
                 selector: q => _mapper.Map<GetQuestionResponse>(q),
-                orderBy: q => q.OrderByDescending(q => q.CreateAt),
-                predicate: q => q.IsActive,
+                orderBy: q => sortByContent.HasValue ? 
+                        (sortByContent.Value ? q.OrderBy(q => q.Content) : q.OrderByDescending(q => q.Content)) : 
+                        q.OrderByDescending(q => q.CreateAt),
+                predicate: q => q.IsActive && (string.IsNullOrEmpty(content) || q.Content.Contains(content)),
                 page: page,
                 size: size);
 
@@ -167,6 +169,18 @@ namespace Galini.Services.Implement
                 {
                     status = StatusCodes.Status404NotFound.ToString(),
                     message = "Không tìm thấy câu hỏi",
+                    data = null
+                };
+            }
+            var questionExisted = await _unitOfWork.GetRepository<Question>().SingleOrDefaultAsync(
+                predicate: q => q.Content.Equals(request.Content) && !q.Content.Equals(question.Content));
+
+            if (questionExisted != null)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status400BadRequest.ToString(),
+                    message = "Câu hỏi đã tồn tại",
                     data = null
                 };
             }
