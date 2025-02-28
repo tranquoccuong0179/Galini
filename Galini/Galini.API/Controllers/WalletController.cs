@@ -90,6 +90,23 @@ namespace Galini.API.Controllers
             return StatusCode(int.Parse(response.status), response);
         }
 
+        [HttpGet("ReturnUrlFail")]
+        public async Task<IActionResult> ReturnFailedUrl()
+        {
+            string responseCode = Request.Query["code"].ToString();
+            string id = Request.Query["id"].ToString();
+            string cancel = Request.Query["cancel"].ToString();
+            string status = Request.Query["status"].ToString();
+            string orderCode = Request.Query["orderCode"];
+
+            if (status == "CANCELLED")
+            {
+                var response = await _walletService.HandleFailedPayment(id, long.Parse(orderCode));
+                return Redirect("http://localhost:3000/failed");
+            }
+            return Redirect("http://localhost:3000/failed");
+        }
+
 
     }
 }
