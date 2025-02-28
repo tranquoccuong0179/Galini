@@ -62,15 +62,43 @@ namespace Galini.Services.Implement
             };
         }
 
-        public async Task<BaseResponse> GetAllNotification(int page, int size, TypeEnum? type, int? daysAgo, int? monthsAgo)
+        public async Task<BaseResponse> GetAllNotification(int page, int size, TypeEnum? type, int? daysAgo, int? weeksAgo, int? monthsAgo)
         {
+            DateTime? fromDate = null;
+            DateTime? toDate = null;
+
+            if (daysAgo.HasValue)
+            {
+                fromDate = DateTime.Today.AddDays(-daysAgo.Value);
+                toDate = fromDate.Value.AddDays(1);
+            }
+
+            if (weeksAgo.HasValue)
+            {
+                DateTime weekStart = DateTime.Today.AddDays(-weeksAgo.Value * 7);
+                weekStart = weekStart.AddDays(-(int)weekStart.DayOfWeek + 1);
+                DateTime weekEnd = weekStart.AddDays(7);
+
+                fromDate = weekStart;
+                toDate = weekEnd;
+            }
+
+            if (monthsAgo.HasValue)
+            {
+                DateTime monthStart = new DateTime(DateTime.Today.AddMonths(-monthsAgo.Value).Year,
+                                                   DateTime.Today.AddMonths(-monthsAgo.Value).Month, 1);
+                DateTime monthEnd = monthStart.AddMonths(1);
+
+                fromDate = monthStart;
+                toDate = monthEnd;
+            }
             var response = await _unitOfWork.GetRepository<Notification>().GetPagingListAsync(
                 selector: n => _mapper.Map<GetNotificationResponse>(n),
                 orderBy: n => n.OrderByDescending(n => n.CreateAt),
                 predicate: n => n.IsActive == true
                 && (!type.HasValue || n.Type.Equals(type.GetDescriptionFromEnum()))
-                && (!daysAgo.HasValue || n.CreateAt >= DateTime.Today.AddDays(-daysAgo.Value))
-                && (!monthsAgo.HasValue || n.CreateAt >= DateTime.Today.AddMonths(-monthsAgo.Value)),
+                && (!fromDate.HasValue || n.CreateAt >= fromDate.Value)
+                && (!toDate.HasValue || n.CreateAt < toDate.Value),
                 page: page,
                 size: size);
 

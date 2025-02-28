@@ -10,10 +10,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Galini.API.Controllers
 {
-    public class TopicController : BaseController<AccountController>
+    public class TopicController : BaseController<TopicController>
     {
         private readonly ITopicService _service;
-        public TopicController(ILogger<AccountController> logger, ITopicService service) : base(logger)
+
+        public TopicController(ILogger<TopicController> logger, ITopicService service) : base(logger)
         {
             _service = service;
         }
