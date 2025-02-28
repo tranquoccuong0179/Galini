@@ -32,11 +32,13 @@ namespace Galini.API.Controllers
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesErrorResponseType(typeof(ProblemDetails))]
         public async Task<IActionResult> GetNotifications([FromQuery] int? page,
-                                                          [FromQuery] int? size)
+                                                          [FromQuery] int? size,
+                                                          [FromQuery] string? content,
+                                                          [FromQuery] bool? sortByContent)
         {
             int pageNumber = page ?? 1;
             int pageSize = size ?? 10;
-            var response = await _questionService.GetAllQuestion(pageNumber, pageSize);
+            var response = await _questionService.GetAllQuestion(pageNumber, pageSize, content, sortByContent);
             return StatusCode(int.Parse(response.status), response);
         }
 

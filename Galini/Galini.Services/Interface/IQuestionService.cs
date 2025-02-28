@@ -11,7 +11,7 @@ namespace Galini.Services.Interface
     public interface IQuestionService
     {
         public Task<BaseResponse> CreateQuestion(CreateQuestionRequest request);
-        public Task<BaseResponse> GetAllQuestion(int page, int size);
+        public Task<BaseResponse> GetAllQuestion(int page, int size, string? content, bool? sortByContent);
         public Task<BaseResponse> GetQuestionById(Guid id);
         public Task<BaseResponse> UpdateQuestion(Guid id, UpdateQuestionRequest request);
         public Task<BaseResponse> RemoveQuestion(Guid id);
