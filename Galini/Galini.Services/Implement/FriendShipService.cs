@@ -4,6 +4,7 @@ using Galini.Models.Enum;
 using Galini.Models.Payload.Request.FriendShip;
 using Galini.Models.Payload.Response;
 using Galini.Models.Payload.Response.FriendShip;
+using Galini.Models.Utils;
 using Galini.Repository.Interface;
 using Galini.Services.Interface;
 using Galini.Utils;
@@ -21,10 +22,12 @@ namespace Galini.Services.Implement
 {
     public class FriendShipService : BaseService<FriendShipService>, IFriendShipService
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
     public FriendShipService(IUnitOfWork<HarmonContext> unitOfWork, ILogger<FriendShipService> logger, IMapper mapper, IHttpContextAccessor httpContextAccessor) : base(unitOfWork, logger, mapper, httpContextAccessor)
     {
-        _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
+            _mapper = mapper;
     }
 
         public async Task<BaseResponse> CreateFriendShip(Guid userId, Guid friendId)
@@ -112,6 +115,60 @@ namespace Galini.Services.Implement
                 status = StatusCodes.Status200OK.ToString(),
                 message = "Lấy thông tin mối quan hệ thành công",
                 data = friendShip
+            };
+        }
+
+        public async Task<BaseResponse> GetFriendList(int page, int size)
+        {
+            Guid? id = UserUtil.GetAccountId(_httpContextAccessor.HttpContext);
+            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+                predicate: x => x.Id.Equals(id) && x.IsActive);
+            if (account == null)
+            {
+                _logger.LogWarning($"Không tìm thấy tài khoản có Id {id} .");
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status404NotFound.ToString(),
+                    message = "Tài khoản không tồn tại",
+                    data = null
+                };
+            }
+
+            if (page < 1 || size < 1)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status400BadRequest.ToString(),
+                    message = "Page hoặc size không hợp lệ.",
+                    data = null
+                };
+            }
+
+            var friendships = await _unitOfWork.GetRepository<FriendShip>().GetListAsync(
+                predicate: f => (f.UserId == account.Id || f.FriendId == account.Id) && f.Status == "Accepted");
+
+            if (friendships == null || !friendships.Any())
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status200OK.ToString(),
+                    message = "Không tìm thấy bạn bè nào.",
+                    data = null
+                };
+            }
+
+            var friendIds = new HashSet<Guid>(friendships.Select(f => f.UserId == account.Id ? f.FriendId : f.UserId).ToList());
+
+            var friends = await _unitOfWork.GetRepository<Account>().GetPagingListAsync(
+                predicate: a => friendIds.Contains(a.Id),
+                page: page,
+                size: size);
+
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status200OK.ToString(),
+                message = "Lấy danh sách bạn bè thành công",
+                data = friends
             };
         }
 

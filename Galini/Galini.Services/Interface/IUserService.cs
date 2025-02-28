@@ -12,5 +12,5 @@ public interface IUserService
     Task<string> CreateTokenByEmail(string email);
     Task<bool> GetAccountByEmail(string email);
     Task<BaseResponse> CreateNewUserAccountByGoogle(GoogleAuthResponse request);
-
+    Task<BaseResponse> GetListenerAccount(int page, int size);
 }
