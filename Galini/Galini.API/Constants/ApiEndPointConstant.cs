@@ -181,7 +181,16 @@ namespace Galini.API.Constants
             public const string UpdateUserPresence = UserPresenceEndPoint + "/{id}";
             public const string RemoveUserPresence = UserPresenceEndPoint + "/{id}";
         }
-
+        public static class WorkShift
+        {
+            public const string WorkShiftEndPoint = "api/workshift";
+            public const string GetAllWorkShift = WorkShiftEndPoint;
+            public const string GetWorkShiftById = WorkShiftEndPoint + "/{id}";
+            public const string GetWorkShiftByAccountId = WorkShiftEndPoint + "/account/{id}";
+            public const string CreateWorkShift = WorkShiftEndPoint + "/account/{id}";
+            public const string UpdateWorkShift = WorkShiftEndPoint + "/{id}";
+            public const string RemoveWorkShift = WorkShiftEndPoint + "/{id}";
+        }
         public static class Transaction
         {
             public const string TransactionEndPoint = ApiEndpoint + "/transaction";
