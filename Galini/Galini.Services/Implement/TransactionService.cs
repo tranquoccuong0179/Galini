@@ -5,12 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Galini.Models.Entity;
+using Galini.Models.Enum;
 using Galini.Models.Paginate;
 using Galini.Models.Payload.Response;
 using Galini.Models.Payload.Response.Transaction;
 using Galini.Models.Utils;
 using Galini.Repository.Interface;
 using Galini.Services.Interface;
+using Galini.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -27,14 +29,54 @@ namespace Galini.Services.Implement
                                                           int size, 
                                                           string? name, 
                                                           string? email, 
-                                                          string? phone, 
-                                                          bool? sortByPrice)
+                                                          string? phone,
+                                                          TransactionStatusEnum? status, 
+                                                          TransactionTypeEnum? type,
+                                                          bool? sortByPrice,
+                                                          int? daysAgo,
+                                                          int? weeksAgo,
+                                                          int? monthsAgo)
         {
+
+            DateTime? fromDate = null;
+            DateTime? toDate = null;
+
+            if (daysAgo.HasValue)
+            {
+                fromDate = DateTime.Today.AddDays(-daysAgo.Value);
+                toDate = fromDate.Value.AddDays(1);
+            }
+
+            if (weeksAgo.HasValue)
+            {
+                DateTime weekStart = DateTime.Today.AddDays(-weeksAgo.Value * 7);
+                weekStart = weekStart.AddDays(-(int)weekStart.DayOfWeek + 1);
+                DateTime weekEnd = weekStart.AddDays(7);
+
+                fromDate = weekStart;
+                toDate = weekEnd;
+            }
+
+            if (monthsAgo.HasValue)
+            {
+                DateTime monthStart = new DateTime(DateTime.Today.AddMonths(-monthsAgo.Value).Year,
+                                                   DateTime.Today.AddMonths(-monthsAgo.Value).Month, 1);
+                DateTime monthEnd = monthStart.AddMonths(1);
+
+                fromDate = monthStart;
+                toDate = monthEnd;
+            }
+
+
             var response = await _unitOfWork.GetRepository<Transaction>().GetPagingListAsync(
                 selector: t => _mapper.Map<GetTransactionAdminResponse>(t),
                 predicate: t => (string.IsNullOrEmpty(name) || t.Wallet.Account.UserName.Contains(name)) &&
                                 (string.IsNullOrEmpty(email) || t.Wallet.Account.Email.Equals(email)) &&
-                                (string.IsNullOrEmpty(phone) || t.Wallet.Account.Phone.Equals(phone)),
+                                (string.IsNullOrEmpty(phone) || t.Wallet.Account.Phone.Equals(phone)) &&
+                                (!status.HasValue || t.Status.Equals(status.GetDescriptionFromEnum())) &&
+                                (!type.HasValue || t.Type.Equals(type.GetDescriptionFromEnum())) &&
+                                (!fromDate.HasValue || t.CreateAt >= fromDate.Value) &&
+                                (!toDate.HasValue || t.CreateAt < toDate.Value),
                 include: t => t.Include(t => t.Wallet)
                                .ThenInclude(w => w.Account),
                 orderBy: t => sortByPrice.HasValue ?
@@ -108,7 +150,11 @@ namespace Galini.Services.Implement
             };
         }
 
-        public async Task<BaseResponse> GetTransactions(int page, int size)
+        public async Task<BaseResponse> GetTransactions(int page, 
+                                                        int size, 
+                                                        int? daysAgo, 
+                                                        int? weeksAgo, 
+                                                        int? monthsAgo)
         {
             Guid? userId = UserUtil.GetAccountId(_httpContextAccessor.HttpContext);
             var user = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
@@ -123,9 +169,41 @@ namespace Galini.Services.Implement
                 };
             }
 
+            DateTime? fromDate = null;
+            DateTime? toDate = null;
+
+            if (daysAgo.HasValue)
+            {
+                fromDate = DateTime.Today.AddDays(-daysAgo.Value);
+                toDate = fromDate.Value.AddDays(1);
+            }
+
+            if (weeksAgo.HasValue)
+            {
+                DateTime weekStart = DateTime.Today.AddDays(-weeksAgo.Value * 7);
+                weekStart = weekStart.AddDays(-(int)weekStart.DayOfWeek + 1);
+                DateTime weekEnd = weekStart.AddDays(7);
+
+                fromDate = weekStart;
+                toDate = weekEnd;
+            }
+
+            if (monthsAgo.HasValue)
+            {
+                DateTime monthStart = new DateTime(DateTime.Today.AddMonths(-monthsAgo.Value).Year,
+                                                   DateTime.Today.AddMonths(-monthsAgo.Value).Month, 1);
+                DateTime monthEnd = monthStart.AddMonths(1);
+
+                fromDate = monthStart;
+                toDate = monthEnd;
+            }
+
             var response = await _unitOfWork.GetRepository<Transaction>().GetPagingListAsync(
                 selector: t => _mapper.Map<GetTransactionResponse>(t),
-                predicate: t => t.Wallet.AccountId.Equals(user.Id),
+                predicate: t => t.Wallet.AccountId.Equals(user.Id) &&
+                                (!fromDate.HasValue || t.CreateAt >= fromDate.Value) &&
+                                (!toDate.HasValue || t.CreateAt < toDate.Value),
+                orderBy: t => t.OrderByDescending(t => t.CreateAt),
                 page: page,
                 size: size);
 

@@ -66,6 +66,20 @@ builder.Services.AddSwaggerGen(c =>
                    .Select(name => new OpenApiString(name) as IOpenApiAny)
                    .ToList()
     });
+    c.MapType<TransactionTypeEnum>(() => new OpenApiSchema
+    {
+        Type = "string",
+        Enum = Enum.GetNames(typeof(TransactionTypeEnum))
+                   .Select(name => new OpenApiString(name) as IOpenApiAny)
+                   .ToList()
+    });
+    c.MapType<TransactionStatusEnum>(() => new OpenApiSchema
+    {
+        Type = "string",
+        Enum = Enum.GetNames(typeof(TransactionStatusEnum))
+                   .Select(name => new OpenApiString(name) as IOpenApiAny)
+                   .ToList()
+    });
 });
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
