@@ -19,6 +19,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Net.payOS;
 using Net.payOS.Types;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using StackExchange.Redis;
 
 namespace Galini.Services.Implement
 {
@@ -26,11 +29,14 @@ namespace Galini.Services.Implement
     {
         private readonly PayOSSettings _payOSSettings;
         private readonly PayOS _payOS;
+        private readonly HttpClient _client;
+
         public WalletService(IUnitOfWork<HarmonContext> unitOfWork, ILogger<WalletService> logger, 
-            IMapper mapper, IHttpContextAccessor httpContextAccessor, IOptions<PayOSSettings> settings) : base(unitOfWork, logger, mapper, httpContextAccessor)
+            IMapper mapper, IHttpContextAccessor httpContextAccessor, IOptions<PayOSSettings> settings, HttpClient client) : base(unitOfWork, logger, mapper, httpContextAccessor)
         {
             _payOSSettings = settings.Value;
             _payOS = new PayOS(_payOSSettings.ClientId, _payOSSettings.ApiKey, _payOSSettings.ChecksumKey);
+            _client = client;
         }
 
         public async Task<BaseResponse> ConfirmWebhook(WebhookType payload)
@@ -42,10 +48,6 @@ namespace Galini.Services.Implement
             if (success && code == "00")
             {
                 await HandleSuccessPayment(transaction);
-            }
-            else
-            {
-                await HandleFailedPayment(transaction);
             }
             return new BaseResponse
             {
@@ -73,12 +75,60 @@ namespace Galini.Services.Implement
             await _unitOfWork.CommitAsync();
         }
 
-        public async Task HandleFailedPayment(Models.Entity.Transaction transaction)
+        public async Task<BaseResponse> HandleFailedPayment(string paymentLinkId, long orderCode)
         {
-            transaction.UpdateAt = TimeUtil.GetCurrentSEATime();
-            transaction.Status = TransactionStatusEnum.FAILED.ToString();
-            _unitOfWork.GetRepository<Models.Entity.Transaction>().UpdateAsync(transaction);
-            await _unitOfWork.CommitAsync();
+            var paymentInfo = await GetPaymentInfo(paymentLinkId);
+            if (paymentInfo.Status == "CANCELLED")
+            {
+                var transactions = await _unitOfWork.GetRepository<Models.Entity.Transaction>().SingleOrDefaultAsync(
+                    predicate: t => t.OrderCode == orderCode);
+
+                if (transactions != null)
+                {
+                    transactions.UpdateAt = TimeUtil.GetCurrentSEATime();
+                    transactions.Status = TransactionStatusEnum.FAILED.ToString();
+                    _unitOfWork.GetRepository<Models.Entity.Transaction>().UpdateAsync(transactions);
+                    await _unitOfWork.CommitAsync();
+                    return new BaseResponse()
+                    {
+                        status = StatusCodes.Status200OK.ToString(),
+                        message = "Hủy thanh toán thành công",
+                        data = true
+                    };
+                }
+            }
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status200OK.ToString(),
+                message = "Hủy thanh toán thành công",
+                data = true
+            };
+        }
+
+        public async Task<ObjectPayment> GetPaymentInfo(string paymentLinkId)
+        {
+            try
+            {
+                var getUrl = $"https://api-merchant.payos.vn/v2/payment-requests/{paymentLinkId}";
+
+                var request = new HttpRequestMessage(HttpMethod.Get, getUrl);
+                request.Headers.Add("x-client-id", _payOSSettings.ClientId);
+                request.Headers.Add("x-api-key", _payOSSettings.ApiKey);
+
+                var response = await _client.SendAsync(request);
+                response.EnsureSuccessStatusCode();
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var responseObject = JsonConvert.DeserializeObject<JObject>(responseContent);
+                var paymentInfo = responseObject["data"].ToObject<ObjectPayment>();
+
+                return paymentInfo;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while getting payment info.", ex);
+            }
+
         }
 
         public async Task<BaseResponse> CreatePaymentUrlRegisterCreator(CreateDepositRequest request)

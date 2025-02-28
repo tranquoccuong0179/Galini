@@ -14,5 +14,6 @@ namespace Galini.Services.Interface
         Task<BaseResponse> CreatePaymentUrlRegisterCreator(CreateDepositRequest request);
         Task<BaseResponse> ConfirmWebhook(WebhookType payload);
         Task<BaseResponse> GetWallet();
+        Task<BaseResponse> HandleFailedPayment(string paymentLinkId, long orderCode);
     }
 }
