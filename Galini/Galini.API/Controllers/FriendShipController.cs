@@ -41,6 +41,19 @@ namespace Galini.API.Controllers
             return StatusCode(int.Parse(response.status), response);
         }
 
+        [HttpGet(ApiEndPointConstant.FriendShip.GetFriendList)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesErrorResponseType(typeof(ProblemDetails))]
+        public async Task<IActionResult> GetFriendList([FromQuery] int? page, [FromQuery] int? size)
+        {
+            int pageNumber = page ?? 1;
+            int pageSize = size ?? 10;
+            var response = await _friendShipService.GetFriendList(pageNumber, pageSize);
+
+            return StatusCode(int.Parse(response.status), response);
+        }
+
         [HttpGet(ApiEndPointConstant.FriendShip.GetFriendShipById)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]

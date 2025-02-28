@@ -1,6 +1,7 @@
 using Galini.API.Constants;
 using Galini.Models.Payload.Request.User;
 using Galini.Models.Payload.Response;
+using Galini.Services.Implement;
 using Galini.Services.Interface;
 using Microsoft.AspNetCore.Mvc;
 
@@ -43,6 +44,19 @@ public class AccountController : BaseController<AccountController>
     public async Task<IActionResult> ResendOtp([FromBody] string email)
     {
         var response = await _userService.ResendOtp(email);
+        return StatusCode(int.Parse(response.status), response);
+    }
+
+    [HttpGet(ApiEndPointConstant.User.GetListenerAccount)]
+    [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+    [ProducesErrorResponseType(typeof(ProblemDetails))]
+    public async Task<IActionResult> GetListenerAccount([FromQuery] int? page, [FromQuery] int? size)
+    {
+        int pageNumber = page ?? 1;
+        int pageSize = size ?? 10;
+        var response = await _userService.GetListenerAccount(pageNumber, pageSize);
+
         return StatusCode(int.Parse(response.status), response);
     }
 }

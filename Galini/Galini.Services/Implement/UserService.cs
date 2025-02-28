@@ -8,6 +8,7 @@ using Galini.Models.Payload.Request.UserInfo;
 using Galini.Models.Payload.Response;
 using Galini.Models.Payload.Response.Account;
 using Galini.Models.Payload.Response.GoogleAuthentication;
+using Galini.Models.Payload.Response.WorkShift;
 using Galini.Models.Utils;
 using Galini.Repository.Interface;
 using Galini.Services.Interface;
@@ -32,6 +33,32 @@ public class UserService : BaseService<UserService>, IUserService
         _mapper = mapper;
         _emailService = emailService;
         _redis = redis;
+    }
+
+    public async Task<BaseResponse> GetListenerAccount(int page, int size)
+    {
+        if (page < 1 || size < 1)
+        {
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status400BadRequest.ToString(),
+                message = "Page hoặc size không hợp lệ.",
+                data = null
+            };
+        }
+
+        var accounts = await _unitOfWork.GetRepository<Account>().GetPagingListAsync(
+            predicate: a => a.IsActive && a.ListenerInfo != null,
+            orderBy: a => a.OrderBy(a => a.CreateAt),
+            page: page,
+            size: size);
+
+        return new BaseResponse()
+        {
+            status = StatusCodes.Status200OK.ToString(),
+            message = "Lấy tham vấn viên thành công",
+            data = accounts
+        };
     }
 
     public async Task<BaseResponse> RegisterUser(RegisterUserRequest request)

@@ -32,6 +32,7 @@ namespace Galini.API.Constants
             public const string RegisterUser = UserEndPoint;
             public const string VerifyOtp = UserEndPoint + "/verify-otp";
             public const string ResendOtp = UserEndPoint + "/resend-otp";
+            public const string GetListenerAccount = UserEndPoint + "/listener";
         }
 
         public static class Notification
@@ -91,6 +92,7 @@ namespace Galini.API.Constants
             public const string FriendShipEndPoint = ApiEndpoint + "/friendship";
             public const string CreateFriendShip = FriendShipEndPoint;
             public const string GetAllFriendShip = FriendShipEndPoint;
+            public const string GetFriendList = FriendShipEndPoint + "/friend-list";
             public const string GetFriendShipById = FriendShipEndPoint + "/{id}";
             public const string GetFriendShipByAccountIdAndStatus = FriendShipEndPoint + "/account/{id}/status";
             public const string GetFriendByAccountId = FriendShipEndPoint + "/account/{id}";

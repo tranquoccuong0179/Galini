@@ -13,6 +13,7 @@ namespace Galini.Services.Interface
     {
         public Task<BaseResponse> CreateFriendShip(Guid userId, Guid friendId);
         public Task<BaseResponse> GetAllFriendShip(int page, int size, string? status, bool? sortByStatus);
+        public Task<BaseResponse> GetFriendList(int page, int size);
         public Task<BaseResponse> GetFriendShipById(Guid friendShipId);
         public Task<BaseResponse> GetFriendShipByAccountIdAndStatus(Guid accountId, FriendShipEnum status, int page, int size);
         public Task<BaseResponse> GetFriendByAccountId(Guid accountId, int page, int size);
