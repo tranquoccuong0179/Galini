@@ -13,6 +13,8 @@ public partial class Transaction
 
     public decimal Amount { get; set; }
 
+    public long? OrderCode { get; set; }
+
     public bool IsActive { get; set; }
 
     public DateTime CreateAt { get; set; }
@@ -20,6 +22,10 @@ public partial class Transaction
     public DateTime UpdateAt { get; set; }
 
     public DateTime? DeleteAt { get; set; }
+
+    public string? Status { get; set; }
+
+    public string? Type { get; set; }
 
     public virtual Deposit? Deposit { get; set; }
 

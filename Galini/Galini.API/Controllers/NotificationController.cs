@@ -39,11 +39,12 @@ namespace Galini.API.Controllers
                                                           [FromQuery] int? size,
                                                           [FromQuery] TypeEnum? type,
                                                           [FromQuery] int? daysAgo,
+                                                          [FromQuery] int? weeksAgo,
                                                           [FromQuery] int? monthsAgo)
         {
             int pageNumber = page ?? 1;
             int pageSize = size ?? 10;
-            var response = await _notificationService.GetAllNotification(pageNumber, pageSize, type, daysAgo, monthsAgo);
+            var response = await _notificationService.GetAllNotification(pageNumber, pageSize, type, daysAgo, weeksAgo, monthsAgo);
             return StatusCode(int.Parse(response.status), response);
         }
 

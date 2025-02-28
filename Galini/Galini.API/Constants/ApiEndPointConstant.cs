@@ -125,6 +125,8 @@ namespace Galini.API.Constants
         {
             public const string WalletEndPoint = ApiEndpoint + "/wallet";
             public const string CreateLink = WalletEndPoint;
+            public const string Webhook = WalletEndPoint + "/webhook-url";
+            public const string GetWallet = WalletEndPoint;
         }
 
         public static class Message
@@ -190,6 +192,13 @@ namespace Galini.API.Constants
             public const string CreateWorkShift = WorkShiftEndPoint + "/account/{id}";
             public const string UpdateWorkShift = WorkShiftEndPoint + "/{id}";
             public const string RemoveWorkShift = WorkShiftEndPoint + "/{id}";
+        }
+        public static class Transaction
+        {
+            public const string TransactionEndPoint = ApiEndpoint + "/transaction";
+            public const string GetTransactions = TransactionEndPoint;
+            public const string GetTransactionsForAdmin = TransactionEndPoint + "/admin";
+            public const string GetTransactionById = TransactionEndPoint + "/{id}";
         }
     }
 }
