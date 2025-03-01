@@ -17,6 +17,24 @@ namespace Galini.API.Controllers
             _messageService = messageService;
         }
 
+        /// <summary>
+        /// API tạo tin nhắn mới trong phòng chat, mỗi khi người dùng gửi tin nhắn thì gọi API này.
+        /// </summary>
+        /// <remarks>
+        /// - Xác minh phòng chat (`DirectChat`) có tồn tại hay không.  
+        /// - Xác minh người gửi (`Sender`) có hợp lệ hay không.  
+        /// - Tạo tin nhắn và lưu vào database.  
+        /// - Trả về `200 OK` nếu thành công, `400 Bad Request` nếu thất bại, hoặc `404 Not Found` nếu không tìm thấy dữ liệu.
+        /// - Yêu cầu thông tin người dùng thông qua `CreateMessageRequest`.
+        /// - Trả về `BaseResponse` chứa kết quả đăng ký.
+        /// </remarks>
+        /// <param name="request">Dữ liệu tin nhắn cần tạo.</param>
+        /// <param name="id">ID của phòng chat.</param>
+        /// <returns>
+        /// - `200 OK`: Tạo tin nhắn thành công.  
+        /// - `400 Bad Request`: Dữ liệu không hợp lệ hoặc lưu thất bại.  
+        /// - `404 Not Found`: Không tìm thấy phòng chat hoặc tài khoản.
+        /// </returns>
         [HttpPost(ApiEndPointConstant.Message.CreateMessage)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
