@@ -18,8 +18,23 @@ namespace Galini.API.Controllers
             _walletService = walletService;
         }
 
+        /// <summary>
+        /// API tạo liên kết thanh toán để nạp tiền vào ví.
+        /// </summary>
+        /// <remarks>
+        /// - Nhận thông tin nạp tiền từ yêu cầu (`CreateDepositRequest`).  
+        /// - Trả về liên kết thanh toán để người dùng thực hiện giao dịch.  
+        /// - Nếu không tìm thấy người dùng hoặc ví của họ, trả về lỗi `404 Not Found`.  
+        /// - Kết quả trả về được bọc trong `BaseResponse`.
+        /// </remarks>
+        /// <param name="request">Dữ liệu yêu cầu nạp tiền.</param>
+        /// <returns>
+        /// - `200 OK`: Tạo liên kết thanh toán thành công.  
+        /// - `404 Not Found`: Không tìm thấy người dùng hoặc ví của người dùng.  
+        /// </returns>
         [HttpPost(ApiEndPointConstant.Wallet.CreateLink)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status404NotFound)]
         [ProducesErrorResponseType(typeof(ProblemDetails))]
         public async Task<IActionResult> CreateLink([FromBody] CreateDepositRequest request)
         {
@@ -80,6 +95,18 @@ namespace Galini.API.Controllers
 
         }
 
+        /// <summary>
+        /// API lấy thông tin số dư ví của người dùng.
+        /// </summary>
+        /// <remarks>
+        /// - Trả về thông tin chi tiết về số dư hiện tại của ví.  
+        /// - Nếu không tìm thấy người dùng hoặc ví của họ, trả về lỗi `404 Not Found`. 
+        /// - Kết quả trả về được bọc trong `BaseResponse`.
+        /// </remarks>
+        /// <returns>
+        /// - `200 OK`: Trả về thông tin ví thành công.  
+        /// - `404 Not Found`: Không tìm thấy ví.
+        /// </returns>
         [HttpGet(ApiEndPointConstant.Wallet.GetWallet)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status404NotFound)]

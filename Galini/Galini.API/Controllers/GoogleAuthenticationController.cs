@@ -20,6 +20,12 @@ namespace Galini.API.Controllers
             _googleAuthenticationService = googleAuthenticationService;
         }
 
+        /// <summary>
+        /// API đăng nhập bằng google.
+        /// </summary>
+        /// <returns>
+        /// - `200 OK`: Đăng nhập thành công.  
+        /// </returns>
         [HttpGet(ApiEndPointConstant.GoogleAuthentication.GoogleLogin)]
         public IActionResult Login()
         {
