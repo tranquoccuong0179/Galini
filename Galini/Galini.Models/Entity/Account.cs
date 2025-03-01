@@ -33,6 +33,8 @@ public partial class Account
 
     public DateTime? DeleteAt { get; set; }
 
+    public virtual ICollection<Blog> Blogs { get; set; } = new List<Blog>();
+
     public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 
     public virtual ICollection<Deposit> Deposits { get; set; } = new List<Deposit>();

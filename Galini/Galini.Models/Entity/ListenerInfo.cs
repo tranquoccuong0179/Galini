@@ -15,6 +15,8 @@ public partial class ListenerInfo
 
     public decimal Price { get; set; }
 
+    public string Type { get; set; } = null!;
+
     public bool IsActive { get; set; }
 
     public DateTime CreateAt { get; set; }
