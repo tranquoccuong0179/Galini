@@ -40,6 +40,19 @@ namespace Galini.API.Controllers
             return StatusCode(int.Parse(response.status), response);
         }
 
+        /// <summary>
+        /// API xác thực người dùng bằng Refresh Token.
+        /// </summary>
+        /// <remarks>
+        /// - Nhận Refresh Token từ yêu cầu.  
+        /// - Trả về `BaseResponse` chứa Access Token mới nếu Refresh Token hợp lệ.  
+        /// - Nếu Refresh Token không hợp lệ hoặc đã hết hạn, trả về lỗi `400 Bad Request`.  
+        /// </remarks>
+        /// <param name="request">Chuỗi Refresh Token.</param>
+        /// <returns>
+        /// - `200 OK`: Cấp lại Access Token thành công.  
+        /// - `400 Bad Request`: Refresh Token không hợp lệ hoặc đã hết hạn.  
+        /// </returns>
         [HttpPost(ApiEndPointConstant.Authentication.AutheticateWithRefreshToken)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
