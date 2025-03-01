@@ -52,6 +52,10 @@ builder.Services.AddSwaggerGen(c =>
         },
     };
     c.AddSecurityRequirement(securityRequirement);
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
+    c.AddSecurityRequirement(securityRequirement);
     c.MapType<TypeEnum>(() => new OpenApiSchema
     {
         Type = "string",

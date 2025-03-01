@@ -17,6 +17,19 @@ namespace Galini.API.Controllers
             _authService = authService;
         }
 
+        /// <summary>
+        /// API đăng nhập tài khoản vào hệ thống
+        /// </summary>
+        /// <remarks>
+        /// - Yêu cầu thông tin người dùng thông qua `AuthenticateRequest`.
+        /// - Trả về `BaseResponse` chứa kết quả đăng nhập.
+        /// - Nếu đăng nhập thất bại trả về lỗi phù hợp.
+        /// </remarks>
+        /// <param name="request">Thông tin đăng nhập, bao gồm username và password.</param>
+        /// <returns>
+        /// - `200 OK`: Trả về danh sách tài khoản người nghe thành công.  
+        /// - `400 Bad Request`: Thông tin không hợp lệ.
+        /// </returns>
         [HttpPost(ApiEndPointConstant.Authentication.Authenticate)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
