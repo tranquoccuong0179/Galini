@@ -11,6 +11,8 @@ public partial class Topic
 
     public string Name { get; set; } = null!;
 
+    public int Translate { get; set; }
+
     public bool IsActive { get; set; }
 
     public DateTime CreateAt { get; set; }
