@@ -200,5 +200,15 @@ namespace Galini.API.Constants
             public const string GetTransactionsForAdmin = TransactionEndPoint + "/admin";
             public const string GetTransactionById = TransactionEndPoint + "/{id}";
         }
+        public static class Booking
+        {
+            public const string BookingEndPoint = ApiEndpoint + "/booking";
+            public const string CreateBooking = BookingEndPoint;
+            public const string GetAllBookings = BookingEndPoint;
+            public const string GetUserBookings = BookingEndPoint + "/account";
+            public const string GetBookingById = BookingEndPoint + "/{id}";
+            public const string UpdateBooking = BookingEndPoint + "/{id}";
+            public const string RemoveBooking = BookingEndPoint + "/{id}";
+        }
     }
 }

@@ -77,6 +77,13 @@ builder.Services.AddSwaggerGen(c =>
                    .Select(name => new OpenApiString(name) as IOpenApiAny)
                    .ToList()
     });
+    c.MapType<BookingEnum>(() => new OpenApiSchema
+    {
+        Type = "string",
+        Enum = Enum.GetNames(typeof(BookingEnum))
+                   .Select(name => new OpenApiString(name) as IOpenApiAny)
+                   .ToList()
+    });
     c.MapType<TransactionStatusEnum>(() => new OpenApiSchema
     {
         Type = "string",

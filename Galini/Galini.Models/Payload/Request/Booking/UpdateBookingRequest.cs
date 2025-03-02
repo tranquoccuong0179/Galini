@@ -7,10 +7,12 @@ using System.Threading.Tasks;
 
 namespace Galini.Models.Payload.Request.Booking
 {
-    public class CreateBookingRequest
+    public class UpdateBookingRequest
     {
         public DateTime Date { get; set; }
 
         public BookingEnum Status { get; set; }
+
+        public bool IsActive { get; set; }
     }
 }
