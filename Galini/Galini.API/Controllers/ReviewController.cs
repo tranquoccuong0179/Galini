@@ -19,6 +19,22 @@ namespace Galini.API.Controllers
             _reviewService = reviewService;
         }
 
+        /// <summary>
+        /// API tạo đánh giá mới.
+        /// </summary>
+        /// <remarks>
+        /// - Tạo đánh giá dựa trên `request` và `bookingId`.  
+        /// - Kiểm tra booking và người nghe có tồn tại không, nếu không trả `404`.  
+        /// - Nếu dữ liệu `request` không hợp lệ, trả lỗi `400`.  
+        /// - Kết quả bọc trong `BaseResponse`.
+        /// </remarks>
+        /// <param name="request">Dữ liệu đánh giá cần tạo.</param>
+        /// <param name="bookingId">ID của booking liên quan.</param>
+        /// <returns>
+        /// - `200 OK`: Tạo đánh giá thành công.  
+        /// - `400 Bad Request`: Dữ liệu không hợp lệ hoặc lưu thất bại.  
+        /// - `404 Not Found`: Không tìm thấy booking hoặc người nghe.
+        /// </returns>
         [HttpPost(ApiEndPointConstant.Review.CreateReview)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
@@ -39,6 +55,25 @@ namespace Galini.API.Controllers
             return StatusCode(int.Parse(response.status), response);
         }
 
+        /// <summary>
+        /// API lấy danh sách đánh giá với phân trang.
+        /// </summary>
+        /// <remarks>
+        /// - Trả về danh sách đánh giá có phân trang, mặc định `page = 1`, `size = 10`.  
+        /// - Lọc theo số sao (`star`) và booking (`id`) nếu có, sắp xếp theo sao (`sortByStar`) hoặc thời gian tạo.  
+        /// - Nếu `sortByStar = true` thì tăng dần, `false` thì giảm dần, không truyền thì theo thời gian tạo.  
+        /// - Nếu `page` hoặc `size` nhỏ hơn 1, trả lỗi `400`.  
+        /// - Kết quả bọc trong `BaseResponse`.
+        /// </remarks>
+        /// <param name="page">Số trang (mặc định 1).</param>
+        /// <param name="size">Số lượng mỗi trang (mặc định 10).</param>
+        /// <param name="star">Lọc theo số sao tối thiểu.</param>
+        /// <param name="sortByStar">Sắp xếp theo sao (true: tăng, false: giảm).</param>
+        /// <param name="id">ID booking để lọc.</param>
+        /// <returns>
+        /// - `200 OK`: Lấy danh sách đánh giá thành công.  
+        /// - `400 Bad Request`: Page hoặc size không hợp lệ.
+        /// </returns>
         [HttpGet(ApiEndPointConstant.Review.GetAllReview)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
@@ -54,6 +89,25 @@ namespace Galini.API.Controllers
             return StatusCode(int.Parse(response.status), response);
         }
 
+        /// <summary>
+        /// API lấy danh sách đánh giá theo ID tham vấn viên với phân trang.
+        /// </summary>
+        /// <remarks>
+        /// - Trả về danh sách đánh giá của tham vấn viên dựa trên `id`, có phân trang (mặc định `page = 1`, `size = 10`).  
+        /// - Lọc theo số sao (`star`) nếu có, sắp xếp theo sao (`sortByStar`) hoặc thời gian tạo.  
+        /// - Nếu `sortByStar = true` thì tăng dần, `false` thì giảm dần, không truyền thì theo thời gian tạo.  
+        /// - Nếu `page` hoặc `size` nhỏ hơn 1, trả lỗi `400`.  
+        /// - Kết quả bọc trong `BaseResponse`.
+        /// </remarks>
+        /// <param name="id">ID của tham vấn viên.</param>
+        /// <param name="star">Lọc theo số sao tối thiểu.</param>
+        /// <param name="sortByStar">Sắp xếp theo sao (true: tăng, false: giảm).</param>
+        /// <param name="page">Số trang (mặc định 1).</param>
+        /// <param name="size">Số lượng mỗi trang (mặc định 10).</param>
+        /// <returns>
+        /// - `200 OK`: Lấy danh sách đánh giá thành công.  
+        /// - `400 Bad Request`: Page hoặc size không hợp lệ.
+        /// </returns>
         [HttpGet(ApiEndPointConstant.Review.GetAllReviewByListenerId)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
@@ -66,6 +120,20 @@ namespace Galini.API.Controllers
             return StatusCode(int.Parse(response.status), response);
         }
 
+        /// <summary>
+        /// API lấy thông tin đánh giá theo ID.
+        /// </summary>
+        /// <remarks>
+        /// - Trả về chi tiết đánh giá dựa trên `id`.  
+        /// - Chỉ lấy đánh giá còn hoạt động (`IsActive = true`).  
+        /// - Nếu không tìm thấy, trả lỗi `404`.  
+        /// - Kết quả bọc trong `BaseResponse`.
+        /// </remarks>
+        /// <param name="id">ID của đánh giá.</param>
+        /// <returns>
+        /// - `200 OK`: Lấy đánh giá thành công.  
+        /// - `404 Not Found`: Không tìm thấy đánh giá.
+        /// </returns>
         [HttpGet(ApiEndPointConstant.Review.GetReviewById)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
@@ -76,6 +144,22 @@ namespace Galini.API.Controllers
             return StatusCode(int.Parse(response.status), response);
         }
 
+        /// <summary>
+        /// API cập nhật thông tin đánh giá theo ID.
+        /// </summary>
+        /// <remarks>
+        /// - Cập nhật đánh giá dựa trên `id` và `request`.  
+        /// - Nếu `id` không tồn tại hoặc không hoạt động, trả lỗi `404`.  
+        /// - Nếu dữ liệu `request` không hợp lệ hoặc cập nhật thất bại, trả lỗi `400`.  
+        /// - Kết quả bọc trong `BaseResponse`.
+        /// </remarks>
+        /// <param name="id">ID của đánh giá cần cập nhật.</param>
+        /// <param name="request">Thông tin cập nhật cho đánh giá.</param>
+        /// <returns>
+        /// - `200 OK`: Cập nhật đánh giá thành công.  
+        /// - `400 Bad Request`: Dữ liệu không hợp lệ hoặc cập nhật thất bại.  
+        /// - `404 Not Found`: Không tìm thấy đánh giá.
+        /// </returns>
         [HttpPatch(ApiEndPointConstant.Review.UpdateReview)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
@@ -87,6 +171,21 @@ namespace Galini.API.Controllers
             return StatusCode(int.Parse(response.status), response);
         }
 
+        /// <summary>
+        /// API xoá đánh giá theo ID.
+        /// </summary>
+        /// <remarks>
+        /// - Xoá đánh giá dựa trên `id` (chuyển `IsActive = false`).  
+        /// - Nếu không tìm thấy đánh giá, trả lỗi `404`.  
+        /// - Nếu không xoá được, trả lỗi `400`.  
+        /// - Kết quả bọc trong `BaseResponse`.
+        /// </remarks>
+        /// <param name="id">ID của đánh giá cần xoá.</param>
+        /// <returns>
+        /// - `200 OK`: Xoá đánh giá thành công.  
+        /// - `400 Bad Request`: Không thể xoá đánh giá.  
+        /// - `404 Not Found`: Không tìm thấy đánh giá.
+        /// </returns>
         [HttpDelete(ApiEndPointConstant.Review.RemoveReview)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]

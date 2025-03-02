@@ -15,6 +15,22 @@ namespace Galini.API.Controllers
             _userPresenceService = userPresenceService;
         }
 
+        /// <summary>
+        /// API tạo trạng thái người dùng mới, tạo ngay khi người dùng create, và đã verify tài khoải.
+        /// </summary>
+        /// <remarks>
+        /// - Tạo trạng thái người dùng dựa trên `request` và `id` tài khoản.  
+        /// - Kiểm tra tài khoản có tồn tại không, nếu không trả `404`.  
+        /// - Nếu dữ liệu `request` không hợp lệ, trả lỗi `400`.  
+        /// - Kết quả bọc trong `BaseResponse`.
+        /// </remarks>
+        /// <param name="request">Dữ liệu trạng thái người dùng cần tạo.</param>
+        /// <param name="id">ID của tài khoản người dùng.</param>
+        /// <returns>
+        /// - `200 OK`: Tạo trạng thái người dùng thành công.  
+        /// - `400 Bad Request`: Dữ liệu không hợp lệ hoặc lưu thất bại.  
+        /// - `404 Not Found`: Không tìm thấy tài khoản.
+        /// </returns>
         [HttpPost(ApiEndPointConstant.UserPresence.CreateUserPresence)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
@@ -35,6 +51,21 @@ namespace Galini.API.Controllers
             return StatusCode(int.Parse(response.status), response);
         }
 
+        /// <summary>
+        /// API lấy danh sách trạng thái người dùng với phân trang.
+        /// </summary>
+        /// <remarks>
+        /// - Trả về danh sách trạng thái người dùng còn hoạt động, mặc định `page = 1`, `size = 10`.  
+        /// - Sắp xếp theo thời gian tạo tăng dần, không hỗ trợ lọc hay sắp xếp tùy chỉnh.  
+        /// - Nếu `page` hoặc `size` nhỏ hơn 1, trả lỗi `400`.  
+        /// - Kết quả bọc trong `BaseResponse`.
+        /// </remarks>
+        /// <param name="page">Số trang (mặc định 1).</param>
+        /// <param name="size">Số lượng mỗi trang (mặc định 10).</param>
+        /// <returns>
+        /// - `200 OK`: Lấy danh sách trạng thái người dùng thành công.  
+        /// - `400 Bad Request`: Page hoặc size không hợp lệ.
+        /// </returns>
         [HttpGet(ApiEndPointConstant.UserPresence.GetAllUserPresence)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
@@ -48,6 +79,20 @@ namespace Galini.API.Controllers
             return StatusCode(int.Parse(response.status), response);
         }
 
+        /// <summary>
+        /// API lấy trạng thái người dùng theo ID, được sử dụng để thể hiện trạng thái của bạn bè có online, offline, incall.
+        /// </summary>
+        /// <remarks>
+        /// - Trả về chi tiết trạng thái người dùng dựa trên `id`.  
+        /// - Chỉ lấy nếu còn hoạt động (`IsActive = true`).  
+        /// - Nếu không tìm thấy, trả lỗi `404`.  
+        /// - Kết quả bọc trong `BaseResponse`.
+        /// </remarks>
+        /// <param name="id">ID của trạng thái người dùng.</param>
+        /// <returns>
+        /// - `200 OK`: Lấy trạng thái người dùng thành công.  
+        /// - `404 Not Found`: Không tìm thấy trạng thái người dùng.
+        /// </returns>
         [HttpGet(ApiEndPointConstant.UserPresence.GetUserPresenceById)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
@@ -58,6 +103,20 @@ namespace Galini.API.Controllers
             return StatusCode(int.Parse(response.status), response);
         }
 
+        /// <summary>
+        /// API lấy trạng thái người dùng theo ID tài khoản.
+        /// </summary>
+        /// <remarks>
+        /// - Trả về trạng thái người dùng đầu tiên dựa trên `id` tài khoản.  
+        /// - Chỉ lấy nếu tài khoản và trạng thái còn hoạt động (`IsActive = true`).  
+        /// - Nếu không tìm thấy tài khoản hoặc trạng thái, trả lỗi `404`.  
+        /// - Kết quả bọc trong `BaseResponse`.
+        /// </remarks>
+        /// <param name="id">ID của tài khoản.</param>
+        /// <returns>
+        /// - `200 OK`: Lấy trạng thái người dùng thành công.  
+        /// - `404 Not Found`: Không tìm thấy tài khoản hoặc trạng thái người dùng.
+        /// </returns>
         [HttpGet(ApiEndPointConstant.UserPresence.GetUserPresenceByAccountId)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
@@ -68,6 +127,22 @@ namespace Galini.API.Controllers
             return StatusCode(int.Parse(response.status), response);
         }
 
+        /// <summary>
+        /// API cập nhật trạng thái người dùng theo ID.
+        /// </summary>
+        /// <remarks>
+        /// - Cập nhật trạng thái người dùng dựa trên `id` và `request`.  
+        /// - Nếu `id` không tồn tại hoặc không hoạt động, trả lỗi `404`.  
+        /// - Nếu dữ liệu `request` không hợp lệ hoặc cập nhật thất bại, trả lỗi `400`.  
+        /// - Kết quả bọc trong `BaseResponse`.
+        /// </remarks>
+        /// <param name="id">ID của trạng thái người dùng cần cập nhật.</param>
+        /// <param name="request">Thông tin cập nhật cho trạng thái người dùng.</param>
+        /// <returns>
+        /// - `200 OK`: Cập nhật trạng thái người dùng thành công.  
+        /// - `400 Bad Request`: Dữ liệu không hợp lệ hoặc cập nhật thất bại.  
+        /// - `404 Not Found`: Không tìm thấy trạng thái người dùng.
+        /// </returns>
         [HttpPatch(ApiEndPointConstant.UserPresence.UpdateUserPresence)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
@@ -87,6 +162,21 @@ namespace Galini.API.Controllers
             return StatusCode(int.Parse(response.status), response);
         }
 
+        /// <summary>
+        /// API xoá trạng thái người dùng theo ID.
+        /// </summary>
+        /// <remarks>
+        /// - Xoá trạng thái người dùng dựa trên `id` (chuyển `IsActive = false`).  
+        /// - Nếu không tìm thấy trạng thái người dùng, trả lỗi `404`.  
+        /// - Nếu không xoá được, trả lỗi `400`.  
+        /// - Kết quả bọc trong `BaseResponse`.
+        /// </remarks>
+        /// <param name="id">ID của trạng thái người dùng cần xoá.</param>
+        /// <returns>
+        /// - `200 OK`: Xoá trạng thái người dùng thành công.  
+        /// - `400 Bad Request`: Không thể xoá trạng thái người dùng.  
+        /// - `404 Not Found`: Không tìm thấy trạng thái người dùng.
+        /// </returns>
         [HttpDelete(ApiEndPointConstant.UserPresence.RemoveUserPresence)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]

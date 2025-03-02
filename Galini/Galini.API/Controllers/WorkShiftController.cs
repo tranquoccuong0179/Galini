@@ -14,6 +14,22 @@ namespace Galini.API.Controllers
             _workShiftService = workShiftService;
         }
 
+        /// <summary>
+        /// API tạo ca làm việc mới.
+        /// </summary>
+        /// <remarks>
+        /// - Tạo ca làm việc dựa trên `request` và `id` tài khoản.  
+        /// - Kiểm tra tài khoản có tồn tại không, nếu không trả `404`.  
+        /// - Nếu dữ liệu `request` không hợp lệ, trả lỗi `400`.  
+        /// - Kết quả bọc trong `BaseResponse`.
+        /// </remarks>
+        /// <param name="request">Dữ liệu ca làm việc cần tạo.</param>
+        /// <param name="id">ID của tài khoản người dùng.</param>
+        /// <returns>
+        /// - `200 OK`: Tạo ca làm việc thành công.  
+        /// - `400 Bad Request`: Dữ liệu không hợp lệ hoặc lưu thất bại.  
+        /// - `404 Not Found`: Không tìm thấy tài khoản.
+        /// </returns>
         [HttpPost(ApiEndPointConstant.WorkShift.CreateWorkShift)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
@@ -34,6 +50,21 @@ namespace Galini.API.Controllers
             return StatusCode(int.Parse(response.status), response);
         }
 
+        /// <summary>
+        /// API lấy danh sách ca làm việc với phân trang.
+        /// </summary>
+        /// <remarks>
+        /// - Trả về danh sách ca làm việc còn hoạt động, mặc định `page = 1`, `size = 10`.  
+        /// - Sắp xếp theo thời gian tạo tăng dần, không hỗ trợ lọc hay sắp xếp tùy chỉnh.  
+        /// - Nếu `page` hoặc `size` nhỏ hơn 1, trả lỗi `400`.  
+        /// - Kết quả bọc trong `BaseResponse`.
+        /// </remarks>
+        /// <param name="page">Số trang (mặc định 1).</param>
+        /// <param name="size">Số lượng mỗi trang (mặc định 10).</param>
+        /// <returns>
+        /// - `200 OK`: Lấy danh sách ca làm việc thành công.  
+        /// - `400 Bad Request`: Page hoặc size không hợp lệ.
+        /// </returns>
         [HttpGet(ApiEndPointConstant.WorkShift.GetAllWorkShift)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
@@ -47,6 +78,20 @@ namespace Galini.API.Controllers
             return StatusCode(int.Parse(response.status), response);
         }
 
+        /// <summary>
+        /// API lấy ca làm việc theo ID.
+        /// </summary>
+        /// <remarks>
+        /// - Trả về chi tiết ca làm việc dựa trên `id`.  
+        /// - Chỉ lấy nếu còn hoạt động (`IsActive = true`).  
+        /// - Nếu không tìm thấy, trả lỗi `404`.  
+        /// - Kết quả bọc trong `BaseResponse`.
+        /// </remarks>
+        /// <param name="id">ID của ca làm việc.</param>
+        /// <returns>
+        /// - `200 OK`: Lấy ca làm việc thành công.  
+        /// - `404 Not Found`: Không tìm thấy ca làm việc.
+        /// </returns>
         [HttpGet(ApiEndPointConstant.WorkShift.GetWorkShiftById)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
@@ -57,6 +102,24 @@ namespace Galini.API.Controllers
             return StatusCode(int.Parse(response.status), response);
         }
 
+        /// <summary>
+        /// - API lấy danh sách ca làm việc theo ID tài khoản với phân trang.
+        /// - Sử dụng để lấy danh sách các ca làm việc của từng tham vấn viên cho người dùng lựa chọn.
+        /// </summary>
+        /// <remarks>
+        /// - Trả về danh sách ca làm việc của tài khoản, mặc định `page = 1`, `size = 10`.  
+        /// - Chỉ lấy ca còn hoạt động (`IsActive = true`), sắp xếp theo thời gian tạo tăng dần.  
+        /// - Nếu tài khoản không tồn tại, trả `404`. Nếu `page` hoặc `size` nhỏ hơn 1, trả `400`.  
+        /// - Kết quả bọc trong `BaseResponse`.
+        /// </remarks>
+        /// <param name="page">Số trang (mặc định 1).</param>
+        /// <param name="size">Số lượng mỗi trang (mặc định 10).</param>
+        /// <param name="id">ID của tài khoản.</param>
+        /// <returns>
+        /// - `200 OK`: Lấy danh sách ca làm việc thành công.  
+        /// - `400 Bad Request`: Page hoặc size không hợp lệ.  
+        /// - `404 Not Found`: Không tìm thấy tài khoản.
+        /// </returns>
         [HttpGet(ApiEndPointConstant.WorkShift.GetWorkShiftByAccountId)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
@@ -69,6 +132,22 @@ namespace Galini.API.Controllers
             return StatusCode(int.Parse(response.status), response);
         }
 
+        /// <summary>
+        /// API cập nhật ca làm việc theo ID.
+        /// </summary>
+        /// <remarks>
+        /// - Cập nhật ca làm việc dựa trên `id` và `request`.  
+        /// - Nếu `id` không tồn tại hoặc không hoạt động, trả lỗi `404`.  
+        /// - Nếu dữ liệu `request` không hợp lệ hoặc cập nhật thất bại, trả lỗi `400`.  
+        /// - Kết quả bọc trong `BaseResponse`.
+        /// </remarks>
+        /// <param name="id">ID của ca làm việc cần cập nhật.</param>
+        /// <param name="request">Thông tin cập nhật cho ca làm việc.</param>
+        /// <returns>
+        /// - `200 OK`: Cập nhật ca làm việc thành công.  
+        /// - `400 Bad Request`: Dữ liệu không hợp lệ hoặc cập nhật thất bại.  
+        /// - `404 Not Found`: Không tìm thấy ca làm việc.
+        /// </returns>
         [HttpPatch(ApiEndPointConstant.WorkShift.UpdateWorkShift)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
@@ -88,6 +167,21 @@ namespace Galini.API.Controllers
             return StatusCode(int.Parse(response.status), response);
         }
 
+        /// <summary>
+        /// API xoá ca làm việc theo ID.
+        /// </summary>
+        /// <remarks>
+        /// - Xoá ca làm việc dựa trên `id` (chuyển `IsActive = false`).  
+        /// - Nếu không tìm thấy ca làm việc, trả lỗi `404`.  
+        /// - Nếu không xoá được, trả lỗi `400`.  
+        /// - Kết quả bọc trong `BaseResponse`.
+        /// </remarks>
+        /// <param name="id">ID của ca làm việc cần xoá.</param>
+        /// <returns>
+        /// - `200 OK`: Xoá ca làm việc thành công.  
+        /// - `400 Bad Request`: Không thể xoá ca làm việc.  
+        /// - `404 Not Found`: Không tìm thấy ca làm việc.
+        /// </returns>
         [HttpDelete(ApiEndPointConstant.WorkShift.RemoveWorkShift)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]

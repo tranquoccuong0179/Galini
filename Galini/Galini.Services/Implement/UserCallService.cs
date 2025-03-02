@@ -106,8 +106,18 @@ namespace Galini.Services.Implement
             };
         }
 
-        public async Task<BaseResponse> GetUserCallByAccountId(Guid accountId)
+        public async Task<BaseResponse> GetUserCallByAccountId(int page, int size, Guid accountId)
         {
+            if (page < 1 || size < 1)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status400BadRequest.ToString(),
+                    message = "Page hoặc size không hợp lệ.",
+                    data = null
+                };
+            }
+
             var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
                 predicate: x => x.IsActive && x.Id.Equals(accountId));
 
@@ -122,8 +132,11 @@ namespace Galini.Services.Implement
                 };
             }
 
-            var userCall = await _unitOfWork.GetRepository<UserCall>().SingleOrDefaultAsync(
-                predicate: x => x.AccountId.Equals(accountId) && x.IsActive);
+            var userCall = await _unitOfWork.GetRepository<UserCall>().GetPagingListAsync(
+                selector: a => _mapper.Map<CreateUserCallResponse>(a),
+                predicate: x => x.AccountId.Equals(accountId) && x.IsActive,
+                page: page,
+                size: size);
 
             if (userCall == null)
             {
