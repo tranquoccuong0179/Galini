@@ -1,4 +1,5 @@
-﻿using Galini.Models.Payload.Request.Topic;
+﻿using Galini.Models.Enum;
+using Galini.Models.Payload.Request.Topic;
 using Galini.Models.Payload.Response;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace Galini.Services.Interface
     public interface ITopicService
     {
         public Task<BaseResponse> CreateTopic(CreateTopicRequest request);
-        public Task<BaseResponse> GetAllTopic(int page, int size);
+        public Task<BaseResponse> GetAllTopic(int page, int size, TopicNameEnum? topicNameEnum);
         public Task<BaseResponse> GetTopicById(Guid id);
         public Task<BaseResponse> GetTopicByListenerInfoId(Guid listenerInfoId);
         public Task<BaseResponse> UpdateTopic(Guid id, UpdateTopicRequest request);

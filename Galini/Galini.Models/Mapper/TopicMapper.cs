@@ -18,6 +18,7 @@ namespace Galini.Models.Mapper
         {
             CreateMap<CreateTopicRequest, Topic>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid()))
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name.GetDescriptionFromEnum()))
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true))
             .ForMember(dest => dest.CreateAt, opt => opt.MapFrom(src => TimeUtil.GetCurrentSEATime()))
             .ForMember(dest => dest.UpdateAt, opt => opt.MapFrom(src => TimeUtil.GetCurrentSEATime()));

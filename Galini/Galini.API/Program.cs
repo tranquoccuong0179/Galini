@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Galini.API;
 using Galini.API.ConfigHub;
 using Galini.API.Constants;
@@ -5,6 +6,7 @@ using Galini.Models.Enum;
 using Galini.Models.Payload;
 using Galini.Models.Payload.Response.Wallet;
 using Galini.Services.Interface;
+using Galini.Utils;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
@@ -13,7 +15,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -91,6 +97,15 @@ builder.Services.AddSwaggerGen(c =>
                    .Select(name => new OpenApiString(name) as IOpenApiAny)
                    .ToList()
     });
+    c.MapType<TopicNameEnum>(() => new OpenApiSchema
+    {
+        Type = "string",
+        Enum = Enum.GetValues(typeof(TopicNameEnum))
+               .Cast<TopicNameEnum>()
+               .Select(value => new OpenApiString(EnumUtil.GetDescriptionFromEnum(value)) as IOpenApiAny)
+               .ToList()
+    });
+
 });
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
