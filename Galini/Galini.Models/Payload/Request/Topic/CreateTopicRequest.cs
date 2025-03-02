@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Galini.Models.Enum;
 
 namespace Galini.Models.Payload.Request.Topic
 {
     public class CreateTopicRequest
     {
-        public string Name { get; set; } = null!;
+        public TopicNameEnum Name { get; set; }
     }
 }

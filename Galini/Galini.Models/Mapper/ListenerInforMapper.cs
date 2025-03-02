@@ -18,6 +18,7 @@ namespace Galini.Models.Mapper
         {
             CreateMap<CreateListenerInfoRequest, ListenerInfo>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid()))
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.ListenerType.GetDescriptionFromEnum()))
                 .ForMember(dest => dest.Star, opt => opt.MapFrom(src => 0))
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true))
                 .ForMember(dest => dest.CreateAt, opt => opt.MapFrom(src => TimeUtil.GetCurrentSEATime()))

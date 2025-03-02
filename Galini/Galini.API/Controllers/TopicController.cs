@@ -1,8 +1,10 @@
 ﻿
 using System.Drawing;
 using Galini.API.Constants;
+using Galini.Models.Enum;
 using Galini.Models.Payload.Request.Topic;
 using Galini.Models.Payload.Response;
+using Galini.Models.Utils;
 using Galini.Services.Implement;
 using Galini.Services.Interface;
 using Galini.Utils;
@@ -20,10 +22,21 @@ namespace Galini.API.Controllers
         }
 
         /// <summary>
-        /// API tạo topic mới.
+        /// API tạo một topic mới dựa trên thông tin từ người nghe.
         /// </summary>
         /// <remarks>
-        /// - Nhận dữ liệu từ client dưới dạng `CreateTopicRequest`.  
+        /// - Nhận dữ liệu từ người nghe dưới dạng `CreateTopicRequest`, chứa tên topic thuộc `TopicNameEnum`:  
+        /// - **Danh sách topic khả dụng:**  
+        ///   - `StressAnxiety` (Stress Lo Âu)  
+        ///   - `Depression` (Trầm Cảm)  
+        ///   - `Relationships` (Mối Quan Hệ gia đình, bạn bè, tình yêu)  
+        ///   - `WorkStudy` (Công Việc Học Tập)  
+        ///   - `SelfConfidence` (Tự Tin Giá Trị Bản Thân)  
+        ///   - `EmotionalControl` (Kiểm Soát Cảm Xúc)  
+        ///   - `LossTrauma` (Mất Mát Tổn Thương)  
+        ///   - `SleepDisorders` (Rối Loạn Giấc Ngủ)  
+        ///   - `LifeOrientation` (Định Hướng Cuộc Sống)  
+        ///   - `CommunicationSkills` (Kỹ Năng Giao Tiếp)  
         /// - Kiểm tra tính hợp lệ của dữ liệu trước khi tạo topic.  
         /// - Kết quả trả về được bọc trong `BaseResponse`.
         /// </remarks>
@@ -45,26 +58,55 @@ namespace Galini.API.Controllers
         }
 
         /// <summary>
-        /// API lấy danh sách topic với phân trang.
+        /// API lấy danh sách topic với phân trang và bộ lọc theo mô tả.
         /// </summary>
         /// <remarks>
-        /// - Trả về danh sách topic có hỗ trợ phân trang.  
+        /// - Trả về danh sách topic có hỗ trợ phân trang và lọc theo loại topic.  
         /// - Nếu không truyền `page` hoặc `size`, giá trị mặc định sẽ được sử dụng (`page = 1`, `size = 10`).  
+        /// - **Bộ lọc `topicNameEnum` chỉ chấp nhận dùng description(`tiếng việt`)**.  
+        /// - **Danh sách topic khả dụng:**  
+        ///   - `"Stress Lo Âu"` (StressAnxiety)  
+        ///   - `"Trầm Cảm"` (Depression)  
+        ///   - `"Mối Quan Hệ (gia đình, bạn bè, tình yêu)"` (Relationships)  
+        ///   - `"Công Việc Học Tập"` (WorkStudy)  
+        ///   - `"Tự Tin Giá Trị Bản Thân"` (SelfConfidence)  
+        ///   - `"Kiểm Soát Cảm Xúc"` (EmotionalControl)  
+        ///   - `"Mất Mát Tổn Thương"` (LossTrauma)  
+        ///   - `"Rối Loạn Giấc Ngủ"` (SleepDisorders)  
+        ///   - `"Định Hướng Cuộc Sống"` (LifeOrientation)  
+        ///   - `"Kỹ Năng Giao Tiếp"` (CommunicationSkills)   
         /// - Kết quả trả về được bọc trong `BaseResponse`.
         /// </remarks>
         /// <param name="page">Số trang hiện tại (mặc định là 1).</param>
         /// <param name="size">Số lượng topic trên mỗi trang (mặc định là 10).</param>
+        /// <param name="topicNameEnum">
+        /// Mô tả của loại topic cần lọc (chỉ nhập giá trị **description** của enum `TopicNameEnum`).  
+        /// **Danh sách giá trị hợp lệ:**  
+        /// - `"Stress Lo Âu"`  
+        /// - `"Trầm Cảm"`  
+        /// - `"Mối Quan Hệ (gia đình, bạn bè, tình yêu)"`  
+        /// - `"Công Việc Học Tập"`  
+        /// - `"Tự Tin Giá Trị Bản Thân"`  
+        /// - `"Kiểm Soát Cảm Xúc"`  
+        /// - `"Mất Mát Tổn Thương"`  
+        /// - `"Rối Loạn Giấc Ngủ"`  
+        /// - `"Định Hướng Cuộc Sống"`  
+        /// - `"Kỹ Năng Giao Tiếp"`  
+        /// </param>
         /// <returns>
         /// - `200 OK`: Trả về danh sách topic thành công.
         /// </returns>
         [HttpGet(ApiEndPointConstant.Topic.GetListTopic)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesErrorResponseType(typeof(ProblemDetails))]
-        public async Task<IActionResult> GetTopics([FromQuery] int? page, [FromQuery] int? size)
+        public async Task<IActionResult> GetTopics([FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? topicNameEnum)
         {
             int pageNumber = page ?? 1;
             int pageSize = size ?? 10;
-            var response = await _service.GetAllTopic(pageNumber, pageSize);
+            TopicNameEnum? topicEnum = string.IsNullOrWhiteSpace(topicNameEnum)
+                ? null
+                : topicNameEnum!.GetEnumFromDescription<TopicNameEnum>();
+            var response = await _service.GetAllTopic(pageNumber, pageSize, topicEnum);
             return StatusCode(int.Parse(response.status), response);
         }
 

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Azure;
 using Galini.Models.Entity;
+using Galini.Models.Enum;
 using Galini.Models.Paginate;
 using Galini.Models.Payload.Request.Topic;
 using Galini.Models.Payload.Response;
@@ -44,7 +45,7 @@ namespace Galini.Services.Implement
             }
 
             var topicExist = await _unitOfWork.GetRepository<Topic>().SingleOrDefaultAsync(
-                predicate: t => t.Name.Equals(request.Name) && t.IsActive == true);
+                predicate: t => t.Name.Equals(request.Name.GetDescriptionFromEnum()) && t.ListenerInfoId.Equals(listenerInfo.Id) && t.IsActive == true);
             if(topicExist != null)
             {
                 return new BaseResponse()
@@ -79,7 +80,7 @@ namespace Galini.Services.Implement
             };
         }
 
-        public async Task<BaseResponse> GetAllTopic(int page, int size)
+        public async Task<BaseResponse> GetAllTopic(int page, int size, TopicNameEnum? topicNameEnum)
         {
             Guid? id = UserUtil.GetAccountId(_httpContextAccessor.HttpContext);
             var listenerInfo = await _unitOfWork.GetRepository<ListenerInfo>().SingleOrDefaultAsync(
@@ -97,7 +98,9 @@ namespace Galini.Services.Implement
 
             var topics = await _unitOfWork.GetRepository<Topic>().GetPagingListAsync(
                 selector: t => _mapper.Map<GetTopicResponse>(t),
-                predicate: t => t.ListenerInfoId.Equals(listenerInfo.Id) && t.IsActive == true,
+                predicate: t => t.ListenerInfoId.Equals(listenerInfo.Id) 
+                                && t.IsActive == true
+                                && (topicNameEnum == null || t.Name.Equals(topicNameEnum.GetDescriptionFromEnum())),
                 page: page,
                 size: size);
 
