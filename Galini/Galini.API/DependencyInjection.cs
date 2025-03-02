@@ -50,6 +50,8 @@ namespace Galini.API
             services.AddScoped<IQuestionService, QuestionService>();
             services.AddScoped<ITransactionService, TransactionService>();
             services.AddScoped<IWorkShiftService, WorkShiftService>();
+            services.AddScoped<IUserPresenceService, UserPresenceService>();
+            services.AddScoped<IBookingService, BookingService>();
             services.AddScoped<CallHub>();
             return services;
         }
