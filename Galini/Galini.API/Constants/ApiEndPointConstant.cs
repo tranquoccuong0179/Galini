@@ -210,5 +210,32 @@ namespace Galini.API.Constants
             public const string UpdateBooking = BookingEndPoint + "/{id}";
             public const string RemoveBooking = BookingEndPoint + "/{id}";
         }
+        public static class Blog
+        {
+            public const string BlogEndPoint = ApiEndpoint + "/blog";
+            public const string CreateBlog = BlogEndPoint;
+            public const string GetAllBlogs = BlogEndPoint;
+            public const string GetBlogById = BlogEndPoint + "/{id}";
+            public const string UpdateBlog = BlogEndPoint + "/{id}";
+            public const string RemoveBlog = BlogEndPoint + "/{id}";
+        }
+        public static class DirectChat
+        {
+            public const string DirectChatEndPoint = ApiEndpoint + "/direct-chat";
+            public const string CreateDirectChat = DirectChatEndPoint;
+            public const string GetAllDirectChats = DirectChatEndPoint;
+            public const string GetDirectChatById = DirectChatEndPoint + "/{id}";
+            public const string UpdateDirectChat = DirectChatEndPoint + "/{id}";
+            public const string RemoveDirectChat = DirectChatEndPoint + "/{id}";
+        }
+        public static class DirectChatParticipant
+        {
+            public const string DirectChatParticipantEndPoint = ApiEndpoint + "/direct-chat-participant";
+            public const string CreateDirectChatParticipant = DirectChatParticipantEndPoint;
+            public const string GetAllDirectChatParticipants = DirectChatParticipantEndPoint;
+            public const string GetDirectChatParticipantById = DirectChatParticipantEndPoint + "/{id}";
+            public const string UpdateDirectChatParticipant = DirectChatParticipantEndPoint + "/{id}";
+            public const string RemoveDirectChatParticipant = DirectChatParticipantEndPoint + "/{id}";
+        }
     }
 }
