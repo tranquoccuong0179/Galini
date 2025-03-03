@@ -8,6 +8,7 @@ namespace Galini.Models.Payload.Response.UserPresence
 {
     public class CreateUserPresenceResponse
     {
+        public Guid Id { get; set; }
         public bool Offline { get; set; }
         public bool Online { get; set; }
         public bool InCall { get; set; }

@@ -8,8 +8,8 @@ namespace Galini.Models.Payload.Response.TestHistory
 {
     public class CreateTestHistoryResponse
     {
+        public Guid Id { get; set; }
         public int Grade { get; set; }
-
         public string Status { get; set; }
     }
 }

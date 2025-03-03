@@ -9,6 +9,7 @@ namespace Galini.Models.Payload.Response.Topic
 {
     public class CreateTopicResponse
     {
+        public Guid Id { get; set; }
         public string? Name { get; set; }
     }
 }

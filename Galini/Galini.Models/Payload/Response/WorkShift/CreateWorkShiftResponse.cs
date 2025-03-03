@@ -8,6 +8,7 @@ namespace Galini.Models.Payload.Response.WorkShift
 {
     public class CreateWorkShiftResponse
     {
+        public Guid Id { get; set; }
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set; }
     }

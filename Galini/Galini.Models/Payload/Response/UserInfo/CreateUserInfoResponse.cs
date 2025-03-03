@@ -8,6 +8,7 @@ namespace Galini.Models.Payload.Response.UserInfo
 {
     public class CreateUserInfoResponse
     {
+        public Guid Id { get; set; }
         public Guid AccountId { get; set; }
         public Guid PremiumId { get; set; }
         public DateTime DateStart { get; set; }

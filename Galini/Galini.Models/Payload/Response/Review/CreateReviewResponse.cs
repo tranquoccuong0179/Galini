@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 namespace Galini.Models.Payload.Response.Review
 {
     public class CreateReviewResponse
-    {       
+    {
+        public Guid Id { get; set; }
         public string? ReviewMessage { get; set; }
         public string? ReplyMessage { get; set; }
         public double Star { get; set; }

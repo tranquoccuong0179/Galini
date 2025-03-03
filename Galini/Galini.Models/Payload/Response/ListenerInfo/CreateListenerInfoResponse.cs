@@ -9,12 +9,10 @@ namespace Galini.Models.Payload.Response.ListenerInfo
 {
     public class CreateListenerInfoResponse
     {
+        public Guid Id { get; set; }
         public string? Description { get; set; }
-
         public double? Star { get; set; }
-
         public decimal? Price { get; set; }
-
         public RegisterUserResponse? Account {  get; set; } 
     }
 }

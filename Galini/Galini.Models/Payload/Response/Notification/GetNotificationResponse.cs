@@ -9,11 +9,10 @@ namespace Galini.Models.Payload.Response.Notification
 {
     public class GetNotificationResponse
     {
+        public Guid Id { get; set; }
         public Guid UserId { get; set; }
         public TypeEnum Type { get; set; }
-
         public string Content { get; set; }
-
         public bool IsRead { get; set; }
     }
 }
