@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Galini.Models.Payload.Request.DirectChat
 {
-    public class CreateDirectChatRequest
+    public class UpdateDirectChatRequest
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
     }
 }
