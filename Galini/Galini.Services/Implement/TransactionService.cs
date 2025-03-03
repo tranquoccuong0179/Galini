@@ -108,7 +108,7 @@ namespace Galini.Services.Implement
             return new BaseResponse()
             {
                 status = StatusCodes.Status200OK.ToString(),
-                message = "Danh sách chủ đề",
+                message = "Danh sách giao dịch",
                 data = response
             };
         }

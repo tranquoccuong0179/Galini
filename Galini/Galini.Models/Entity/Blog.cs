@@ -21,13 +21,13 @@ public partial class Blog
 
     public Guid AuthorId { get; set; }
 
-    public int IsActive { get; set; }
+    public bool IsActive { get; set; }
 
-    public int CreateAt { get; set; }
+    public DateTime CreateAt { get; set; }
 
-    public int UpdateAt { get; set; }
+    public DateTime UpdateAt { get; set; }
 
-    public int? DeleteAt { get; set; }
+    public DateTime? DeleteAt { get; set; }
 
     public virtual Account Author { get; set; } = null!;
 }
