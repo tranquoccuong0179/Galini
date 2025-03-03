@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Galini.Models.Payload.Request.DirectChat
+namespace Galini.Models.Enum
 {
-    public class CreateDirectChatRequest
+    public enum BlogTypeEnum
     {
-        public string Name { get; set; }
+        Admin,
+        Customer
     }
 }

@@ -100,10 +100,9 @@ builder.Services.AddSwaggerGen(c =>
     c.MapType<TopicNameEnum>(() => new OpenApiSchema
     {
         Type = "string",
-        Enum = Enum.GetValues(typeof(TopicNameEnum))
-               .Cast<TopicNameEnum>()
-               .Select(value => new OpenApiString(EnumUtil.GetDescriptionFromEnum(value)) as IOpenApiAny)
-               .ToList()
+        Enum = Enum.GetNames(typeof(TopicNameEnum))
+                   .Select(name => new OpenApiString(name) as IOpenApiAny)
+                   .ToList()
     });
 
 });

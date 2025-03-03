@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using Galini.API.ConfigHub;
 using Galini.Models.Entity;
+using Galini.Models.Utils;
 using Galini.Repository.Implement;
 using Galini.Repository.Interface;
 using Galini.Services.Implement;
@@ -52,6 +53,8 @@ namespace Galini.API
             services.AddScoped<IWorkShiftService, WorkShiftService>();
             services.AddScoped<IUserPresenceService, UserPresenceService>();
             services.AddScoped<IBookingService, BookingService>();
+            services.AddScoped<IDirectChatService, DirectChatService>();
+            services.AddScoped<HtmlSanitizerUtil>();
             services.AddScoped<CallHub>();
             return services;
         }
