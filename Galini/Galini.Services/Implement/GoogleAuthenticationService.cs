@@ -30,7 +30,7 @@ namespace Galini.Services.Implement
             var email = authenticateResult.Principal.FindFirstValue(ClaimTypes.Email);
             if (email == null) return null;
             var accessToken = authenticateResult.Properties.GetTokenValue("access_token");
-
+         
             return new GoogleAuthResponse
             {
                 FullName = name,

@@ -49,8 +49,20 @@ namespace Galini.API.Controllers
                     return Problem("Tài khoản không tồn tại");
                 }
             }
-            var token = await _userService.CreateTokenByEmail(googleAuthResponse.Email);
-            googleAuthResponse.Token = token;
+            var authResponse = await _userService.CreateTokenByEmail(googleAuthResponse.Email);
+            googleAuthResponse.Token = authResponse.Token;
+            googleAuthResponse.RefreshToken = authResponse.RefreshToken;
+
+            if (authResponse == null || authResponse.Token == null || authResponse.RefreshToken == null)
+            {
+                return Ok(new BaseResponse()
+                {
+                    status = StatusCodes.Status400BadRequest.ToString(),
+                    message = "Login faild",
+                    data = null
+                });
+            }
+
             return Ok(new BaseResponse()
             {
                 status = StatusCodes.Status200OK.ToString(),
