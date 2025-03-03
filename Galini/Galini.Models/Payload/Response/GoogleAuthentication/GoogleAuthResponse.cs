@@ -10,6 +10,7 @@ namespace Galini.Models.Payload.Response.GoogleAuthentication
     {
         public string Email { get; set; }
         public string Token { get; set; }
+        public string RefreshToken { get; set; }
         public string FullName { get; set; }
     }
 }

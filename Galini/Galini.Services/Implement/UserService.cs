@@ -7,6 +7,7 @@ using Galini.Models.Payload.Request.User;
 using Galini.Models.Payload.Request.UserInfo;
 using Galini.Models.Payload.Response;
 using Galini.Models.Payload.Response.Account;
+using Galini.Models.Payload.Response.Authentication;
 using Galini.Models.Payload.Response.GoogleAuthentication;
 using Galini.Models.Payload.Response.WorkShift;
 using Galini.Models.Utils;
@@ -296,7 +297,7 @@ public class UserService : BaseService<UserService>, IUserService
         }
     }
 
-    public async Task<string> CreateTokenByEmail(string email)
+    public async Task<GoogleAuthResponse> CreateTokenByEmail(string email)
     {
         if (string.IsNullOrEmpty(email))
         {
@@ -308,7 +309,31 @@ public class UserService : BaseService<UserService>, IUserService
         if (account == null) throw new BadHttpRequestException("Account not found");
         var guidClaim = new Tuple<string, Guid>("userId", account.Id);
         var token = JwtUtil.GenerateJwtToken(account, guidClaim);
-        return token;
+
+
+        var refreshToken = new RefreshToken()
+        {
+            Id = Guid.NewGuid(),
+            UserId = account.Id,
+            Token = JwtUtil.GenerateRefreshToken(),
+            ExpirationTime = DateTime.Now.AddDays(30),
+        };
+
+        await _unitOfWork.GetRepository<RefreshToken>().InsertAsync(refreshToken);
+        bool isSuccessfully = await _unitOfWork.CommitAsync() > 0;
+
+        var response = new GoogleAuthResponse()
+        {
+            Token = token,
+            RefreshToken = refreshToken.Token
+        };
+
+        if (!isSuccessfully)
+        {
+            return new GoogleAuthResponse();
+        }
+
+        return response;
     }
 
     public async Task<bool> GetAccountByEmail(string email)
