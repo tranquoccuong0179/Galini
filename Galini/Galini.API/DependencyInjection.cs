@@ -54,6 +54,7 @@ namespace Galini.API
             services.AddScoped<IUserPresenceService, UserPresenceService>();
             services.AddScoped<IBookingService, BookingService>();
             services.AddScoped<IDirectChatService, DirectChatService>();
+            services.AddScoped<IBlogService, BlogService>();
             services.AddScoped<HtmlSanitizerUtil>();
             services.AddScoped<CallHub>();
             return services;

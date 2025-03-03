@@ -4,11 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Galini.Models.Payload.Request.Blog
+namespace Galini.Models.Payload.Response.Blog
 {
-    public class UpdateBlogRequest
+    public class GetBlogResponse
     {
+        public Guid? Id { get; set; }
+
         public string? Title { get; set; }
+
         public string? Content { get; set; }
+
+        public int? Views { get; set; }
+
+        public int? Likes { get; set; }
     }
 }
