@@ -8,6 +8,7 @@ namespace Galini.Models.Payload.Response.CallHistory
 {
     public class CreateCallHistoryResponse
     {
+        public Guid Id { get; set; }
         public DateTime TimeStart { get; set; }
         public DateTime TimeEnd { get; set; }
         public int Duration { get; set; }

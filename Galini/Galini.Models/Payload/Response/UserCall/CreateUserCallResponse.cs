@@ -9,6 +9,7 @@ namespace Galini.Models.Payload.Response.UserCall
 {
     public class CreateUserCallResponse
     {
+        public Guid Id { get; set; }
         public Guid AccountId { get; set; }
         public Guid CallHistoryId { get; set; }
         public CallRoleEnum CallRole { get; set; }

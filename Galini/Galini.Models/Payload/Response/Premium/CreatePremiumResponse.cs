@@ -8,6 +8,7 @@ namespace Galini.Models.Payload.Response.Premium
 {
     public class CreatePremiumResponse
     {
+        public Guid Id { get; set; }
         public string Type { get; set; } = null!;
         public int Friend { get; set; }
         public bool Timelimit { get; set; }

@@ -8,6 +8,7 @@ namespace Galini.Models.Payload.Response.Transaction
 {
     public class GetTransactionResponse
     {
+        public Guid Id { get; set; }
         public decimal? Amount { get; set; }
         public long? OrderCode { get; set; }
         public string? Status { get; set; }
