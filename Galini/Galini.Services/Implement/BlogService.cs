@@ -62,7 +62,7 @@ namespace Galini.Services.Implement
                 {
                     status = StatusCodes.Status200OK.ToString(),
                     message = "Thêm blog thành công",
-                    data = _mapper.Map<CreateTopicResponse>(blog)
+                    data = _mapper.Map<CreateBlogResponse>(blog)
                 };
             }
 
