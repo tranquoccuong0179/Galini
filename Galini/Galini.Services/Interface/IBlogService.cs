@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AngleSharp.Io;
 using Galini.Models.Payload.Request.Blog;
 using Galini.Models.Payload.Response;
+using Microsoft.AspNetCore.Http;
 
 namespace Galini.Services.Interface
 {
@@ -15,5 +17,6 @@ namespace Galini.Services.Interface
         Task<BaseResponse> GetBlogById(Guid id);
         Task<BaseResponse> RemoveBlog(Guid id);
         Task<BaseResponse> UpdateBlog(Guid id, UpdateBlogRequest request);
+        Task<BaseResponse> UpImageForDescription(IFormFile formFile);
     }
 }
