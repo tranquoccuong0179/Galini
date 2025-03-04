@@ -119,7 +119,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: CorsConstant.PolicyName,
         policy =>
         {
-            policy.WithOrigins("http://127.0.0.1:5500", "http://localhost:5500", "http://localhost:5173", "http://127.0.0.1", "https://harmon.love")
+            policy.WithOrigins("http://127.0.0.1:5500", "http://localhost:5500", "http://localhost:5173", "http://127.0.0.1", "https://harmon.love", "https://galini-admin-fe.vercel.app")
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials();
