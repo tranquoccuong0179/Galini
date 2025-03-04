@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using AngleSharp.Io;
 using AutoMapper;
 using Galini.Models.Entity;
 using Galini.Models.Paginate;
@@ -22,6 +25,7 @@ namespace Galini.Services.Implement
 {
     public class BlogService : BaseService<BlogService>, IBlogService
     {
+        private const string FirebaseStorageBaseUrl = "https://firebasestorage.googleapis.com/v0/b/test-ce15e.appspot.com/o";
         private readonly HtmlSanitizerUtil _sanitizer;
 
         public BlogService(IUnitOfWork<HarmonContext> unitOfWork, ILogger<BlogService> logger, IMapper mapper, IHttpContextAccessor httpContextAccessor, HtmlSanitizerUtil sanitizer) : base(unitOfWork, logger, mapper, httpContextAccessor)
@@ -237,6 +241,91 @@ namespace Galini.Services.Implement
                 message = "Cập nhật blog thất bại",
                 data = null
             };
+        }
+
+        private string ParseDownloadUrl(string responseBody, string fileName)
+        {
+            var json = JsonDocument.Parse(responseBody);
+            var nameElement = json.RootElement.GetProperty("name");
+            var downloadUrl = $"{FirebaseStorageBaseUrl}/{Uri.EscapeDataString(nameElement.GetString())}?alt=media";
+            return downloadUrl;
+        }
+
+        public async Task<BaseResponse> UpImageForDescription(IFormFile formFile)
+        {
+            if (formFile == null || formFile.Length == 0)
+            {
+                return new BaseResponse
+                {
+                    status = StatusCodes.Status400BadRequest.ToString(),
+                    message = "File is null or empty",
+                    data = null
+                };
+            }
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+            var allowedContentTypes = new[] { "image/jpeg", "image/png" };
+            if (!allowedContentTypes.Contains(formFile.ContentType, StringComparer.OrdinalIgnoreCase) ||
+    !allowedExtensions.Contains(Path.GetExtension(formFile.FileName), StringComparer.OrdinalIgnoreCase))
+            {
+                return new BaseResponse
+                {
+                    status = StatusCodes.Status400BadRequest.ToString(),
+                    message = "Only .jpg, .jpeg, and .png files are allowed",
+                    data = null
+                };
+            }
+
+            long maxFileSize = 300 * 1024;
+            if (formFile.Length > maxFileSize)
+            {
+                return new BaseResponse
+                {
+                    status = StatusCodes.Status400BadRequest.ToString(),
+                    message = "File size must not exceed 300 KB",
+                    data = null
+                };
+            }
+
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    string fileName = Path.GetFileName(formFile.FileName);
+                    string firebaseStorageUrl = $"{FirebaseStorageBaseUrl}?uploadType=media&name=image/{Guid.NewGuid()}_{fileName}";
+
+                    using (var stream = new MemoryStream())
+                    {
+                        await formFile.CopyToAsync(stream);
+                        stream.Position = 0;
+
+                        var content = new ByteArrayContent(stream.ToArray());
+                        content.Headers.ContentType = new MediaTypeHeaderValue(formFile.ContentType);
+
+                        var response = await client.PostAsync(firebaseStorageUrl, content);
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var responseBody = await response.Content.ReadAsStringAsync();
+                            var dowloadUrl = ParseDownloadUrl(responseBody, fileName);
+                            return new BaseResponse()
+                            {
+                                status = StatusCodes.Status200OK.ToString(),
+                                message = "Upload image successful",
+                                data = dowloadUrl
+                            };
+                        }
+                        else
+                        {
+                            var errorMessage = $"Error uploading file {fileName} to Firebase Storage. Status Code: {response.StatusCode}\nContent: {await response.Content.ReadAsStringAsync()}";
+                            throw new Exception(errorMessage);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while uploading the file to Firebase.", ex);
+            }
         }
     }
 }

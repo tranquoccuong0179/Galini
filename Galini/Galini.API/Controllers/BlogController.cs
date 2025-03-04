@@ -1,4 +1,5 @@
 ﻿
+using AngleSharp.Io;
 using Galini.API.Constants;
 using Galini.Models.Payload.Request.Blog;
 using Galini.Models.Payload.Request.Question;
@@ -139,6 +140,19 @@ namespace Galini.API.Controllers
         {
             var response = await _blogService.UpdateBlog(id, request);
             return StatusCode(int.Parse(response.status), response);
+        }
+
+        [HttpPost(ApiEndPointConstant.Blog.UploadImg)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesErrorResponseType(typeof(ProblemDetails))]
+        public async Task<IActionResult> UploadImg(IFormFile formFile)
+        {
+
+            var response = await _blogService.UpImageForDescription(formFile);
+
+            return StatusCode(int.Parse(response.status), response);
+
         }
     }
 }
