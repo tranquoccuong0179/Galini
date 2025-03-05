@@ -99,14 +99,12 @@ namespace Galini.API.Controllers
         [HttpGet(ApiEndPointConstant.Topic.GetListTopic)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesErrorResponseType(typeof(ProblemDetails))]
-        public async Task<IActionResult> GetTopics([FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? topicNameEnum)
+        public async Task<IActionResult> GetTopics([FromQuery] int? page, [FromQuery] int? size, [FromQuery] TopicNameEnum? topicNameEnum)
         {
             int pageNumber = page ?? 1;
             int pageSize = size ?? 10;
-            TopicNameEnum? topicEnum = string.IsNullOrWhiteSpace(topicNameEnum)
-                ? null
-                : topicNameEnum!.GetEnumFromDescription<TopicNameEnum>();
-            var response = await _service.GetAllTopic(pageNumber, pageSize, topicEnum);
+
+            var response = await _service.GetAllTopic(pageNumber, pageSize, topicNameEnum);
             return StatusCode(int.Parse(response.status), response);
         }
 

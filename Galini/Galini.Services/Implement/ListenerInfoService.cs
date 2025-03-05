@@ -114,11 +114,12 @@ namespace Galini.Services.Implement
             };
         }
 
-        public async Task<BaseResponse> GetAllListenerInfo(int page, int size, string? name, bool? sortByName, bool? sortByPrice, bool? sortByStar)
+        public async Task<BaseResponse> GetAllListenerInfo(int page, int size, string? name, bool? sortByName, bool? sortByPrice, bool? sortByStar, TopicNameEnum? topicNameEnum, ListenerTypeEnum? listenerTypeEnum)
         {
             var listenerInfo = await _unitOfWork.GetRepository<ListenerInfo>().GetPagingListAsync(
                 selector: l => _mapper.Map<GetListenerInfoResponse>(l),
-                predicate: l => (l.IsActive == true) && (string.IsNullOrEmpty(name) || l.Account.FullName.Contains(name)),
+                predicate: l => l.IsActive && (!listenerTypeEnum.HasValue || l.Type.Equals(listenerTypeEnum.ToString())) && 
+                       (!topicNameEnum.HasValue || l.Topics.Any(t => t.Name.Equals(topicNameEnum.GetDescriptionFromEnum()))),
                 orderBy: l => sortByName.HasValue ?
                       (sortByName.Value ? l.OrderBy(l => l.Account.FullName) : l.OrderByDescending(l => l.Account.FullName)) :
                       sortByPrice.HasValue ?
@@ -126,7 +127,7 @@ namespace Galini.Services.Implement
                       sortByStar.HasValue ?
                       (sortByStar.Value ? l.OrderBy(l => l.Star) : l.OrderByDescending(l => l.Star)) :
                       l.OrderByDescending(l => l.CreateAt),
-                include: l => l.Include(l => l.Account),
+                include: l => l.Include(l => l.Account).Include(l => l.Topics),
                 page: page,
                 size: size);
 
