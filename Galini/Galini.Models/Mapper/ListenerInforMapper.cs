@@ -28,7 +28,9 @@ namespace Galini.Models.Mapper
                 .ForMember(dest => dest.Account, opt => opt.MapFrom(src => src.Account));
 
             CreateMap<ListenerInfo, GetListenerInfoResponse>()
-                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.Account.FullName));
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.Account.FullName))
+                .ForMember(dest => dest.AvatarUrl, opt => opt.MapFrom(src => src.Account.AvatarUrl))
+                .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.Account.Gender));
 
             CreateMap<UpdateListenerInfoRequest, ListenerInfo>()
                 .ForMember(dest => dest.Description, opt => opt.Condition(src => src.Description != null))
