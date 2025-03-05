@@ -1,10 +1,13 @@
 ﻿
 using Galini.API.Constants;
+using Galini.Models.Enum;
 using Galini.Models.Payload.Request.ListenerInfo;
 using Galini.Models.Payload.Request.User;
 using Galini.Models.Payload.Response;
+using Galini.Models.Utils;
 using Galini.Services.Implement;
 using Galini.Services.Interface;
+using Galini.Utils;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Galini.API.Controllers
@@ -67,13 +70,16 @@ namespace Galini.API.Controllers
         public async Task<IActionResult> GetListListenerInfo([FromQuery] int? page, 
                                                              [FromQuery] int? size, 
                                                              [FromQuery] string? name, 
+                                                             [FromQuery] TopicNameEnum? topicNameEnum, 
+                                                             [FromQuery] ListenerTypeEnum? listenerTypeEnum, 
                                                              [FromQuery] bool? sortByName, 
                                                              [FromQuery] bool? sortByPrice, 
                                                              [FromQuery] bool? sortByStar)
         {
             int pageNumber = page ?? 1;
             int pageSize = size ?? 10;
-            var response = await _listenerInfoService.GetAllListenerInfo(pageNumber, pageSize, name, sortByName, sortByPrice, sortByStar);
+
+            var response = await _listenerInfoService.GetAllListenerInfo(pageNumber, pageSize, name, sortByName, sortByPrice, sortByStar, topicNameEnum, listenerTypeEnum);
             return StatusCode(int.Parse(response.status), response);
         }
 
