@@ -14,23 +14,24 @@ namespace Galini.API.Controllers
             _workShiftService = workShiftService;
         }
 
-        /// <summary>
-        /// API tạo ca làm việc mới.
-        /// </summary>
-        /// <remarks>
-        /// - Tạo ca làm việc dựa trên `request` và `id` tài khoản.  
-        /// - Kiểm tra tài khoản có tồn tại không, nếu không trả `404`.  
-        /// - Nếu dữ liệu `request` không hợp lệ, trả lỗi `400`.  
-        /// - Kết quả bọc trong `BaseResponse`.
-        /// </remarks>
-        /// <param name="request">Dữ liệu ca làm việc cần tạo.</param>
-        /// <param name="id">ID của tài khoản người dùng.</param>
-        /// <returns>
-        /// - `200 OK`: Tạo ca làm việc thành công.  
-        /// - `400 Bad Request`: Dữ liệu không hợp lệ hoặc lưu thất bại.  
-        /// - `404 Not Found`: Không tìm thấy tài khoản.
-        /// </returns>
-        [HttpPost(ApiEndPointConstant.WorkShift.CreateWorkShift)]
+    /// <summary>
+    /// API tạo ca làm việc mới.
+    /// </summary>
+    /// <remarks>
+    /// - Tạo ca làm việc dựa trên `request` và `id` tài khoản.  
+    /// - Kiểm tra tài khoản có tồn tại không, nếu không trả `404`.  
+    /// - Nếu dữ liệu `request` không hợp lệ, trả lỗi `400`.  
+    /// - Kết quả bọc trong `BaseResponse`.
+    /// - Request cần tạo có form như sau: {  "startTime": "00:00:00",  "endTime": "00:00:00"}
+    /// </remarks>
+    /// <param name="request">Dữ liệu ca làm việc cần tạo.</param>
+    /// <param name="id">ID của tài khoản người dùng.</param>
+    /// <returns>
+    /// - `200 OK`: Tạo ca làm việc thành công.  
+    /// - `400 Bad Request`: Dữ liệu không hợp lệ hoặc lưu thất bại.  
+    /// - `404 Not Found`: Không tìm thấy tài khoản.
+    /// </returns>
+    [HttpPost(ApiEndPointConstant.WorkShift.CreateWorkShift)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
         [ProducesErrorResponseType(typeof(ProblemDetails))]
