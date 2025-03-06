@@ -1,4 +1,5 @@
 ﻿using Galini.Models.Payload.Request.Deposit;
+using Galini.Models.Payload.Request.DirectChatParticipant;
 using Galini.Models.Payload.Response;
 using System;
 using System.Collections.Generic;
@@ -10,12 +11,12 @@ namespace Galini.Services.Interface
 {
     public interface IDirectChatParticipantService
     {
-        public Task<BaseResponse> CreateDirectChatParticipant(CreateDepositRequest request, Guid accountId, Guid directChatId);
+        public Task<BaseResponse> CreateDirectChatParticipant(CreateDirectChatParticipant request);
         public Task<BaseResponse> GetAllDirectChatParticipant(int page, int size);
-        public Task<BaseResponse> GetDirectChatParticipantById(Guid directChatParticipantId);
-        public Task<BaseResponse> GetDirectChatParticipantByAccountId(Guid accountId);
-        public Task<BaseResponse> UpdateDirectChatParticipant(Guid directChatParticipantId, CreateDepositRequest request);
-        public Task<BaseResponse> RemoveDirectChatParticipant(Guid directChatParticipantId);
-        public Task<BaseResponse> GetAllDirectChatByAccountId(Guid accountId);
+        public Task<BaseResponse> GetDirectChatParticipantById(Guid id);
+        //public Task<BaseResponse> GetDirectChatParticipantByAccountId(Guid accountId);
+        public Task<BaseResponse> UpdateDirectChatParticipant(Guid id, UpdateDirectChatParticipant request);
+        public Task<BaseResponse> RemoveDirectChatParticipant(Guid id);
+        //public Task<BaseResponse> GetAllDirectChatByAccountId(Guid accountId);
     }
 }

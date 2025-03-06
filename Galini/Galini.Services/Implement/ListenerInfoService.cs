@@ -119,6 +119,7 @@ namespace Galini.Services.Implement
             var listenerInfo = await _unitOfWork.GetRepository<ListenerInfo>().GetPagingListAsync(
                 selector: l => _mapper.Map<GetListenerInfoResponse>(l),
                 predicate: l => l.IsActive && (!listenerTypeEnum.HasValue || l.Type.Equals(listenerTypeEnum.ToString())) && 
+                       (string.IsNullOrEmpty(name) || l.Account.FullName.Contains(name)) &&
                        (!topicNameEnum.HasValue || l.Topics.Any(t => t.Name.Equals(topicNameEnum.GetDescriptionFromEnum()))),
                 orderBy: l => sortByName.HasValue ?
                       (sortByName.Value ? l.OrderBy(l => l.Account.FullName) : l.OrderByDescending(l => l.Account.FullName)) :
