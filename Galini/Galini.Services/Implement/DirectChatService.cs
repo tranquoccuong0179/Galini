@@ -46,11 +46,12 @@ namespace Galini.Services.Implement
             };
         }
 
-        public async Task<BaseResponse> GetAllDirectChat(int page, int size)
+        public async Task<BaseResponse> GetAllDirectChat(int page, int size, string? name)
         {
             var response = await _unitOfWork.GetRepository<DirectChat>().GetPagingListAsync(
                 selector: d => _mapper.Map<GetDirectChatResponse>(d),
-                predicate: d => d.IsActive,
+                predicate: d => d.IsActive && (string.IsNullOrEmpty(name) || d.Name.Contains(name)),
+                orderBy: d => d.OrderByDescending(d => d.UpdateAt),
                 page: page,
                 size: size);
             int totalItems = response.Total;

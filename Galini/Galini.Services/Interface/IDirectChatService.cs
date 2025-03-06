@@ -11,7 +11,7 @@ namespace Galini.Services.Interface
     public interface IDirectChatService
     {
         public Task<BaseResponse> CreateDirectChat(CreateDirectChatRequest request);
-        public Task<BaseResponse> GetAllDirectChat(int page, int size);
+        public Task<BaseResponse> GetAllDirectChat(int page, int size, string? name);
         public Task<BaseResponse> GetDirectChatById(Guid id);
         public Task<BaseResponse> UpdateDirectChat(Guid id, UpdateDirectChatRequest request);
         public Task<BaseResponse> RemoveDirectChat(Guid id);

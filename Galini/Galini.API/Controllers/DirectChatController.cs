@@ -55,11 +55,13 @@ namespace Galini.API.Controllers
         [HttpGet(ApiEndPointConstant.DirectChat.GetAllDirectChats)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesErrorResponseType(typeof(ProblemDetails))]
-        public async Task<IActionResult> GetAllDirectChats([FromQuery] int? page, [FromQuery] int? size)
+        public async Task<IActionResult> GetAllDirectChats([FromQuery] int? page, 
+                                                           [FromQuery] int? size,
+                                                           [FromQuery] string? name)
         {
             int pageNumber = page ?? 1;
             int pageSize = size ?? 10;
-            var response = await _directChat.GetAllDirectChat(pageNumber, pageSize);
+            var response = await _directChat.GetAllDirectChat(pageNumber, pageSize, name);
 
             return StatusCode(int.Parse(response.status), response);
         }
