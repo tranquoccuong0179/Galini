@@ -18,6 +18,7 @@ namespace Galini.API.Constants
             public const string AuthenticationEndPoint = ApiEndpoint + "/auth";
             public const string Authenticate = AuthenticationEndPoint;
             public const string AutheticateWithRefreshToken = AuthenticationEndPoint + "/refresh-token";
+            public const string RevokeRefreshToken = AuthenticationEndPoint + "/revoke-refresh-token/{id}";
         }
 
         public static class GoogleAuthentication

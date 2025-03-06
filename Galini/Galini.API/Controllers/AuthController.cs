@@ -62,5 +62,30 @@ namespace Galini.API.Controllers
             var response = await _authService.AutheticateWithRefreshToken(request);
             return StatusCode(int.Parse(response.status), response);
         }
+
+        /// <summary>
+        /// API thu hồi tất cả Refresh Token của người dùng.
+        /// </summary>
+        /// <remarks>
+        /// - Xóa toàn bộ Refresh Token của người dùng dựa trên `accountId`.  
+        /// - Nếu tài khoản không tồn tại, trả về lỗi `400 Bad Request`.  
+        /// - Nếu không có Refresh Token nào để thu hồi, trả về `200 OK`.  
+        /// - Nếu thu hồi thành công, trả về `200 OK`.  
+        /// - Nếu có lỗi trong quá trình xử lý, trả về `400 Bad Request`.  
+        /// </remarks>
+        /// <param name="id">ID của tài khoản cần thu hồi Refresh Token.</param>
+        /// <returns>
+        /// - `200 OK`: Thu hồi thành công hoặc không có Refresh Token nào để xóa.  
+        /// - `400 Bad Request`: Tài khoản không tồn tại hoặc có lỗi khi thu hồi Refresh Token.  
+        /// </returns>
+        [HttpPost(ApiEndPointConstant.Authentication.RevokeRefreshToken)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesErrorResponseType(typeof(ProblemDetails))]
+        public async Task<IActionResult> RevokeRefreshToken([FromRoute] Guid id)
+        {
+            var response = await _authService.RevokeRefreshToken(id);
+            return StatusCode(int.Parse(response.status), response);
+        }
     }
 }

@@ -21,10 +21,10 @@ namespace Galini.Models.Mapper
                 .ForMember(dest => dest.CreateAt, opt => opt.MapFrom(src => TimeUtil.GetCurrentSEATime()))
                 .ForMember(dest => dest.UpdateAt, opt => opt.MapFrom(src => TimeUtil.GetCurrentSEATime()));
 
-            CreateMap<UpdateWorkShiftRequest, Premium>()
+            CreateMap<UpdateWorkShiftRequest, WorkShift>()
                 .ForMember(dest => dest.UpdateAt, opt => opt.MapFrom(src => TimeUtil.GetCurrentSEATime()));
 
-            CreateMap<Premium, CreateWorkShiftResponse>();
+            CreateMap<WorkShift, CreateWorkShiftResponse>();
         }
     }
 }

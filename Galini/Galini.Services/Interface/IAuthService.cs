@@ -12,5 +12,6 @@ namespace Galini.Services.Interface
     {
         Task<BaseResponse> Authenticate(AuthenticateRequest request);
         Task<BaseResponse> AutheticateWithRefreshToken(string refreshTokenRequest);
+        Task<BaseResponse> RevokeRefreshToken(Guid accountId);
     }
 }
