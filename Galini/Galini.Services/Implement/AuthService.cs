@@ -148,5 +148,53 @@ namespace Galini.Services.Implement
                 data = authenticateResponse
             };           
         }
+
+        public async Task<BaseResponse> RevokeRefreshToken(Guid accountId)
+        {
+            Account account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: a => a.IsActive && a.Id.Equals(accountId));
+            if (account == null)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status400BadRequest.ToString(),
+                    message = "Không tim thấy tài khoản này",
+                    data = null
+                };
+            }
+
+            var refreshTokens = await _unitOfWork.GetRepository<RefreshToken>().GetListAsync(predicate: a => a.UserId.Equals(accountId));
+
+            if (!refreshTokens.Any()) 
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status200OK.ToString(),
+                    message = "Không có refresh token nào để xóa",
+                    data = false
+                };
+            }
+
+            _unitOfWork.GetRepository<RefreshToken>().DeleteRangeAsync(refreshTokens);
+
+            bool isSuccessfully = await _unitOfWork.CommitAsync() > 0;
+
+            if (!isSuccessfully)
+            {
+                // Return a success response
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status400BadRequest.ToString(),
+                    message = "Revoke refresh token failed",
+                    data = isSuccessfully
+                };
+            }
+
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status200OK.ToString(),
+                message = "Revoke refresh token success",
+                data = isSuccessfully
+            };
+        }
     }
 }
