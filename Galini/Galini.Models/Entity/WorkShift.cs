@@ -13,6 +13,8 @@ public partial class WorkShift
 
     public TimeOnly EndTime { get; set; }
 
+    public string Day { get; set; } = null!;
+
     public bool IsActive { get; set; }
 
     public DateTime CreateAt { get; set; }
