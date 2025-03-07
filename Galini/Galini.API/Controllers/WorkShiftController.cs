@@ -1,4 +1,5 @@
 ﻿using Galini.API.Constants;
+using Galini.Models.Enum;
 using Galini.Models.Payload.Request.WorkShift;
 using Galini.Models.Payload.Response;
 using Galini.Services.Interface;
@@ -35,7 +36,7 @@ namespace Galini.API.Controllers
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
         [ProducesErrorResponseType(typeof(ProblemDetails))]
-        public async Task<IActionResult> CreateWorkShift([FromBody] CreateWorkShiftRequest request, [FromRoute] Guid id)
+        public async Task<IActionResult> CreateWorkShift([FromBody] CreateWorkShiftRequest request, [FromRoute] Guid id, [FromQuery] DayEnum day)
         {
             if (request == null)
             {
@@ -47,7 +48,7 @@ namespace Galini.API.Controllers
                 });
             }
 
-            var response = await _workShiftService.CreateWorkShift(request, id);
+            var response = await _workShiftService.CreateWorkShift(request, id, day);
             return StatusCode(int.Parse(response.status), response);
         }
 
@@ -134,6 +135,39 @@ namespace Galini.API.Controllers
         }
 
         /// <summary>
+        /// - API lấy danh sách ca làm việc còn trống theo ID tài khoản và ngày cụ thể với phân trang.
+        /// - Dùng để lấy các ca làm việc chưa bị đặt của tham vấn viên trong ngày hôm đó cho người dùng chọn.
+        /// </summary>
+        /// <remarks>
+        /// - Trả về danh sách ca làm việc còn trống của tài khoản, mặc định `page = 1`, `size = 10`.  
+        /// - Chỉ lấy ca còn hoạt động (`IsActive = true`), khớp với ngày truyền vào, sắp xếp theo thời gian bắt đầu tăng dần.  
+        /// - Lọc bỏ các ca đã được đặt trong bảng Booking dựa trên `id` và `date`.  
+        /// - Nếu tài khoản không tồn tại, trả `404`. Nếu `page` hoặc `size` nhỏ hơn 1, trả `400`.  
+        /// - Ví dụ: `date =2025-03-07T14:30:00` (Thứ Hai, 10/03/2025) sẽ lấy các ca trống của ngày Thứ Hai đó.
+        /// - Kết quả bọc trong `BaseResponse`.
+        /// </remarks>
+        /// <param name="page">Số trang (mặc định 1).</param>
+        /// <param name="size">Số lượng mỗi trang (mặc định 10).</param>
+        /// <param name="id">ID của tài khoản tham vấn viên.</param>
+        /// <param name="date">Ngày cần lấy ca trống (định dạng (yyyy-MM-ddTHH:mm:ssZ) ví dụ: 2025-03-07T14:30:00) THỜI GIAN KHÔNG QUAN TRỌNG, QUAN TRỌNG LÀ ĐÚNG NGÀY.</param>
+        /// <returns>
+        /// - `200 OK`: Lấy danh sách ca làm việc còn trống thành công.  
+        /// - `400 Bad Request`: Page hoặc size không hợp lệ.  
+        /// - `404 Not Found`: Không tìm thấy tài khoản.
+        /// </returns>
+        [HttpGet(ApiEndPointConstant.WorkShift.GetAvailableWorkShifts)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesErrorResponseType(typeof(ProblemDetails))]
+        public async Task<IActionResult> GetAvailableWorkShifts([FromQuery] int? page, [FromQuery] int? size, [FromRoute] Guid id, [FromQuery] DateTime date)
+        {
+            int pageNumber = page ?? 1;
+            int pageSize = size ?? 10;
+            var response = await _workShiftService.GetAvailableWorkShifts(pageNumber, pageSize, id, date);
+            return StatusCode(int.Parse(response.status), response);
+        }
+
+        /// <summary>
         /// API cập nhật ca làm việc theo ID.
         /// </summary>
         /// <remarks>
@@ -153,7 +187,7 @@ namespace Galini.API.Controllers
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
         [ProducesErrorResponseType(typeof(ProblemDetails))]
-        public async Task<IActionResult> UpdateWorkShift([FromRoute] Guid id, [FromBody] UpdateWorkShiftRequest request)
+        public async Task<IActionResult> UpdateWorkShift([FromRoute] Guid id, [FromBody] UpdateWorkShiftRequest request, [FromQuery] DayEnum day)
         {
             if (request == null)
             {
@@ -164,7 +198,7 @@ namespace Galini.API.Controllers
                     data = null
                 });
             }
-            var response = await _workShiftService.UpdateWorkShift(request, id);
+            var response = await _workShiftService.UpdateWorkShift(request, id, day);
             return StatusCode(int.Parse(response.status), response);
         }
 

@@ -478,6 +478,7 @@ public partial class HarmonContext : DbContext
         {
             entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.CreateAt).HasColumnType("datetime");
+            entity.Property(e => e.Day).HasMaxLength(50);
             entity.Property(e => e.DeleteAt).HasColumnType("datetime");
             entity.Property(e => e.UpdateAt).HasColumnType("datetime");
 

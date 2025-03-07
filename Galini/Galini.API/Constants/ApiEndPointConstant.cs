@@ -191,6 +191,7 @@ namespace Galini.API.Constants
             public const string GetAllWorkShift = WorkShiftEndPoint;
             public const string GetWorkShiftById = WorkShiftEndPoint + "/{id}";
             public const string GetWorkShiftByAccountId = WorkShiftEndPoint + "/account/{id}";
+            public const string GetAvailableWorkShifts = WorkShiftEndPoint + "/account/{id}/available";
             public const string CreateWorkShift = WorkShiftEndPoint + "/account/{id}";
             public const string UpdateWorkShift = WorkShiftEndPoint + "/{id}";
             public const string RemoveWorkShift = WorkShiftEndPoint + "/{id}";
