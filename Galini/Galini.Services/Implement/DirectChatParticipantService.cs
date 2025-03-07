@@ -81,9 +81,23 @@ namespace Galini.Services.Implement
 
         public async Task<BaseResponse> GetAllDirectChatParticipant(int page, int size)
         {
+
+            Guid? id = UserUtil.GetAccountId(_httpContextAccessor.HttpContext);
+            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+                predicate: a => a.Id.Equals(id) && a.IsActive == true);
+
+            if (account == null)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status404NotFound.ToString(),
+                    message = "Không tìm thấy tài khoản",
+                    data = null
+                };
+            }
             var response = await _unitOfWork.GetRepository<DirectChatParticipant>().GetPagingListAsync(
                 selector: d => _mapper.Map<GetDirectChatParticipantResponse>(d),
-                predicate: d => d.IsActive,
+                predicate: d => d.IsActive && d.AccountId.Equals(account.Id),
                 page: page,
                 size: size);
 
@@ -117,9 +131,22 @@ namespace Galini.Services.Implement
 
         public async Task<BaseResponse> GetDirectChatParticipantById(Guid id)
         {
+            Guid? accountId = UserUtil.GetAccountId(_httpContextAccessor.HttpContext);
+            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+                predicate: a => a.Id.Equals(accountId) && a.IsActive == true);
+
+            if (account == null)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status404NotFound.ToString(),
+                    message = "Không tìm thấy tài khoản",
+                    data = null
+                };
+            }
             var response = await _unitOfWork.GetRepository<DirectChatParticipant>().SingleOrDefaultAsync(
                 selector: d => _mapper.Map<GetDirectChatParticipantResponse>(d),
-                predicate: d => d.Id.Equals(id) && d.IsActive);
+                predicate: d => d.Id.Equals(id) && d.IsActive && d.AccountId.Equals(account.Id));
 
             if(response == null)
             {
@@ -149,7 +176,7 @@ namespace Galini.Services.Implement
                 {
                     status = StatusCodes.Status404NotFound.ToString(),
                     message = "Không tìm thấy",
-                    data = null
+                    data = false
                 };
             }
 
@@ -166,8 +193,57 @@ namespace Galini.Services.Implement
                 return new BaseResponse()
                 {
                     status = StatusCodes.Status200OK.ToString(),
+                    message = "Xóa thành công",
+                    data = true
+                };
+            }
+
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status400BadRequest.ToString(),
+                message = "Xóa thất bại",
+                data = false
+            };
+        }
+
+        public async Task<BaseResponse> UpdateDirectChatParticipant(Guid id, UpdateDirectChatParticipant request)
+        {
+            Guid? accountId = UserUtil.GetAccountId(_httpContextAccessor.HttpContext);
+            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+                predicate: a => a.Id.Equals(id) && a.IsActive == true);
+
+            if (account == null)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status404NotFound.ToString(),
+                    message = "Không tìm thấy tài khoản",
+                    data = null
+                };
+            }
+            var directChatParticipant = await _unitOfWork.GetRepository<DirectChatParticipant>().SingleOrDefaultAsync(
+                predicate: d => d.Id.Equals(id) && d.IsActive && d.AccountId.Equals(account.Id));
+            if (directChatParticipant == null)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status404NotFound.ToString(),
+                    message = "Không tìm thấy",
+                    data = null
+                };
+            }
+
+            directChatParticipant.NickName = string.IsNullOrEmpty(request.NickName) ? directChatParticipant.NickName : request.NickName;
+            _unitOfWork.GetRepository<DirectChatParticipant>().UpdateAsync(directChatParticipant);
+            bool isSuccessfully = await _unitOfWork.CommitAsync() > 0;
+
+            if (isSuccessfully)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status200OK.ToString(),
                     message = "Cập nhật thành công",
-                    data = _mapper.Map<GetDirectChatParticipantResponse>(direct)
+                    data = _mapper.Map<GetDirectChatParticipantResponse>(directChatParticipant)
                 };
             }
 
@@ -177,11 +253,6 @@ namespace Galini.Services.Implement
                 message = "Cập nhật thất bại",
                 data = null
             };
-        }
-
-        public Task<BaseResponse> UpdateDirectChatParticipant(Guid id, UpdateDirectChatParticipant request)
-        {
-            throw new NotImplementedException();
         }
     }
 }
