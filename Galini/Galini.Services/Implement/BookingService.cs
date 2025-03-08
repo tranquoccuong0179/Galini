@@ -73,6 +73,19 @@ namespace Galini.Services.Implement
                 };
             }
 
+            var exitBooking = await _unitOfWork.GetRepository<Booking>().SingleOrDefaultAsync(
+                predicate: x => x.WorkShiftId.Equals(workShift.Id) && x.IsActive && DateOnly.FromDateTime(x.Date) == DateOnly.FromDateTime(request.Date));
+
+            if (exitBooking != null)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status404NotFound.ToString(),
+                    message = "Ca làm việc này đã bị đặt vấn viên không tồn tại",
+                    data = null
+                };
+            }
+
             var booking = _mapper.Map<CreateBookingRequest, Booking>(request);
             booking.ListenerId = listener.Id;
             booking.WorkShiftId = workShiftId;
