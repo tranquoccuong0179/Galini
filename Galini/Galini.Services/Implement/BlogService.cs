@@ -113,8 +113,12 @@ namespace Galini.Services.Implement
         public async Task<BaseResponse> GetBlogById(Guid id)
         {
             var response = await _unitOfWork.GetRepository<Blog>().SingleOrDefaultAsync(
-                selector: b => _mapper.Map<GetBlogResponse>(b),
                 predicate: b => b.IsActive && b.Id.Equals(id));
+
+            response.Views += 1;
+
+            _unitOfWork.GetRepository<Blog>().UpdateAsync(response);
+            await _unitOfWork.CommitAsync();
 
             if(response == null)
             {
@@ -130,7 +134,7 @@ namespace Galini.Services.Implement
             {
                 status = StatusCodes.Status200OK.ToString(),
                 message = "Tìm thấy blog",
-                data = response
+                data = _mapper.Map<GetBlogResponse>(response),
             };
         }
 
