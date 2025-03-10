@@ -331,5 +331,41 @@ namespace Galini.Services.Implement
                 throw new Exception("An error occurred while uploading the file to Firebase.", ex);
             }
         }
+
+        public async Task<BaseResponse> LikeBlog(Guid id)
+        {
+            var blog = await _unitOfWork.GetRepository<Blog>().SingleOrDefaultAsync(
+                predicate: b => b.Id.Equals(id) && b.IsActive);
+            if (blog == null)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status404NotFound.ToString(),
+                    message = "Không tìm thấy blog",
+                    data = false
+                };
+            }
+
+            blog.Likes += 1;
+            _unitOfWork.GetRepository<Blog>().UpdateAsync(blog);
+            bool isSuccessfully = await _unitOfWork.CommitAsync() > 0;
+
+            if (isSuccessfully)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status200OK.ToString(),
+                    message = "Like blog thành công",
+                    data = true
+                };
+            }
+
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status400BadRequest.ToString(),
+                message = "Like blog thất bại",
+                data = false
+            };
+        }
     }
 }
