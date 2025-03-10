@@ -221,6 +221,7 @@ namespace Galini.API.Constants
             public const string GetBlogById = BlogEndPoint + "/{id}";
             public const string UpdateBlog = BlogEndPoint + "/{id}";
             public const string RemoveBlog = BlogEndPoint + "/{id}";
+            public const string LikeBlog = BlogEndPoint + "/{id}/like";
             public const string UploadImg = "upload-img";
         }
         public static class DirectChat

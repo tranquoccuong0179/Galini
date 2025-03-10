@@ -18,5 +18,6 @@ namespace Galini.Services.Interface
         Task<BaseResponse> RemoveBlog(Guid id);
         Task<BaseResponse> UpdateBlog(Guid id, UpdateBlogRequest request);
         Task<BaseResponse> UpImageForDescription(IFormFile formFile);
+        Task<BaseResponse> LikeBlog(Guid id);
     }
 }

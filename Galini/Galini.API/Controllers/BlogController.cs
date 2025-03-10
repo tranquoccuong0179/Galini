@@ -142,6 +142,30 @@ namespace Galini.API.Controllers
             return StatusCode(int.Parse(response.status), response);
         }
 
+        /// <summary>
+        /// API like một bài viết theo ID.
+        /// </summary>
+        /// <remarks>
+        /// - Nhận `id` của bài viết và cập nhật lượt like.  
+        /// - Nếu bài viết không tồn tại, trả về lỗi `404 Not Found`.  
+        /// - Kết quả trả về được bọc trong `BaseResponse`.
+        /// </remarks>
+        /// <param name="id">ID của bài viết cần lấy.</param>
+        /// <returns>
+        /// - `200 OK`: Trả về thông tin bài viết thành công.  
+        /// - `400 Bad Request`: Like bài viết thất bại.  
+        /// - `404 Not Found`: Không tìm thấy bài viết.
+        /// </returns>
+        [HttpGet(ApiEndPointConstant.Blog.LikeBlog)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status404NotFound)]
+        [ProducesErrorResponseType(typeof(ProblemDetails))]
+        public async Task<IActionResult> LikeBlog([FromRoute] Guid id)
+        {
+            var response = await _blogService.LikeBlog(id);
+            return StatusCode(int.Parse(response.status), response);
+        }
+
         [HttpPost(ApiEndPointConstant.Blog.UploadImg)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
