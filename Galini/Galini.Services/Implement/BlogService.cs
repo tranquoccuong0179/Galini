@@ -342,7 +342,7 @@ namespace Galini.Services.Implement
                 {
                     status = StatusCodes.Status404NotFound.ToString(),
                     message = "Không tìm thấy blog",
-                    data = false
+                    data = null
                 };
             }
 
@@ -356,7 +356,7 @@ namespace Galini.Services.Implement
                 {
                     status = StatusCodes.Status200OK.ToString(),
                     message = "Like blog thành công",
-                    data = true
+                    data = _mapper.Map<Blog>(blog)
                 };
             }
 
@@ -364,7 +364,7 @@ namespace Galini.Services.Implement
             {
                 status = StatusCodes.Status400BadRequest.ToString(),
                 message = "Like blog thất bại",
-                data = false
+                data = null
             };
         }
     }
