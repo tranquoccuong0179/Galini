@@ -19,5 +19,4 @@ public class RegisterUserRequest
 
     public string? AvatarUrl { get; set; }
 
-    public int Weight { get; set; }
 }

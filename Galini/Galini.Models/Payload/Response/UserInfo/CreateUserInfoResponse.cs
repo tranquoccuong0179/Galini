@@ -25,5 +25,6 @@ namespace Galini.Models.Payload.Response.UserInfo
         public DateTime DateOfBirth { get; set; }
         public string Gender { get; set; } 
         public string? AvatarUrl { get; set; }
+        public int? Duration { get; set; }
     }
 }
