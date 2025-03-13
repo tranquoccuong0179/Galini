@@ -29,6 +29,8 @@ namespace Galini.Models.Mapper
             CreateMap<Account, RegisterUserResponse>();
 
             CreateMap<Account, GetAccountResponse>();
+
+            CreateMap<Account, GetAccountByIdResponse>();
         }
     }
 }

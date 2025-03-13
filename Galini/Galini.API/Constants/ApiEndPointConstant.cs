@@ -36,6 +36,7 @@ namespace Galini.API.Constants
             public const string ResendOtp = UserEndPoint + "/resend-otp";
             public const string GetListenerAccount = UserEndPoint + "/listener";
             public const string UpdateDuration = UserEndPoint + "/update-duration/{id}";
+            public const string GetAccountById = UserEndPoint + "/account/{id}";
         }
 
         public static class Notification
