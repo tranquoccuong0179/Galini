@@ -8,6 +8,7 @@ using Galini.Repository.Interface;
 using Galini.Services.Interface;
 using Galini.Utils;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -95,6 +96,7 @@ namespace Galini.Services.Implement
                 selector: a => _mapper.Map<CreateUserInfoResponse>(a),
                 predicate: a => a.IsActive && (string.IsNullOrEmpty(premium) || a.Premium.Type.Equals(premium)),
                 orderBy: l => sortByPremium.HasValue ? (sortByPremium.Value ? l.OrderBy(l => l.Premium.Type) : l.OrderByDescending(l => l.Premium.Type)) : l.OrderBy(l => l.CreateAt),
+                include: l => l.Include(l => l.Premium).Include(l => l.Account),
                 page: page,
                 size: size);
 
@@ -123,7 +125,9 @@ namespace Galini.Services.Implement
             }
 
             var userInfo = await _unitOfWork.GetRepository<UserInfo>().SingleOrDefaultAsync(
-                predicate: x => x.AccountId.Equals(accountId) && x.IsActive);
+                predicate: x => x.AccountId.Equals(accountId) && x.IsActive,
+                include: l => l.Include(l => l.Premium).Include(l => l.Account));
+
 
             if (userInfo == null)
             {
@@ -146,7 +150,8 @@ namespace Galini.Services.Implement
         public async Task<BaseResponse> GetUserInfoById(Guid userInfoId)
         {
             var userInfo = await _unitOfWork.GetRepository<UserInfo>().SingleOrDefaultAsync(
-                predicate: x => x.Id.Equals(userInfoId) && x.IsActive);
+                predicate: x => x.Id.Equals(userInfoId) && x.IsActive,
+                include: l => l.Include(l => l.Premium).Include(l => l.Account));
 
             if (userInfo == null)
             {
