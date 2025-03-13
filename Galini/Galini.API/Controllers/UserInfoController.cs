@@ -27,7 +27,6 @@ namespace Galini.API.Controllers
         /// - Nếu dữ liệu `request` không hợp lệ, trả lỗi `400`.  
         /// - Kết quả bọc trong `BaseResponse`.
         /// </remarks>
-        /// <param name="request">Dữ liệu thông tin người dùng cần tạo.</param>
         /// <param name="accountId">ID của tài khoản người dùng.</param>
         /// <param name="premiumId">ID của gói premium.</param>
         /// <returns>
@@ -39,19 +38,9 @@ namespace Galini.API.Controllers
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
         [ProducesErrorResponseType(typeof(ProblemDetails))]
-        public async Task<IActionResult> CreateUserInfo([FromBody] CreateUserInfoRequest request, [FromQuery] Guid accountId, [FromQuery] Guid premiumId)
+        public async Task<IActionResult> CreateUserInfo([FromQuery] Guid accountId, [FromQuery] Guid premiumId)
         {
-            if (request == null)
-            {
-                return BadRequest(new BaseResponse
-                {
-                    status = StatusCodes.Status400BadRequest.ToString(),
-                    message = "Invalid request data",
-                    data = null
-                });
-            }
-
-            var response = await _userInfoService.CreateUserInfo(request, accountId, premiumId);
+            var response = await _userInfoService.CreateUserInfo(accountId, premiumId);
             return StatusCode(int.Parse(response.status), response);
         }
 

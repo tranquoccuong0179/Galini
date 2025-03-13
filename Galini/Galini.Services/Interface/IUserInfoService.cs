@@ -11,7 +11,7 @@ namespace Galini.Services.Interface
 {
     public interface IUserInfoService
     {
-        public Task<BaseResponse> CreateUserInfo(CreateUserInfoRequest request, Guid accountId, Guid premiumId);
+        public Task<BaseResponse> CreateUserInfo(Guid accountId, Guid premiumId);
         public Task<BaseResponse> GetAllUserInfo(int page, int size, string? premium, bool? sortByPremium);
         public Task<BaseResponse> GetUserInfoById(Guid userInfoId);
         public Task<BaseResponse> GetUserInfoByAccountId(Guid accountId);

@@ -56,7 +56,7 @@ namespace Galini.Services.Implement
                 Id = Guid.NewGuid(),
                 UserId = account.Id,
                 Token = JwtUtil.GenerateRefreshToken(),
-                ExpirationTime = DateTime.Now.AddDays(30),
+                ExpirationTime = TimeUtil.GetCurrentSEATime().AddDays(30),
             };
 
             await _unitOfWork.GetRepository<RefreshToken>().InsertAsync(refreshToken);
@@ -99,7 +99,7 @@ namespace Galini.Services.Implement
                 include: r => r.Include(r => r.User)
                 );
 
-            if (refreshToken == null || refreshToken.ExpirationTime < DateTime.UtcNow)
+            if (refreshToken == null || refreshToken.ExpirationTime < TimeUtil.GetCurrentSEATime())
             {
                 return new BaseResponse()
                 {
@@ -110,7 +110,7 @@ namespace Galini.Services.Implement
             }
 
             refreshToken.Token = JwtUtil.GenerateRefreshToken();
-            refreshToken.ExpirationTime = DateTime.Now.AddDays(30);
+            refreshToken.ExpirationTime = TimeUtil.GetCurrentSEATime().AddDays(30);
 
             _unitOfWork.GetRepository<RefreshToken>().UpdateAsync(refreshToken);
 
