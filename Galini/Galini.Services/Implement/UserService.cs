@@ -9,12 +9,14 @@ using Galini.Models.Payload.Response;
 using Galini.Models.Payload.Response.Account;
 using Galini.Models.Payload.Response.Authentication;
 using Galini.Models.Payload.Response.GoogleAuthentication;
+using Galini.Models.Payload.Response.UserCall;
 using Galini.Models.Payload.Response.WorkShift;
 using Galini.Models.Utils;
 using Galini.Repository.Interface;
 using Galini.Services.Interface;
 using Galini.Utils;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MimeKit.Utils;
 using Newtonsoft.Json.Linq;
@@ -444,6 +446,31 @@ public class UserService : BaseService<UserService>, IUserService
             status = StatusCodes.Status400BadRequest.ToString(),
             message = "Update duration failed.",
             data = false
+        };
+    }
+
+    public async Task<BaseResponse> GetAccountById(Guid id)
+    {
+        var existingUser = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+            predicate: u => u.IsActive && u.Id.Equals(id),
+            selector: a => _mapper.Map<GetAccountByIdResponse>(a),
+            include: l => l.Include(l => l.UserInfo).ThenInclude(a => a.Premium));
+
+        if (existingUser == null)
+        {
+            return new BaseResponse
+            {
+                status = StatusCodes.Status400BadRequest.ToString(),
+                message = "User account don't exists.",
+                data = null
+            };
+        }
+
+        return new BaseResponse
+        {
+            status = StatusCodes.Status200OK.ToString(),
+            message = "Lấy account thành công.",
+            data = existingUser
         };
     }
 }

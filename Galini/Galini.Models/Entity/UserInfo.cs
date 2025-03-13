@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Galini.Models.Entity;
 
@@ -23,6 +24,7 @@ public partial class UserInfo
 
     public DateTime? DeleteAt { get; set; }
 
+    [JsonIgnore]
     public virtual Account Account { get; set; } = null!;
 
     public virtual Premium Premium { get; set; } = null!;

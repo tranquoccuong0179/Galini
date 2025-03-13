@@ -140,4 +140,15 @@ public class AccountController : BaseController<AccountController>
 
         return StatusCode(int.Parse(response.status), response);
     }
+
+    [HttpGet(ApiEndPointConstant.User.GetAccountById)]
+    [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+    [ProducesErrorResponseType(typeof(ProblemDetails))]
+    public async Task<IActionResult> GetAccountById([FromRoute] Guid id)
+    {
+        var response = await _userService.GetAccountById(id);
+
+        return StatusCode(int.Parse(response.status), response);
+    }
 }
