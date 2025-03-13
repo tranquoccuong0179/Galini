@@ -26,7 +26,20 @@ namespace Galini.Models.Mapper
                 .ForMember(dest => dest.DateStart, opt => opt.Condition(src => src.DateStart != default))
                 .ForMember(dest => dest.DateEnd, opt => opt.Condition(src => src.DateEnd != default));
 
-            CreateMap<UserInfo, CreateUserInfoResponse>();
+            CreateMap<UserInfo, CreateUserInfoResponse>()
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Premium.Type))
+                .ForMember(dest => dest.Friend, opt => opt.MapFrom(src => src.Premium.Friend))
+                .ForMember(dest => dest.TimeLimit, opt => opt.MapFrom(src => src.Premium.Timelimit))
+                .ForMember(dest => dest.Match, opt => opt.MapFrom(src => src.Premium.Match))
+                .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Premium.Price))
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Account.Role))
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.Account.FullName))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Account.Email))
+                .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.Account.Phone))
+                .ForMember(dest => dest.DateOfBirth, opt => opt.MapFrom(src => src.Account.DateOfBirth))
+                .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.Account.Gender))
+                .ForMember(dest => dest.Duration, opt => opt.MapFrom(src => src.Account.Duration))
+                .ForMember(dest => dest.AvatarUrl, opt => opt.MapFrom(src => src.Account.AvatarUrl));
         }
     }
 }

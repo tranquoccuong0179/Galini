@@ -113,4 +113,54 @@ public class AccountController : BaseController<AccountController>
 
         return StatusCode(int.Parse(response.status), response);
     }
+
+    /// <summary>
+    /// API cập nhật giá trị Duration của tài khoản người dùng.
+    /// </summary>
+    /// <remarks>
+    /// - Cập nhật giá trị `Duration` cho tài khoản người dùng dựa trên `id`.  
+    /// - Người dùng phải có trạng thái hoạt động (`IsActive = true`) mới có thể cập nhật.  
+    /// - Kết quả trả về được bọc trong `BaseResponse`.
+    /// </remarks>
+    /// <param name="id">ID của người dùng cần cập nhật.</param>
+    /// <param name="duration">Giá trị `Duration` mới cần thiết lập.</param>
+    /// <returns>
+    /// - `200 OK`: Cập nhật `Duration` thành công.  
+    /// - `400 Bad Request`:  
+    ///   - Người dùng không tồn tại.  
+    ///   - Cập nhật `Duration` thất bại.  
+    /// </returns>
+    [HttpPatch(ApiEndPointConstant.User.UpdateDuration)]
+    [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+    [ProducesErrorResponseType(typeof(ProblemDetails))]
+    public async Task<IActionResult> UpdateDuration([FromRoute] Guid id, [FromQuery] int duration)
+    {
+        var response = await _userService.UpdateDuration(id, duration);
+
+        return StatusCode(int.Parse(response.status), response);
+    }
+
+    /// <summary>
+    /// API lấy thông tin tài khoản người dùng theo ID.
+    /// </summary>
+    /// <remarks>
+    /// - Trả về thông tin chi tiết của tài khoản dựa trên `id` cung cấp.  
+    /// - Kết quả trả về được bọc trong `BaseResponse`.
+    /// </remarks>
+    /// <param name="id">ID của tài khoản cần lấy thông tin.</param>
+    /// <returns>
+    /// - `200 OK`: Trả về thông tin tài khoản thành công.  
+    /// - `400 Bad Request`: Không tìm thấy tài khoản hoặc ID không hợp lệ.  
+    /// </returns>
+    [HttpGet(ApiEndPointConstant.User.GetAccountById)]
+    [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+    [ProducesErrorResponseType(typeof(ProblemDetails))]
+    public async Task<IActionResult> GetAccountById([FromRoute] Guid id)
+    {
+        var response = await _userService.GetAccountById(id);
+
+        return StatusCode(int.Parse(response.status), response);
+    }
 }

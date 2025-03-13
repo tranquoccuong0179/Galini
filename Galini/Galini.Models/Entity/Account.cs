@@ -23,6 +23,8 @@ public partial class Account
 
     public string Gender { get; set; } = null!;
 
+    public int? Duration { get; set; }
+
     public string? AvatarUrl { get; set; }
 
     public bool IsActive { get; set; }

@@ -9,14 +9,17 @@ using Galini.Models.Payload.Response;
 using Galini.Models.Payload.Response.Account;
 using Galini.Models.Payload.Response.Authentication;
 using Galini.Models.Payload.Response.GoogleAuthentication;
+using Galini.Models.Payload.Response.UserCall;
 using Galini.Models.Payload.Response.WorkShift;
 using Galini.Models.Utils;
 using Galini.Repository.Interface;
 using Galini.Services.Interface;
 using Galini.Utils;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MimeKit.Utils;
+using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 
 namespace Galini.Services.Implement;
@@ -399,4 +402,75 @@ public class UserService : BaseService<UserService>, IUserService
         };
     }
 
+    public async Task<BaseResponse> UpdateDuration(Guid id, int duration)
+    {
+        var existingUser = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+            predicate: u => u.IsActive && u.Id.Equals(id));
+
+        if (existingUser == null)
+        {
+            return new BaseResponse
+            {
+                status = StatusCodes.Status400BadRequest.ToString(),
+                message = "User account don't exists.",
+                data = null
+            };
+        }
+
+        if(duration > 30 || duration < 0)
+        {
+            return new BaseResponse
+            {
+                status = StatusCodes.Status400BadRequest.ToString(),
+                message = "Invalid duration value, Duration must be between 0 and 30.",
+                data = null
+            };
+        }
+
+        existingUser.Duration = duration;
+        _unitOfWork.GetRepository<Account>().UpdateAsync(existingUser);
+        bool isSuccessfully = await _unitOfWork.CommitAsync() > 0;
+
+        if (isSuccessfully)
+        {
+            return new BaseResponse
+            {
+                status = StatusCodes.Status200OK.ToString(),
+                message = "Update duration success.",
+                data = existingUser.Duration
+            };
+        }
+
+        return new BaseResponse
+        {
+            status = StatusCodes.Status400BadRequest.ToString(),
+            message = "Update duration failed.",
+            data = false
+        };
+    }
+
+    public async Task<BaseResponse> GetAccountById(Guid id)
+    {
+        var existingUser = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+            predicate: u => u.IsActive && u.Id.Equals(id),
+            selector: a => _mapper.Map<GetAccountByIdResponse>(a),
+            include: l => l.Include(l => l.UserInfo).ThenInclude(a => a.Premium));
+
+        if (existingUser == null)
+        {
+            return new BaseResponse
+            {
+                status = StatusCodes.Status400BadRequest.ToString(),
+                message = "User account don't exists.",
+                data = null
+            };
+        }
+
+        return new BaseResponse
+        {
+            status = StatusCodes.Status200OK.ToString(),
+            message = "Lấy account thành công.",
+            data = existingUser
+        };
+    }
 }

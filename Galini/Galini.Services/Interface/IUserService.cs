@@ -13,4 +13,6 @@ public interface IUserService
     Task<bool> GetAccountByEmail(string email);
     Task<BaseResponse> CreateNewUserAccountByGoogle(GoogleAuthResponse request);
     Task<BaseResponse> GetListenerAccount(int page, int size);
+    Task<BaseResponse> UpdateDuration(Guid id, int duration);
+    Task<BaseResponse> GetAccountById(Guid id);
 }
