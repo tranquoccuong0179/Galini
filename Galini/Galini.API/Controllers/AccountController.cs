@@ -141,6 +141,18 @@ public class AccountController : BaseController<AccountController>
         return StatusCode(int.Parse(response.status), response);
     }
 
+    /// <summary>
+    /// API lấy thông tin tài khoản người dùng theo ID.
+    /// </summary>
+    /// <remarks>
+    /// - Trả về thông tin chi tiết của tài khoản dựa trên `id` cung cấp.  
+    /// - Kết quả trả về được bọc trong `BaseResponse`.
+    /// </remarks>
+    /// <param name="id">ID của tài khoản cần lấy thông tin.</param>
+    /// <returns>
+    /// - `200 OK`: Trả về thông tin tài khoản thành công.  
+    /// - `400 Bad Request`: Không tìm thấy tài khoản hoặc ID không hợp lệ.  
+    /// </returns>
     [HttpGet(ApiEndPointConstant.User.GetAccountById)]
     [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
