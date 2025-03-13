@@ -26,7 +26,7 @@ namespace Galini.Services.Implement
             _mapper = mapper;
         }
 
-        public async Task<BaseResponse> CreateUserInfo(CreateUserInfoRequest request, Guid accountId, Guid premiumId)
+        public async Task<BaseResponse> CreateUserInfo(Guid accountId, Guid premiumId)
         {
             var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
                 predicate: x => x.IsActive && x.Id.Equals(accountId));
@@ -56,9 +56,15 @@ namespace Galini.Services.Implement
                 };
             }
 
-            var userInfor = _mapper.Map<CreateUserInfoRequest, UserInfo>(request);
+            var userInfor = new UserInfo();
+            userInfor.Id = Guid.NewGuid();
             userInfor.PremiumId = premiumId;
             userInfor.AccountId = accountId;
+            userInfor.DateStart = TimeUtil.GetCurrentSEATime();
+            userInfor.DateEnd = TimeUtil.GetCurrentSEATime().AddDays(30);
+            userInfor.IsActive = true;
+            userInfor.CreateAt = TimeUtil.GetCurrentSEATime(); 
+            userInfor.UpdateAt = TimeUtil.GetCurrentSEATime();
 
             await _unitOfWork.GetRepository<UserInfo>().InsertAsync(userInfor);
             bool isSuccessfully = await _unitOfWork.CommitAsync() > 0;
