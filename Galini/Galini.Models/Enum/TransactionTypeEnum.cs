@@ -9,6 +9,7 @@ namespace Galini.Models.Enum
     public enum TransactionTypeEnum
     {
         DEPOSIT,
-        BOOKING
+        BOOKING,
+        PREMIUM
     }
 }

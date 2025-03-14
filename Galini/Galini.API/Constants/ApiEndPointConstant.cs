@@ -68,6 +68,7 @@ namespace Galini.API.Constants
             public const string RemovePremium = PremiumEndPoint + "/{id}";
             public const string UpdatePremium = PremiumEndPoint + "/{id}";
             public const string GetPremiumById = PremiumEndPoint + "/{id}";
+            public const string BuyPremium = PremiumEndPoint + "/{id}/buy";
         }
 
         public static class UserCall
