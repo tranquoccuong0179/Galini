@@ -165,5 +165,32 @@ namespace Galini.API.Controllers
 
             return StatusCode(int.Parse(response.status), response);
         }
+
+        /// <summary>
+        /// API mua gói Premium.
+        /// </summary>
+        /// <remarks>
+        /// - Nhận `id` của gói Premium cần mua
+        /// - Yêu cầu đăng nhập tài khoản
+        /// - Nếu gói, tài khoản, thông tin người dùng không tồn tại, trả về lỗi `404 Not Found`.  
+        /// - Kết quả trả về được bọc trong `BaseResponse`.
+        /// </remarks>
+        /// <param name="id">ID của gói Premium cần mua.</param>
+        /// <returns>
+        /// - `200 OK`: Mua gói Premium thành công.  
+        /// - `400 Bad Request`: Số tiền trong ví nhỏ hơn giá trị của gói Premium.  
+        /// - `404 Not Found`: Không tìm thấy gói Premium.
+        /// </returns>
+        [HttpPost(ApiEndPointConstant.Premium.BuyPremium)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status404NotFound)]
+        [ProducesErrorResponseType(typeof(ProblemDetails))]
+        public async Task<IActionResult> BuyPremium([FromRoute] Guid id)
+        {
+            var response = await _premiumService.BuyPremium(id);
+
+            return StatusCode(int.Parse(response.status), response);
+        }
     }
 }

@@ -15,5 +15,6 @@ namespace Galini.Services.Interface
         public Task<BaseResponse> GetPremiumById(Guid premiumId);
         public Task<BaseResponse> UpdatePremium(Guid premiumId, UpdatePremiumRequest request);
         public Task<BaseResponse> RemovePremium(Guid premiumId);
+        public Task<BaseResponse> BuyPremium(Guid id);
     }
 }
