@@ -19,5 +19,6 @@ namespace Galini.Services.Interface
         Task<BaseResponse> UpdateBlog(Guid id, UpdateBlogRequest request);
         Task<BaseResponse> UpImageForDescription(IFormFile formFile);
         Task<BaseResponse> LikeBlog(Guid id);
+        Task<BaseResponse> GetAllBlogByUser();
     }
 }
