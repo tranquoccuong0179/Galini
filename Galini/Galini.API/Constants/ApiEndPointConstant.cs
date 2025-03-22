@@ -221,6 +221,7 @@ namespace Galini.API.Constants
             public const string BlogEndPoint = ApiEndpoint + "/blog";
             public const string CreateBlog = BlogEndPoint;
             public const string GetAllBlogs = BlogEndPoint;
+            public const string GetAllBlogsByUser = BlogEndPoint + "/user";
             public const string GetBlogById = BlogEndPoint + "/{id}";
             public const string UpdateBlog = BlogEndPoint + "/{id}";
             public const string RemoveBlog = BlogEndPoint + "/{id}";

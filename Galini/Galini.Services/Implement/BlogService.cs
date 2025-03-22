@@ -367,5 +367,33 @@ namespace Galini.Services.Implement
                 data = null
             };
         }
+
+        public async Task<BaseResponse> GetAllBlogByUser()
+        {
+            Guid? userId = UserUtil.GetAccountId(_httpContextAccessor.HttpContext);
+            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+                predicate: a => a.IsActive && a.Id.Equals(userId));
+
+            if (account == null)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status404NotFound.ToString(),
+                    message = "Người dùng không tồn tại",
+                    data = null
+                };
+            }
+
+            var blogs = await _unitOfWork.GetRepository<Blog>().GetListAsync(
+                selector: b => _mapper.Map<GetBlogResponse>(b),
+                predicate: b => b.AuthorId.Equals(userId) && b.IsActive);
+
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status200OK.ToString(),
+                message = "Danh sách blogs",
+                data = blogs
+            };
+        }
     }
 }

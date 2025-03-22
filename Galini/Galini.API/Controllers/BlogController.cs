@@ -178,5 +178,17 @@ namespace Galini.API.Controllers
             return StatusCode(int.Parse(response.status), response);
 
         }
+
+        [HttpGet(ApiEndPointConstant.Blog.GetAllBlogsByUser)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesErrorResponseType(typeof(ProblemDetails))]
+        public async Task<IActionResult> GetAllBlogsByUser()
+        {
+
+            var response = await _blogService.GetAllBlogByUser();
+
+            return StatusCode(int.Parse(response.status), response);
+
+        }
     }
 }
