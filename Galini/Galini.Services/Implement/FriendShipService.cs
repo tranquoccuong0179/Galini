@@ -248,7 +248,7 @@ namespace Galini.Services.Implement
             {
                 status = StatusCodes.Status200OK.ToString(),
                 message = "Lấy thông tin mối quan hệ thành công",
-                data = _mapper.Map<CreateFriendShipResponse>(friendShip)
+                data = friendShip
             };
         }
 
