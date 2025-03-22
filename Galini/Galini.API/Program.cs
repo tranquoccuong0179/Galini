@@ -1,4 +1,4 @@
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using Galini.API;
 using Galini.API.ConfigHub;
 using Galini.API.Constants;
@@ -110,7 +110,11 @@ builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddRedis();
-builder.Services.AddSignalR();
+builder.Services.AddSignalR(options =>
+{
+    options.KeepAliveInterval = TimeSpan.FromSeconds(30); // Tăng lên 30 giây
+    options.HandshakeTimeout = TimeSpan.FromSeconds(30); // Tăng thời gian handshake
+});
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.Configure<PayOSSettings>(builder.Configuration.GetSection("PayOS"));
 
@@ -119,14 +123,13 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: CorsConstant.PolicyName,
         policy =>
         {
-            policy.WithOrigins("http://127.0.0.1:5500", "http://localhost:5500", "http://localhost:5173", "http://127.0.0.1", "https://harmon.love", "https://galini-admin-fe.vercel.app", "https://harmon-bice.vercel.app")
+            policy.WithOrigins("http://127.0.0.1:5500", "http://localhost:5500", "http://localhost:5173", "http://127.0.0.1", "https://harmon.love", "https://galini-admin-fe.vercel.app", "https://harmon-bice.vercel.app", "https://test-harmon-fe.vercel.app")
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials();
         });
 });
 
-builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -137,11 +140,17 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction() || app.Env
     app.UseSwaggerUI();
 }
 
-app.UseCors(CorsConstant.PolicyName);
-
 app.UseHttpsRedirection();
 
+
 app.UseRouting();
+
+app.UseWebSockets(new WebSocketOptions
+{
+    KeepAliveInterval = TimeSpan.FromSeconds(5)
+});
+
+app.UseCors(CorsConstant.PolicyName);
 
 app.UseAuthorization();
 
