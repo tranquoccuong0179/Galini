@@ -112,8 +112,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddRedis();
 builder.Services.AddSignalR(options =>
 {
-    options.KeepAliveInterval = TimeSpan.FromSeconds(30); // Tăng lên 30 giây
-    options.HandshakeTimeout = TimeSpan.FromSeconds(30); // Tăng thời gian handshake
+    options.EnableDetailedErrors = true;
 });
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.Configure<PayOSSettings>(builder.Configuration.GetSection("PayOS"));
