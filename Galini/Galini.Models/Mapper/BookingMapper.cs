@@ -20,7 +20,8 @@ namespace Galini.Models.Mapper
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid()))
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true))
                 .ForMember(dest => dest.UpdateAt, opt => opt.MapFrom(src => TimeUtil.GetCurrentSEATime()))
-                .ForMember(dest => dest.Status, opt => opt.Condition(src => src.Status != BookingEnum.Upcoming));
+                .ForMember(dest => dest.CreateAt, opt => opt.MapFrom(src => TimeUtil.GetCurrentSEATime()))
+                .ForMember(dest => dest.Status, opt => opt.Condition(src => src.Status == BookingEnum.Upcoming));
 
             CreateMap<UpdateBookingRequest, Booking>()
                 .ForMember(dest => dest.UpdateAt, opt => opt.MapFrom(src => TimeUtil.GetCurrentSEATime()))
