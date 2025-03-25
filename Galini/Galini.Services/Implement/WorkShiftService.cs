@@ -168,7 +168,7 @@ namespace Galini.Services.Implement
             };
         }
 
-        public async Task<BaseResponse> GetAvailableWorkShifts(int page, int size, Guid id, DateTime date)
+        public async Task<BaseResponse> GetAvailableWorkShifts(int page, int size, Guid id, DateOnly dateStart, DateOnly dateEnd)
         {
             if (page < 1 || size < 1)
             {
@@ -176,6 +176,26 @@ namespace Galini.Services.Implement
                 {
                     status = StatusCodes.Status400BadRequest.ToString(),
                     message = "Page hoặc size không hợp lệ.",
+                    data = null
+                };
+            }
+
+            if (dateStart > dateEnd)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status400BadRequest.ToString(),
+                    message = "Ngày bắt đầu không thể lớn hơn ngày kết thúc.",
+                    data = null
+                };
+            }
+
+            if (dateStart < new DateOnly(1753, 1, 1) || dateEnd > new DateOnly(9999, 12, 31))
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status400BadRequest.ToString(),
+                    message = "Ngày không hợp lệ. Phải nằm trong khoảng từ 1753-01-01 đến 9999-12-31.",
                     data = null
                 };
             }
@@ -193,17 +213,23 @@ namespace Galini.Services.Implement
                 };
             }
 
-            // Chuyển đổi ngày sang DayEnum để so sánh
-            DayEnum targetDay = (DayEnum)Enum.Parse(typeof(DayEnum), date.DayOfWeek.ToString());
+            // Lấy danh sách tất cả các ngày trong khoảng dateStart -> dateEnd
+            var daysInRange = Enumerable.Range(0, (dateEnd.DayNumber - dateStart.DayNumber) + 1)
+                                        .Select(offset => dateStart.AddDays(offset))
+                                        .ToList();
 
-            // Lấy tất cả ca làm việc của listener (theo id và ngày)
-            var allWorkShifts = await _unitOfWork.GetRepository<WorkShift>().GetListAsync(
-                predicate: ws => ws.IsActive && ws.AccountId == id && ws.Day == targetDay.ToString()
-            );
+            var targetDays = daysInRange.Select(d => (DayEnum)Enum.Parse(typeof(DayEnum), d.DayOfWeek.ToString())).ToHashSet();
 
-            // Lấy tất cả các booking có listenerId = id vào ngày được truyền vào
+            // Lấy tất cả ca làm việc của listener (chỉ lọc theo ID, chuyển sang memory để lọc tiếp)
+            var allWorkShifts = (await _unitOfWork.GetRepository<WorkShift>().GetListAsync(
+                predicate: ws => ws.IsActive && ws.AccountId == id
+            )).AsEnumerable()
+              .Where(ws => targetDays.Contains((DayEnum)Enum.Parse(typeof(DayEnum), ws.Day)))
+              .ToList();
+
+            // Lấy tất cả các booking có listenerId = id trong khoảng ngày được truyền vào
             var bookedShifts = await _unitOfWork.GetRepository<Booking>().GetListAsync(
-                predicate: b => b.ListenerId == id && b.Date.Date == date.Date
+                predicate: b => b.ListenerId == id && b.Date >= dateStart.ToDateTime(TimeOnly.MinValue) && b.Date <= dateEnd.ToDateTime(TimeOnly.MaxValue)
             );
 
             // Lấy danh sách WorkShiftId đã bị đặt
@@ -212,7 +238,7 @@ namespace Galini.Services.Implement
             // Lọc ra các ca làm việc chưa bị đặt
             var availableWorkShifts = allWorkShifts
                 .Where(ws => !bookedWorkShiftIds.Contains(ws.Id))
-                .OrderBy(ws => ws.StartTime) // Sắp xếp theo thời gian tạo
+                .OrderBy(ws => ws.StartTime)
                 .Skip((page - 1) * size)
                 .Take(size)
                 .Select(ws => _mapper.Map<CreateWorkShiftResponse>(ws))
@@ -225,6 +251,7 @@ namespace Galini.Services.Implement
                 data = availableWorkShifts
             };
         }
+
 
 
         public async Task<BaseResponse> GetWorkShiftById(Guid id)

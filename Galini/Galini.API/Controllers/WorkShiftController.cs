@@ -143,13 +143,13 @@ namespace Galini.API.Controllers
         /// - Chỉ lấy ca còn hoạt động (`IsActive = true`), khớp với ngày truyền vào, sắp xếp theo thời gian bắt đầu tăng dần.  
         /// - Lọc bỏ các ca đã được đặt trong bảng Booking dựa trên `id` và `date`.  
         /// - Nếu tài khoản không tồn tại, trả `404`. Nếu `page` hoặc `size` nhỏ hơn 1, trả `400`.  
-        /// - Ví dụ: `date =2025-03-07T14:30:00` (Thứ Hai, 10/03/2025) sẽ lấy các ca trống của ngày Thứ Hai đó.
+        /// - Ví dụ: `date =2025-03-07` (Thứ Hai, 10/03/2025) sẽ lấy các ca trống của ngày Thứ Hai đó.
         /// - Kết quả bọc trong `BaseResponse`.
         /// </remarks>
         /// <param name="page">Số trang (mặc định 1).</param>
         /// <param name="size">Số lượng mỗi trang (mặc định 10).</param>
         /// <param name="id">ID của tài khoản tham vấn viên.</param>
-        /// <param name="date">Ngày cần lấy ca trống (định dạng (yyyy-MM-ddTHH:mm:ssZ) ví dụ: 2025-03-07T14:30:00) THỜI GIAN KHÔNG QUAN TRỌNG, QUAN TRỌNG LÀ ĐÚNG NGÀY.</param>
+        /// <param name="date">Ngày cần lấy ca trống (định dạng (yyyy-MM-dd) ví dụ: "2025-03-21") Phải ĐÚNG NGÀY.</param>
         /// <returns>
         /// - `200 OK`: Lấy danh sách ca làm việc còn trống thành công.  
         /// - `400 Bad Request`: Page hoặc size không hợp lệ.  
@@ -159,11 +159,11 @@ namespace Galini.API.Controllers
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
         [ProducesErrorResponseType(typeof(ProblemDetails))]
-        public async Task<IActionResult> GetAvailableWorkShifts([FromQuery] int? page, [FromQuery] int? size, [FromRoute] Guid id, [FromQuery] DateTime date)
+        public async Task<IActionResult> GetAvailableWorkShifts([FromQuery] int? page, [FromQuery] int? size, [FromRoute] Guid id, [FromQuery] DateOnly dateStart, [FromQuery] DateOnly dateEnd)
         {
             int pageNumber = page ?? 1;
             int pageSize = size ?? 10;
-            var response = await _workShiftService.GetAvailableWorkShifts(pageNumber, pageSize, id, date);
+            var response = await _workShiftService.GetAvailableWorkShifts(pageNumber, pageSize, id, dateStart, dateEnd);
             return StatusCode(int.Parse(response.status), response);
         }
 

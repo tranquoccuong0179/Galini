@@ -23,7 +23,7 @@ namespace Galini.API.ConfigHub
             await _userStatusService.RemoveUser(Context.ConnectionId); // Khi user ngắt kết nối -> Xóa khỏi danh sách
         }
 
-        public async Task GetRandomUser()
+        public async Task GetRandomUser() // Lấy random 1 connectionId
         {
             var targetConnectionId = await _userStatusService.GetRandomUser(Context.ConnectionId);
 
@@ -37,7 +37,7 @@ namespace Galini.API.ConfigHub
             }
         }
 
-        public async Task StartCall(string targetConnectionId)
+        public async Task StartCall(string targetConnectionId) // Bấm nút kết nối
         {
             if (!string.IsNullOrEmpty(targetConnectionId))
             {
@@ -49,7 +49,7 @@ namespace Galini.API.ConfigHub
             }
         }
 
-        public async Task AcceptCall(string callerConnectionId)
+        public async Task AcceptCall(string callerConnectionId) // Đồng ý kết nối
         {
             await Clients.Client(callerConnectionId).SendAsync("CallAccepted", Context.ConnectionId);
             await Clients.Client(Context.ConnectionId).SendAsync("CallAccepted", callerConnectionId);
@@ -58,14 +58,14 @@ namespace Galini.API.ConfigHub
             await _userStatusService.RemoveUser(Context.ConnectionId);
         }
 
-        public async Task RejectCall(string callerConnectionId)
+        public async Task RejectCall(string callerConnectionId) // Từ chối kết nối
         {
             await Clients.Client(callerConnectionId).SendAsync("CallRejected");
             await _userStatusService.AddUser(callerConnectionId);
             await _userStatusService.AddUser(Context.ConnectionId);
         }
 
-        public async Task EndCall()
+        public async Task EndCall() //Kết thúc cuộc gọi
         {
             await _userStatusService.AddUser(Context.ConnectionId); // Đánh dấu user rảnh trở lại
             await Clients.Client(Context.ConnectionId).SendAsync("CallEnded"); // Thông báo về FE

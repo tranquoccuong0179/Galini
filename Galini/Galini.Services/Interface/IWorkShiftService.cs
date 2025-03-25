@@ -14,7 +14,7 @@ namespace Galini.Services.Interface
     {
         Task<BaseResponse> GetWorkShiftById(Guid id);
         Task<BaseResponse> GetWorkShiftByAccountId(int page, int size, Guid id);
-        Task<BaseResponse> GetAvailableWorkShifts(int page, int size, Guid id, DateTime date);
+        Task<BaseResponse> GetAvailableWorkShifts(int page, int size, Guid id, DateOnly dateStart, DateOnly dateEnd);
         Task<BaseResponse> GetAllWorkShift(int page, int size);
         Task<BaseResponse> CreateWorkShift(CreateWorkShiftRequest request, Guid accountId, DayEnum day);
         Task<BaseResponse> UpdateWorkShift(UpdateWorkShiftRequest request, Guid id, DayEnum day);
