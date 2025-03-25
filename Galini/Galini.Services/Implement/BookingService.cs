@@ -75,13 +75,35 @@ namespace Galini.Services.Implement
 
             var exitBooking = await _unitOfWork.GetRepository<Booking>().SingleOrDefaultAsync(
                 predicate: x => x.WorkShiftId.Equals(workShift.Id) && x.IsActive && DateOnly.FromDateTime(x.Date) == DateOnly.FromDateTime(request.Date));
+         
 
             if (exitBooking != null)
             {
                 return new BaseResponse()
                 {
                     status = StatusCodes.Status404NotFound.ToString(),
-                    message = "Ca làm việc này đã bị đặt vấn viên không tồn tại",
+                    message = "Ca làm việc này đã bị đặt",
+                    data = null
+                };
+            }
+
+            bool checkDay = request.Date.ToString("dddd") == workShift.Day;
+            if (!checkDay)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status404NotFound.ToString(),
+                    message = "Ca làm việc " + workShiftId + " không tồn tại vào thứ " + request.Date.ToString("dddd"),
+                    data = null
+                };
+            }
+
+            if (request.Status != BookingEnum.Upcoming)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status404NotFound.ToString(),
+                    message = "Status không hợp lệ, chỉ chấp nhận 'Upcoming' khi create",
                     data = null
                 };
             }
@@ -104,7 +126,7 @@ namespace Galini.Services.Implement
                 {
                     status = StatusCodes.Status200OK.ToString(),
                     message = "Đặt lịch thành công",
-                    data = _mapper.Map<CreateBookingResponse>(booking)
+                    data = data
                 };
             }
             return new BaseResponse()
