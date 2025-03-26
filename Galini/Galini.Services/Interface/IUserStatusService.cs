@@ -14,5 +14,9 @@ namespace Galini.Services.Interface
         public Task RemoveUser(string connectionId);
 
         public Task<string?> GetRandomUser(string currentConnectionId);
+
+        public Task AddUserForBooking(string connectionId, string accountId);
+
+        public Task<string?> GetUserForBooking(string currentConnectionId, string accountId);
     }
 }

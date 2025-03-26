@@ -18,6 +18,11 @@ namespace Galini.API.ConfigHub
             await _userStatusService.AddUser(Context.ConnectionId);  // Khi user kết nối -> Thêm vào danh sách rảnh
         }
 
+        public async Task OnConnectedForBookingAsync(string acccountId)
+        {
+            await _userStatusService.AddUserForBooking(Context.ConnectionId, acccountId);  // Khi user kết nối -> Thêm vào danh sách rảnh
+        }
+
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
             await _userStatusService.RemoveUser(Context.ConnectionId); // Khi user ngắt kết nối -> Xóa khỏi danh sách
@@ -30,6 +35,20 @@ namespace Galini.API.ConfigHub
             if (!string.IsNullOrEmpty(targetConnectionId))
             {
                 await Clients.Client(Context.ConnectionId).SendAsync("RandomUserSelected", targetConnectionId);
+            }
+            else
+            {
+                await Clients.Client(Context.ConnectionId).SendAsync("NoAvailableUsers");
+            }
+        }
+
+        public async Task GetUserForBooking(string accountId) // Tìm connectionId của 1 người trong book (user hoặc listener) dựa vào accountId
+        {
+            var targetConnectionId = await _userStatusService.GetUserForBooking(Context.ConnectionId, accountId);
+
+            if (!string.IsNullOrEmpty(targetConnectionId))
+            {
+                await Clients.Client(Context.ConnectionId).SendAsync("UserSelected", targetConnectionId);
             }
             else
             {
