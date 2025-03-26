@@ -55,5 +55,31 @@ namespace Galini.Services.Implement
             var random = new Random();
             return availableUsers[random.Next(availableUsers.Count)];
         }
+
+        public async Task AddUserForBooking(string connectionId, string accountId)
+        {
+            var db = _redis.GetDatabase();
+            await db.SetAddAsync(accountId, connectionId);
+        }
+
+        public async Task<string?> GetUserForBooking(string currentConnectionId, string accountId)
+        {
+            var db = _redis.GetDatabase();
+            var users = await db.SetMembersAsync(accountId);
+
+            // Lọc bỏ chính connectionId của người gọi
+            var availableUsers = users
+                .Select(u => u.ToString())
+                .Where(u => u != currentConnectionId)
+                .ToList();
+
+            if (availableUsers.Count == 0)
+            {
+                return null; // Không có người dùng nào khác
+            }
+
+            var random = new Random();
+            return availableUsers[random.Next(availableUsers.Count)];
+        }
     }
 }
