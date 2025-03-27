@@ -13,7 +13,6 @@ using Galini.Models.Paginate;
 using Galini.Models.Payload.Request.Blog;
 using Galini.Models.Payload.Response;
 using Galini.Models.Payload.Response.Blog;
-using Galini.Models.Payload.Response.Topic;
 using Galini.Models.Utils;
 using Galini.Repository.Interface;
 using Galini.Services.Interface;
@@ -181,7 +180,7 @@ namespace Galini.Services.Implement
                 {
                     status = StatusCodes.Status200OK.ToString(),
                     message = "Xóa blog thành công",
-                    data = _mapper.Map<CreateTopicResponse>(blog)
+                    data = isSuccessfully
                 };
             }
 
@@ -235,7 +234,7 @@ namespace Galini.Services.Implement
                 {
                     status = StatusCodes.Status200OK.ToString(),
                     message = "Cập nhật blog thành công",
-                    data = _mapper.Map<CreateTopicResponse>(blog)
+                    data = _mapper.Map<CreateBlogResponse>(blog)
                 };
             }
 
