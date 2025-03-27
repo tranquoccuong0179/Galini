@@ -84,9 +84,10 @@ namespace Galini.API.ConfigHub
             await _userStatusService.AddUser(Context.ConnectionId);
         }
 
-        public async Task EndCall()
+        public async Task EndCall(string callerConnectionId, string targetConnectionId)
         {
-            await _userStatusService.AddUser(Context.ConnectionId); // Đánh dấu user rảnh trở lại
+            await _userStatusService.AddUser(callerConnectionId); // Đánh dấu user rảnh trở lại
+            await _userStatusService.AddUser(targetConnectionId); // Đánh dấu user rảnh trở lại
             await Clients.Client(Context.ConnectionId).SendAsync("CallEnded"); // Thông báo về FE
         }
 
