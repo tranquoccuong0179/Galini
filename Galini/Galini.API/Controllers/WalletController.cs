@@ -129,9 +129,9 @@ namespace Galini.API.Controllers
             if (status == "CANCELLED")
             {
                 var response = await _walletService.HandleFailedPayment(id, long.Parse(orderCode));
-                return Redirect("http://localhost:5173/failed");
+                return Redirect("https://harmon-love.vercel.app/failed");
             }
-            return Redirect("http://localhost:5173/failed");
+            return Redirect("https://harmon-love.vercel.app/failed");
         }
 
 
