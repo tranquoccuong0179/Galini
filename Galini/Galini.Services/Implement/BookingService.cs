@@ -228,9 +228,10 @@ namespace Galini.Services.Implement
             }
 
             var bookings = await _unitOfWork.GetRepository<Booking>().GetPagingListAsync(
-                selector: b => new CreateBookingResponse
+                selector: b => new GetBookingResponse 
                 {
                     Id = b.Id,
+                    ListenerId = b.ListenerId,
                     UserName = b.User.FullName,
                     ListenerName = b.WorkShift.Account.FullName,
                     Time = $"{b.WorkShift.StartTime} - {b.WorkShift.EndTime}",

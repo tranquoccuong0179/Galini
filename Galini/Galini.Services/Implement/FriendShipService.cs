@@ -10,6 +10,7 @@ using Galini.Repository.Interface;
 using Galini.Services.Interface;
 using Galini.Utils;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
 using System;
@@ -200,8 +201,19 @@ namespace Galini.Services.Implement
             }
 
             var friendShip = await _unitOfWork.GetRepository<FriendShip>().GetPagingListAsync(
-                selector: a => _mapper.Map<CreateFriendShipResponse>(a),
+                selector: a =>  new GetFriendShipResponse
+                {
+                    Id = a.Id,
+                    UserId = a.UserId,
+                    FriendId = a.FriendId,
+                    FriendFullName = a.Friend.FullName,
+                    FriendDateOfBirth = a.Friend.DateOfBirth,
+                    FriendGender = a.Friend.Gender,
+                    FriendAvatarUrl = a.Friend.AvatarUrl,
+                    Status = a.Status
+                },
                 predicate: a => a.IsActive && a.UserId == accountId && a.Status == status.ToString(),
+                include: query => query.Include(a => a.Friend),
                 page: page,
                 size: size);
 
