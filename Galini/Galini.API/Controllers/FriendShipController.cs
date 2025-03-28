@@ -190,6 +190,33 @@ namespace Galini.API.Controllers
         }
 
         /// <summary>
+        /// API tìm kiếm bạn bè theo số điện thoại.
+        /// </summary>
+        /// <remarks>
+        /// - Tìm kiếm tài khoản theo số điện thoại `phone`.  
+        /// - Chỉ tìm các tài khoản có trạng thái `Active`.  
+        /// - Nếu không tìm thấy tài khoản, trả về lỗi `404 Not Found`.  
+        /// - Nếu `phone` không hợp lệ hoặc rỗng, trả về lỗi `400 Bad Request`.  
+        /// - Kết quả trả về được bọc trong `BaseResponse`.
+        /// </remarks>
+        /// <param name="phone">Số điện thoại của tài khoản cần tìm kiếm.</param>
+        /// <returns>
+        /// - `200 OK`: Trả về thông tin tài khoản tìm thấy.  
+        /// - `400 Bad Request`: `phone` không hợp lệ.  
+        /// - `404 Not Found`: Không tìm thấy tài khoản.
+        /// </returns>
+
+        [HttpGet(ApiEndPointConstant.FriendShip.SearchFriendByPhone)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesErrorResponseType(typeof(ProblemDetails))]
+        public async Task<IActionResult> SearchFriendByPhone([FromQuery] string phone)
+        {
+            var response = await _friendShipService.SearchFriendByPhone(phone);
+            return StatusCode(int.Parse(response.status), response);
+        }
+
+        /// <summary>
         /// API cập nhật thông tin mối quan hệ bạn bè, sử dụng khi accept, hoặc block mối quan hệm,....
         /// </summary>
         /// <remarks>

@@ -19,5 +19,6 @@ namespace Galini.Services.Interface
         public Task<BaseResponse> GetFriendByAccountId(Guid accountId, int page, int size);
         public Task<BaseResponse> UpdateFriendShip(Guid friendShipId, UpdateFriendShipRequest request);
         public Task<BaseResponse> RemoveFriendShip(Guid friendShipId);
+        public Task<BaseResponse> SearchFriendByPhone(string phoneNumber);
     }
 }

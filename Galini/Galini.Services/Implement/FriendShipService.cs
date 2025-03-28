@@ -3,6 +3,7 @@ using Galini.Models.Entity;
 using Galini.Models.Enum;
 using Galini.Models.Payload.Request.FriendShip;
 using Galini.Models.Payload.Response;
+using Galini.Models.Payload.Response.Account;
 using Galini.Models.Payload.Response.FriendShip;
 using Galini.Models.Utils;
 using Galini.Repository.Interface;
@@ -350,6 +351,29 @@ namespace Galini.Services.Implement
                 status = StatusCodes.Status400BadRequest.ToString(),
                 message = "Cập nhật thông tin mối quan hệ thất bại",
                 data = null
+            };
+        }
+
+        public async Task<BaseResponse> SearchFriendByPhone(string phoneNumber)
+        {
+            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+                predicate: x => x.Phone.Equals(phoneNumber) && x.IsActive);
+
+            if (account == null)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status404NotFound.ToString(),
+                    message = "Không tìm thấy người dùng nào có số điện thoại này",
+                    data = null
+                };
+            }
+
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status200OK.ToString(),
+                message = "Lấy thông tin tài khoản thành công",
+                data = _mapper.Map<RegisterUserResponse>(account)
             };
         }
     }
