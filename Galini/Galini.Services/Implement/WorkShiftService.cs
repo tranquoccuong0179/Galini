@@ -18,6 +18,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Galini.Services.Implement
 {
@@ -266,6 +267,18 @@ namespace Galini.Services.Implement
                 };
             }
 
+            var bookings = await _unitOfWork.GetRepository<Booking>().GetListAsync(
+            predicate: q => q.IsActive && q.WorkShiftId.Equals(id) && DateTime.Now.Date <= q.Date.Date);
+            if (bookings != null)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status400BadRequest.ToString(),
+                    message = "Không thể thực hiện hành động này, nó sẽ ảnh hưởng đến booking khác.",
+                    data = false
+                };
+            }
+
             workShift.IsActive = false;
             workShift.DeleteAt = TimeUtil.GetCurrentSEATime();
             workShift.UpdateAt = TimeUtil.GetCurrentSEATime();
@@ -303,6 +316,18 @@ namespace Galini.Services.Implement
                     status = StatusCodes.Status404NotFound.ToString(),
                     message = "Không tìm thấy ca làm việc này",
                     data = null
+                };
+            }
+
+            var bookings = await _unitOfWork.GetRepository<Booking>().GetListAsync(
+            predicate: q => q.IsActive && q.WorkShiftId.Equals(id) && DateTime.Now.Date <= q.Date.Date);
+            if (bookings != null)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status400BadRequest.ToString(),
+                    message = "Không thể thực hiện hành động này, nó sẽ ảnh hưởng đến booking khác.",
+                    data = false
                 };
             }
 
