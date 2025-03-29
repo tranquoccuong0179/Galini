@@ -15,4 +15,5 @@ public interface IUserService
     Task<BaseResponse> GetListenerAccount(int page, int size);
     Task<BaseResponse> UpdateDuration(Guid id, int duration);
     Task<BaseResponse> GetAccountById(Guid id);
+    Task<BaseResponse> GetFriendById(Guid id);
 }

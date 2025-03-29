@@ -368,8 +368,22 @@ namespace Galini.Services.Implement
 
         public async Task<BaseResponse> SearchFriendByPhone(string phoneNumber)
         {
+            Guid? id = UserUtil.GetAccountId(_httpContextAccessor.HttpContext);
+            var accountExist = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+                predicate: x => x.Id.Equals(id) && x.IsActive);
+            if (accountExist == null)
+            {
+                _logger.LogWarning($"Không tìm thấy tài khoản có Id {id} .");
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status404NotFound.ToString(),
+                    message = "Tài khoản không tồn tại",
+                    data = null
+                };
+            }
+
             var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
-                predicate: x => x.Phone.Equals(phoneNumber) && x.IsActive);
+                predicate: x => x.Phone.Equals(phoneNumber) && x.IsActive && !x.Id.Equals(accountExist.Id));
 
             if (account == null)
             {

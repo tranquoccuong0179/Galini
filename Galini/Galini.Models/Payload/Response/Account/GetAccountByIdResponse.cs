@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Galini.Models.Enum;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,6 +26,8 @@ namespace Galini.Models.Payload.Response.Account
         public int? Duration { get; set; }
 
         public string? AvatarUrl { get; set; }
+
+        public FriendShipEnum Status { get; set; }
 
         public Entity.UserInfo UserInfo { get; set; }
     }
