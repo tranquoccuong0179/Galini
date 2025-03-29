@@ -3,6 +3,7 @@ using Galini.Models.Payload.Request.Message;
 using Galini.Models.Utils;
 using Galini.Repository.Interface;
 using Galini.Services.Interface;
+using Galini.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
@@ -62,7 +63,7 @@ namespace Galini.API.ConfigHub
                 return;
             }
 
-            var username = Context.GetHttpContext()?.Request.Query["username"];
+            var username = Context.GetHttpContext()?.Request.Query["username"].ToString().Trim();
             Console.WriteLine($"===> Username: {username}");
 
             if (!Guid.TryParse(username, out Guid otherId))
@@ -73,7 +74,7 @@ namespace Galini.API.ConfigHub
 
             Console.WriteLine($"===> Parsed OtherId: {otherId}");
 
-            var directChat = GetDirectChat(userId.Value, otherId);
+            var directChat = await GetDirectChat(userId.Value, otherId);
             Console.WriteLine("===> GetDirectChat Completed");
 
             await base.OnConnectedAsync();
@@ -108,40 +109,45 @@ namespace Galini.API.ConfigHub
                             && d.DirectChatParticipants.Any(dc => dc.AccountId.Equals(otherId))
                             && d.IsActive);
 
+            _logger.LogInformation($"Error: {callerId} & {otherId}");
+
+
             if (directChat != null)
             {
                 return directChat;
             }
-            var chatId = Guid.NewGuid();
             var newDirectChat = new DirectChat
             {
-                Id = chatId,
+                Id = Guid.NewGuid(),
                 Name = $"Chat-{callerId}-{otherId}",
                 IsActive = true,
-                CreateAt = DateTime.UtcNow,
-                UpdateAt = DateTime.UtcNow,
-                DirectChatParticipants = new List<DirectChatParticipant>
+                CreateAt = TimeUtil.GetCurrentSEATime(),
+                UpdateAt = TimeUtil.GetCurrentSEATime()
+            };
+
+            var participants = new List<DirectChatParticipant>
+            {
+                new DirectChatParticipant
                 {
-                    new DirectChatParticipant
-                    {
-                        Id = Guid.NewGuid(),
-                        AccountId = callerId,
-                        DirectChatId = chatId,
-                        IsActive = true,
-                        CreateAt = DateTime.UtcNow,
-                        UpdateAt = DateTime.UtcNow
-                    },
-                    new DirectChatParticipant
-                    {
-                        Id = Guid.NewGuid(),
-                        AccountId = otherId,
-                        DirectChatId = chatId,
-                        IsActive = true,
-                        CreateAt = DateTime.UtcNow,
-                        UpdateAt = DateTime.UtcNow
-                    }
+                    Id = Guid.NewGuid(),
+                    AccountId = callerId,
+                    DirectChatId = newDirectChat.Id, 
+                    IsActive = true,
+                    CreateAt = TimeUtil.GetCurrentSEATime(),
+                    UpdateAt = TimeUtil.GetCurrentSEATime()
+                },
+                new DirectChatParticipant
+                {
+                    Id = Guid.NewGuid(),
+                    AccountId = otherId,
+                    DirectChatId = newDirectChat.Id,
+                    IsActive = true,
+                    CreateAt = TimeUtil.GetCurrentSEATime(),
+                    UpdateAt = TimeUtil.GetCurrentSEATime()
                 }
             };
+
+            newDirectChat.DirectChatParticipants = participants;
 
             await _unitOfWork.GetRepository<DirectChat>().InsertAsync(newDirectChat);
             await _unitOfWork.CommitAsync();
