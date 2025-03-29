@@ -232,6 +232,7 @@ namespace Galini.Services.Implement
                 {
                     Id = b.Id,
                     ListenerId = b.ListenerId,
+                    UserId = b.UserId,
                     UserName = b.User.FullName,
                     ListenerName = b.WorkShift.Account.FullName,
                     Time = $"{b.WorkShift.StartTime} - {b.WorkShift.EndTime}",
