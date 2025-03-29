@@ -67,19 +67,19 @@ namespace Galini.Services.Implement
             var db = _redis.GetDatabase();
             var users = await db.SetMembersAsync(accountId);
 
-            // Lọc bỏ chính connectionId của người gọi
+            // Chuyển đổi về danh sách string
             var availableUsers = users
                 .Select(u => u.ToString())
-                .Where(u => u != currentConnectionId)
+                .Where(u => u != currentConnectionId) // Loại bỏ chính user đang gọi
                 .ToList();
 
+            // Nếu không có user nào khác, trả về null
             if (availableUsers.Count == 0)
             {
-                return null; // Không có người dùng nào khác
+                return null;
             }
 
-            var random = new Random();
-            return availableUsers[random.Next(availableUsers.Count)];
+            return availableUsers.First();
         }
     }
 }
