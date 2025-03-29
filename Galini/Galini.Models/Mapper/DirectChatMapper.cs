@@ -22,6 +22,7 @@ namespace Galini.Models.Mapper
                 .ForMember(dest => dest.UpdateAt, opt => opt.MapFrom(src => TimeUtil.GetCurrentSEATime()));
 
             CreateMap<DirectChat, CreateDirectChatResponse>();
+            CreateMap<DirectChat, GetDirectChatResponse>();
         }
     }
 }

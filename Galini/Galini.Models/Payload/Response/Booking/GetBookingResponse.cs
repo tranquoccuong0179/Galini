@@ -11,6 +11,7 @@ namespace Galini.Models.Payload.Response.Booking
     {
         public Guid Id { get; set; }
         public Guid ListenerId{ get; set; }
+        public Guid UserId{ get; set; }
         public DateTime Date { get; set; }
         public BookingEnum Status { get; set; }
         public string ListenerName { get; set; }
