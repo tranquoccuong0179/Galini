@@ -473,4 +473,66 @@ public class UserService : BaseService<UserService>, IUserService
             data = existingUser
         };
     }
+
+    public async Task<BaseResponse> GetFriendById(Guid id)
+    {
+        var existingUser = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+            predicate: u => u.IsActive && u.Id.Equals(id),
+            selector: a => _mapper.Map<GetAccountByIdResponse>(a),
+            include: l => l.Include(l => l.UserInfo).ThenInclude(a => a.Premium));
+
+        if (existingUser == null)
+        {
+            return new BaseResponse
+            {
+                status = StatusCodes.Status400BadRequest.ToString(),
+                message = "User account don't exists.",
+                data = null
+            };
+        }
+
+        Guid? accountId = UserUtil.GetAccountId(_httpContextAccessor.HttpContext);
+        var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+            predicate: x => x.Id.Equals(id) && x.IsActive);
+
+        if (account == null)
+        {
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status404NotFound.ToString(),
+                message = "Tài khoản của chính bạn không tồn tại",
+                data = null
+            };
+        }
+
+        if (accountId.Equals(id))
+        {
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status404NotFound.ToString(),
+                message = "Are you sure bro? Mày đang tự check xem bản thân có phải bạn bè của chính mình không?",
+                data = null
+            };
+        }
+
+        var friendShip = await _unitOfWork.GetRepository<FriendShip>().SingleOrDefaultAsync(
+            predicate: f => f.IsActive && ((f.FriendId.Equals(id) && f.UserId.Equals(accountId)) || ((f.FriendId.Equals(accountId) && f.UserId.Equals(id))))
+            );
+
+        if (friendShip == null)
+        {
+            existingUser.Status = FriendShipEnum.None;
+        } 
+        else
+        {
+            existingUser.Status = Enum.Parse<FriendShipEnum>(friendShip.Status);
+        }
+
+        return new BaseResponse
+        {
+            status = StatusCodes.Status200OK.ToString(),
+            message = "Lấy account thành công.",
+            data = existingUser
+        };
+    }
 }
