@@ -1,26 +1,49 @@
-﻿using Galini.Services.Implement;
+﻿using Galini.Models.Entity;
+using Galini.Models.Payload.Response;
+using Galini.Models.Utils;
+using Galini.Repository.Interface;
+using Galini.Services.Implement;
 using Galini.Services.Interface;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Identity.Client;
 
 namespace Galini.API.ConfigHub
 {
     public class CallHub : Hub
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
         private readonly IUserStatusService _userStatusService;
 
-        public CallHub(IUserStatusService userStatusService)
+        private readonly IUnitOfWork<HarmonContext> _unitOfWork;
+
+
+        public CallHub(IUnitOfWork<HarmonContext> unitOfWork, IUserStatusService userStatusService, IHttpContextAccessor httpContextAccessor)
         {
             _userStatusService = userStatusService;
+            _httpContextAccessor = httpContextAccessor;
+            _unitOfWork = unitOfWork;
         }
 
         public override async Task OnConnectedAsync()
         {
             await _userStatusService.AddUser(Context.ConnectionId);  // Khi user kết nối -> Thêm vào danh sách rảnh
-        }
+            Guid? accountId = UserUtil.GetAccountId(_httpContextAccessor.HttpContext);
+            if (accountId == null)
+            {
+                Context.Abort(); // Ngắt kết nối nếu không có accountId
+                return;
+            }
 
-        public async Task OnConnectedForBookingAsync(string acccountId)
-        {
-            await _userStatusService.AddUserForBooking(Context.ConnectionId, acccountId);  // Khi user kết nối -> Thêm vào danh sách rảnh
+            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+                predicate: x => x.Id.Equals(accountId) && x.IsActive);
+            if (account == null)
+            {
+                Context.Abort(); // Ngắt kết nối nếu tài khoản không tồn tại
+                return;
+            }
+            await _userStatusService.AddUserForBooking(Context.ConnectionId, accountId.ToString());  // Khi user kết nối -> Thêm vào danh sách rảnh
         }
 
         public override async Task OnDisconnectedAsync(Exception? exception)
