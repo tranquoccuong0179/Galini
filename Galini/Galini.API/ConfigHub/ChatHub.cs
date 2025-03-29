@@ -1,8 +1,13 @@
-﻿using Galini.Models.Payload.Request.Message;
+﻿using Galini.Models.Entity;
+using Galini.Models.Payload.Request.Message;
+using Galini.Models.Utils;
+using Galini.Repository.Interface;
 using Galini.Services.Interface;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Galini.API.ConfigHub
 {
@@ -11,33 +16,137 @@ namespace Galini.API.ConfigHub
         private static readonly ConcurrentDictionary<string, string> _userConnections = new(); // Lưu user online
         private readonly ILogger<ChatHub> _logger;
         private readonly IMessageService _messageService;
+        private readonly IUnitOfWork<HarmonContext> _unitOfWork;
+        private readonly IHttpContextAccessor _contextAccessor;
 
-        public ChatHub(IMessageService messageService, ILogger<ChatHub> logger)
+        public ChatHub(IMessageService messageService, ILogger<ChatHub> logger, IUnitOfWork<HarmonContext> unitOfWork, IHttpContextAccessor contextAccessor)
         {
             _messageService = messageService;
+            _unitOfWork = unitOfWork;
             _logger = logger;
             _logger.LogInformation("ChatHub initialized!");
+            _contextAccessor = contextAccessor;
         }
 
         public override async Task OnConnectedAsync()
         {
+            Console.WriteLine("===> OnConnectedAsync STARTED");
+
+            var httpContext = _contextAccessor.HttpContext;
+            if (httpContext == null)
+            {
+                _logger.LogWarning("HttpContext is null. Connection cannot proceed.");
+                return;
+            }
+
+            var token = httpContext.Request.Headers["Authorization"].ToString();
+            if (string.IsNullOrEmpty(token))
+            {
+                token = httpContext.Request.Query["access_token"];
+            }
+
+            Console.WriteLine($"===> Token: {token}");
+
+            if (string.IsNullOrEmpty(token))
+            {
+                _logger.LogWarning("Token is missing from request headers or query string.");
+                return;
+            }
+
+            var userId = GetUserIdFromToken(token);
+            Console.WriteLine($"===> User ID: {userId}");
+
+            if (!userId.HasValue)
+            {
+                _logger.LogWarning("Failed to retrieve user ID. Token: {Token}", token);
+                return;
+            }
+
             var username = Context.GetHttpContext()?.Request.Query["username"];
-            if (!string.IsNullOrEmpty(username))
+            Console.WriteLine($"===> Username: {username}");
+
+            if (!Guid.TryParse(username, out Guid otherId))
             {
-                _logger.LogInformation("Ping received!");
-                _userConnections[username] = Context.ConnectionId;
+                _logger.LogWarning("Invalid username format: {Username}", username);
+                return;
             }
-            else
-            {
-                _logger.LogWarning("User connected without username.");
-            }
+
+            Console.WriteLine($"===> Parsed OtherId: {otherId}");
+
+            var directChat = GetDirectChat(userId.Value, otherId);
+            Console.WriteLine("===> GetDirectChat Completed");
+
             await base.OnConnectedAsync();
+            Console.WriteLine("===> OnConnectedAsync FINISHED");
         }
 
-        public async Task Ping()
+        private Guid? GetUserIdFromToken(string token)
         {
-            _logger.LogInformation("Ping received!");
-            await Clients.Caller.ReceiveMessage("Server", "Pong! 🏓");
+            try
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+
+                var accountIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "accountId");
+                return accountIdClaim != null ? Guid.Parse(accountIdClaim.Value) : null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error decoding JWT token: {Message}", ex.Message);
+                return null;
+            }
+        }
+
+
+        private async Task<DirectChat> GetDirectChat(Guid callerId, Guid otherId)
+        {
+            _logger.LogInformation($"Checking DirectChat for: {callerId} & {otherId}");
+
+            var directChat = await _unitOfWork.GetRepository<DirectChat>()
+                .SingleOrDefaultAsync(
+                predicate: d => d.DirectChatParticipants.Any(dc => dc.AccountId.Equals(callerId))
+                            && d.DirectChatParticipants.Any(dc => dc.AccountId.Equals(otherId))
+                            && d.IsActive);
+
+            if (directChat != null)
+            {
+                return directChat;
+            }
+            var chatId = Guid.NewGuid();
+            var newDirectChat = new DirectChat
+            {
+                Id = chatId,
+                Name = $"Chat-{callerId}-{otherId}",
+                IsActive = true,
+                CreateAt = DateTime.UtcNow,
+                UpdateAt = DateTime.UtcNow,
+                DirectChatParticipants = new List<DirectChatParticipant>
+                {
+                    new DirectChatParticipant
+                    {
+                        Id = Guid.NewGuid(),
+                        AccountId = callerId,
+                        DirectChatId = chatId,
+                        IsActive = true,
+                        CreateAt = DateTime.UtcNow,
+                        UpdateAt = DateTime.UtcNow
+                    },
+                    new DirectChatParticipant
+                    {
+                        Id = Guid.NewGuid(),
+                        AccountId = otherId,
+                        DirectChatId = chatId,
+                        IsActive = true,
+                        CreateAt = DateTime.UtcNow,
+                        UpdateAt = DateTime.UtcNow
+                    }
+                }
+            };
+
+            await _unitOfWork.GetRepository<DirectChat>().InsertAsync(newDirectChat);
+            await _unitOfWork.CommitAsync();
+
+            return newDirectChat;
         }
 
         public override async Task OnDisconnectedAsync(Exception? exception)
