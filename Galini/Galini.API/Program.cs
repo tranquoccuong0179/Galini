@@ -28,6 +28,7 @@ builder.Services.AddUnitOfWork();
 builder.Services.AddCustomServices();
 builder.Services.AddJwtValidation();
 builder.Services.AddHttpClientServices();
+builder.Services.AddQuartzJobs();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Harmon's API", Version = "v1" });

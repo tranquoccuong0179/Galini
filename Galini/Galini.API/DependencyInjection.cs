@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Quartz;
 using StackExchange.Redis;
 
 namespace Galini.API
@@ -162,6 +163,25 @@ namespace Galini.API
             var strConn = config["ConnectionStrings:DefautDB"];
 
             return strConn;
+        }
+
+        public static IServiceCollection AddQuartzJobs(this IServiceCollection services)
+        {
+            var jobKey = new JobKey("PremiumCheckJob");
+
+            services.AddQuartz(config =>
+            {
+                config.AddJob<PremiumCheckJob>(opts => opts.WithIdentity(jobKey));
+
+                config.AddTrigger(opts => opts
+                    .ForJob(jobKey)
+                    .WithIdentity("PremiumCheckTrigger")
+                    .WithCronSchedule("0 0 1 * * ?"));
+            });
+
+            services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+
+            return services;
         }
     }
 }

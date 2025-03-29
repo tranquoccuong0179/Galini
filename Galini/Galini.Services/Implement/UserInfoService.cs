@@ -56,12 +56,15 @@ namespace Galini.Services.Implement
                 };
             }
 
+            DateTime dateEndUtc = new DateTime(9999, 11, 30, 23, 59, 59, DateTimeKind.Utc);
+            DateTime dateEnd = TimeUtil.ConvertToSEATime(dateEndUtc);
+
             var userInfor = new UserInfo();
             userInfor.Id = Guid.NewGuid();
             userInfor.PremiumId = premiumId;
             userInfor.AccountId = accountId;
             userInfor.DateStart = TimeUtil.GetCurrentSEATime();
-            userInfor.DateEnd = TimeUtil.GetCurrentSEATime().AddDays(30);
+            userInfor.DateEnd = dateEnd;
             userInfor.IsActive = true;
             userInfor.CreateAt = TimeUtil.GetCurrentSEATime(); 
             userInfor.UpdateAt = TimeUtil.GetCurrentSEATime();
