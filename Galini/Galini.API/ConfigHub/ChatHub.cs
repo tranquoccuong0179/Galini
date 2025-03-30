@@ -9,10 +9,11 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http;
 
 namespace Galini.API.ConfigHub
 {
-    public sealed class ChatHub : Hub<IChatClient>
+    public sealed class ChatHub : Hub
     {
         private static readonly ConcurrentDictionary<string, string> _userConnections = new(); // Lưu user online
         private readonly ILogger<ChatHub> _logger;
@@ -76,9 +77,19 @@ namespace Galini.API.ConfigHub
 
             var directChat = await GetDirectChat(userId.Value, otherId);
             Console.WriteLine("===> GetDirectChat Completed");
+            Console.WriteLine($"===> directChat ID: {directChat.Id}");
+
+            var messages = await _unitOfWork.GetRepository<Message>()
+                      .GetListAsync(predicate: m => m.DirectChatId == directChat.Id,
+                      orderBy: q => q.OrderBy(m => m.CreateAt));
 
             await base.OnConnectedAsync();
             Console.WriteLine("===> OnConnectedAsync FINISHED");
+            await Groups.AddToGroupAsync(Context.ConnectionId, directChat.Id.ToString());
+            await Clients.Caller.SendAsync("DirectChatId", directChat.Id.ToString());
+            Context.Items["UserToken"] = token;
+            await Clients.Caller.SendAsync("ReceiveMessageThread", messages);
+            Console.WriteLine("===> GetMessage Successful");
         }
 
         private Guid? GetUserIdFromToken(string token)
@@ -98,18 +109,15 @@ namespace Galini.API.ConfigHub
             }
         }
 
-
-        private async Task<DirectChat> GetDirectChat(Guid callerId, Guid otherId)
+        public async Task<DirectChat> GetDirectChat(Guid callerId, Guid otherId)
         {
-            _logger.LogInformation($"Checking DirectChat for: {callerId} & {otherId}");
+            Console.WriteLine($"===> GetDirectChat: Sender={callerId}, Receiver={otherId}");
 
             var directChat = await _unitOfWork.GetRepository<DirectChat>()
                 .SingleOrDefaultAsync(
                 predicate: d => d.DirectChatParticipants.Any(dc => dc.AccountId.Equals(callerId))
                             && d.DirectChatParticipants.Any(dc => dc.AccountId.Equals(otherId))
                             && d.IsActive);
-
-            _logger.LogInformation($"Error: {callerId} & {otherId}");
 
 
             if (directChat != null)
@@ -131,7 +139,7 @@ namespace Galini.API.ConfigHub
                 {
                     Id = Guid.NewGuid(),
                     AccountId = callerId,
-                    DirectChatId = newDirectChat.Id, 
+                    DirectChatId = newDirectChat.Id,
                     IsActive = true,
                     CreateAt = TimeUtil.GetCurrentSEATime(),
                     UpdateAt = TimeUtil.GetCurrentSEATime()
@@ -146,7 +154,7 @@ namespace Galini.API.ConfigHub
                     UpdateAt = TimeUtil.GetCurrentSEATime()
                 }
             };
-
+            Console.WriteLine("directChat thất bại");
             newDirectChat.DirectChatParticipants = participants;
 
             await _unitOfWork.GetRepository<DirectChat>().InsertAsync(newDirectChat);
@@ -165,31 +173,69 @@ namespace Galini.API.ConfigHub
             await base.OnDisconnectedAsync(exception);
         }
 
-        public async Task SendMessage(Guid directChatId, string sender, string receiver, string message)
+        public async Task SendMessage(Guid directChatId, string message)
         {
-            var createMessageRequest = new CreateMessageRequest { Content = message };
-            var response = await _messageService.CreateMessage(createMessageRequest, directChatId);          
 
-            if (response.status == "200")
+            var token = Context.Items["UserToken"]?.ToString();
+            Console.WriteLine("===> Token: ", token);
+
+
+            if (!string.IsNullOrEmpty(token) && token.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
             {
-                // Nếu người nhận online -> gửi ngay
-                if (_userConnections.TryGetValue(receiver, out var connectionId))
-                {
-                    await Clients.Client(connectionId).ReceiveMessage(sender, message);
-                }
+                token = token.Substring("Bearer ".Length).Trim();
+            }
+
+            if (string.IsNullOrEmpty(token))
+            {
+                _logger.LogWarning("Token is missing from request headers or query string.");
+                return;
+            }
+
+            var userId = GetUserIdFromToken(token);
+            if (!userId.HasValue)
+            {
+                _logger.LogWarning("Failed to retrieve user ID. Token: {Token}", token);
+                return;
+            }
+
+            Console.WriteLine($"===> SendMessage called with: directChatId={directChatId}, sender={userId}, message={message}");
+
+            if (directChatId == Guid.Empty || userId == Guid.Empty || string.IsNullOrWhiteSpace(message))
+            {
+                Console.WriteLine("===> Send Message Failed: Invalid parameters");
+                return;
+            }
+
+            var newMessage = new Message
+            {
+                Id = Guid.NewGuid(),
+                DirectChatId = directChatId,
+                SenderId = userId.Value,
+                Content = message,
+                IsActive = true,
+                Type = "text",
+                CreateAt = TimeUtil.GetCurrentSEATime(),
+                UpdateAt = TimeUtil.GetCurrentSEATime()
+            };
+
+            await _unitOfWork.GetRepository<Message>().InsertAsync(newMessage);
+            if (await _unitOfWork.CommitAsync() > 0)
+            {
+                Console.WriteLine("===> Message Saved Successfully");
+
+                await Clients.Group(directChatId.ToString()).SendAsync("NewMessage", userId, message);
             }
             else
             {
-                // Gửi lỗi về cho sender nếu lưu tin nhắn thất bại
-                await Clients.Caller.ErrorMessage("Không thể gửi tin nhắn");
+                Console.WriteLine("===> Message Save Failed");
             }
         }
+
 
         public async Task GetOnlineUsers()
         {
             var users = _userConnections.Keys.ToList();
-
-            await Clients.Caller.OnlineUsers(users);
+            await Clients.Caller.SendAsync("OnlineUsers", users);
         }
     }
 }
