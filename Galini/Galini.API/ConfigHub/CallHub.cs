@@ -12,38 +12,17 @@ namespace Galini.API.ConfigHub
 {
     public class CallHub : Hub
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
         private readonly IUserStatusService _userStatusService;
 
-        private readonly IUnitOfWork<HarmonContext> _unitOfWork;
-
-
-        public CallHub(IUnitOfWork<HarmonContext> unitOfWork, IUserStatusService userStatusService, IHttpContextAccessor httpContextAccessor)
+        public CallHub(IUserStatusService userStatusService)
         {
             _userStatusService = userStatusService;
-            _httpContextAccessor = httpContextAccessor;
-            _unitOfWork = unitOfWork;
         }
 
         public override async Task OnConnectedAsync()
         {
             await _userStatusService.AddUser(Context.ConnectionId);  // Khi user kết nối -> Thêm vào danh sách rảnh
-            Guid? accountId = UserUtil.GetAccountId(_httpContextAccessor.HttpContext);
-            if (accountId == null)
-            {
-                Context.Abort(); // Ngắt kết nối nếu không có accountId
-                return;
-            }
-
-            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
-                predicate: x => x.Id.Equals(accountId) && x.IsActive);
-            if (account == null)
-            {
-                Context.Abort(); // Ngắt kết nối nếu tài khoản không tồn tại
-                return;
-            }
-            await _userStatusService.AddUserForBooking(Context.ConnectionId, accountId.ToString());  // Khi user kết nối -> Thêm vào danh sách rảnh
         }
 
         public override async Task OnDisconnectedAsync(Exception? exception)
@@ -58,20 +37,6 @@ namespace Galini.API.ConfigHub
             if (!string.IsNullOrEmpty(targetConnectionId))
             {
                 await Clients.Client(Context.ConnectionId).SendAsync("RandomUserSelected", targetConnectionId);
-            }
-            else
-            {
-                await Clients.Client(Context.ConnectionId).SendAsync("NoAvailableUsers");
-            }
-        }
-
-        public async Task GetUserForBooking(string accountId) // Tìm connectionId của 1 người trong book (user hoặc listener) dựa vào accountId
-        {
-            var targetConnectionId = await _userStatusService.GetUserForBooking(Context.ConnectionId, accountId);
-
-            if (!string.IsNullOrEmpty(targetConnectionId))
-            {
-                await Clients.Client(Context.ConnectionId).SendAsync("UserSelected", targetConnectionId);
             }
             else
             {
