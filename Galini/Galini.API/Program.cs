@@ -160,4 +160,6 @@ app.MapHub<ChatHub>("/chathub");
 
 app.MapHub<CallHub>("callhub");
 
+app.MapHub<CallBookingHub>("callbookinghub");
+
 app.Run();

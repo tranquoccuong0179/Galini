@@ -36,6 +36,12 @@ namespace Galini.Services.Implement
             await db.SetRemoveAsync(UsersKey, connectionId); 
         }
 
+        public async Task RemoveUserForBooking(string accountId, string connectionId)
+        {
+            var db = _redis.GetDatabase();
+            await db.SetRemoveAsync(accountId, connectionId);
+        }
+
         public async Task<string?> GetRandomUser(string currentConnectionId)
         {
             var db = _redis.GetDatabase();
@@ -56,30 +62,25 @@ namespace Galini.Services.Implement
             return availableUsers[random.Next(availableUsers.Count)];
         }
 
-        public async Task AddUserForBooking(string connectionId, string accountId)
+        public async Task AddUserForBooking(string accountId, string connectionId)
         {
             var db = _redis.GetDatabase();
             await db.SetAddAsync(accountId, connectionId);
         }
 
-        public async Task<string?> GetUserForBooking(string currentConnectionId, string accountId)
+        public async Task<string?> GetUserForBooking(string accountId)
         {
             var db = _redis.GetDatabase();
             var users = await db.SetMembersAsync(accountId);
 
-            // Chuyển đổi về danh sách string
-            var availableUsers = users
-                .Select(u => u.ToString())
-                .Where(u => u != currentConnectionId) // Loại bỏ chính user đang gọi
-                .ToList();
-
-            // Nếu không có user nào khác, trả về null
-            if (availableUsers.Count == 0)
+            // Nếu tập hợp trống, trả về null
+            if (users.Length == 0)
             {
                 return null;
             }
 
-            return availableUsers.First();
+            // Trả về bất kỳ connectionId nào trong danh sách
+            return users[0].ToString();
         }
     }
 }

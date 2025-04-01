@@ -59,6 +59,7 @@ namespace Galini.API
             services.AddScoped<HtmlSanitizerUtil>();
             services.AddScoped<CallHub>();
             services.AddScoped<IBankService, BankService>();
+            services.AddScoped<CallBookingHub>();
             return services;
         }
         public static IServiceCollection AddHttpClientServices(this IServiceCollection services)
@@ -117,6 +118,23 @@ namespace Galini.API
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey =
                         new SymmetricSecurityKey(Convert.FromHexString("0102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F00"))
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+
+                        // Chỉ áp dụng khi request vào SignalR Hub
+                        if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/callhub"))
+                        {
+                            context.Token = accessToken;
+                        }
+
+                        return Task.CompletedTask;
+                    }
                 };
             }).AddCookie(
                 options =>
