@@ -59,6 +59,7 @@ namespace Galini.API
             services.AddScoped<HtmlSanitizerUtil>();
             services.AddScoped<CallHub>();
             services.AddScoped<CallBookingHub>();
+            services.AddScoped<IBankService, BankService>();
             return services;
         }
         public static IServiceCollection AddHttpClientServices(this IServiceCollection services)
