@@ -87,26 +87,68 @@ namespace Galini.API.ConfigHub
             }
         }
 
-        public async Task AcceptCall(string accountId1, string accountId2, string callerConnectionId)
+        public async Task AcceptCall(string accountId1, string callerConnectionId)
         {
+            Guid? accountId = UserUtil.GetAccountId(_httpContextAccessor.HttpContext);
+            if (accountId == null)
+            {
+                Context.Abort(); // Ngắt kết nối nếu không có accountId
+                return;
+            }
+
+            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+                predicate: x => x.Id.Equals(accountId) && x.IsActive);
+            if (account == null)
+            {
+                Context.Abort(); // Ngắt kết nối nếu tài khoản không tồn tại
+                return;
+            }
             await Clients.Client(callerConnectionId).SendAsync("CallAccepted", Context.ConnectionId);
             await Clients.Client(Context.ConnectionId).SendAsync("CallAccepted", callerConnectionId);
 
             await _userStatusService.RemoveUserForBooking(accountId1, callerConnectionId);
-            await _userStatusService.RemoveUserForBooking(accountId2, Context.ConnectionId);
+            await _userStatusService.RemoveUserForBooking(accountId.ToString(), Context.ConnectionId);
         }
 
-        public async Task RejectCall(string accountId1, string accountId2, string callerConnectionId) //accountId1 là người bị Reject, accountId2 là người bấm reject
+        public async Task RejectCall(string accountId1, string callerConnectionId) //accountId1 là người bị Reject, accountId2 là người bấm reject
         {
+            Guid? accountId = UserUtil.GetAccountId(_httpContextAccessor.HttpContext);
+            if (accountId == null)
+            {
+                Context.Abort(); // Ngắt kết nối nếu không có accountId
+                return;
+            }
+
+            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+                predicate: x => x.Id.Equals(accountId) && x.IsActive);
+            if (account == null)
+            {
+                Context.Abort(); // Ngắt kết nối nếu tài khoản không tồn tại
+                return;
+            }
             await Clients.Client(callerConnectionId).SendAsync("CallRejected");
             await _userStatusService.AddUserForBooking(accountId1, callerConnectionId);
-            await _userStatusService.AddUserForBooking(accountId2, Context.ConnectionId);
+            await _userStatusService.AddUserForBooking(accountId.ToString(), Context.ConnectionId);
         }
 
-        public async Task EndCall(string accountId1, string accountId2, string callerConnectionId) //accountId1 là người bị Reject, accountId2 là người bấm reject
+        public async Task EndCall(string accountId1, string callerConnectionId) //accountId1 là người bị Reject, accountId2 là người bấm reject
         {
+            Guid? accountId = UserUtil.GetAccountId(_httpContextAccessor.HttpContext);
+            if (accountId == null)
+            {
+                Context.Abort(); // Ngắt kết nối nếu không có accountId
+                return;
+            }
+
+            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+                predicate: x => x.Id.Equals(accountId) && x.IsActive);
+            if (account == null)
+            {
+                Context.Abort(); // Ngắt kết nối nếu tài khoản không tồn tại
+                return;
+            }
             await _userStatusService.AddUserForBooking(accountId1, callerConnectionId);
-            await _userStatusService.AddUserForBooking(accountId2, Context.ConnectionId);
+            await _userStatusService.AddUserForBooking(accountId.ToString(), Context.ConnectionId);
             await Clients.Client(Context.ConnectionId).SendAsync("CallEnded"); // Thông báo về FE
         }
 
