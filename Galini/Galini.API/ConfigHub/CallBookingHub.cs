@@ -4,6 +4,7 @@ using Galini.Repository.Interface;
 using Galini.Services.Interface;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Identity.Client;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Galini.API.ConfigHub
 {
@@ -15,31 +16,55 @@ namespace Galini.API.ConfigHub
 
         private readonly IUnitOfWork<HarmonContext> _unitOfWork;
 
+        private readonly ILogger<ChatHub> _logger;
 
-        public CallBookingHub(IUnitOfWork<HarmonContext> unitOfWork, IUserStatusService userStatusService, IHttpContextAccessor httpContextAccessor)
+
+        public CallBookingHub(ILogger<ChatHub> logger, IUnitOfWork<HarmonContext> unitOfWork, IUserStatusService userStatusService, IHttpContextAccessor httpContextAccessor)
         {
             _userStatusService = userStatusService;
             _httpContextAccessor = httpContextAccessor;
             _unitOfWork = unitOfWork;
+            _logger = logger;
         }
 
         public override async Task OnConnectedAsync()
         {
-            Guid? accountId = UserUtil.GetAccountId(_httpContextAccessor.HttpContext);
-            if (accountId == null)
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext == null)
             {
-                Context.Abort(); // Ngắt kết nối nếu không có accountId
+                _logger.LogWarning("HttpContext is null. Connection cannot proceed.");
+                return;
+            }
+
+            var token = httpContext.Request.Headers["Authorization"].ToString();
+            if (string.IsNullOrEmpty(token))
+            {
+                token = httpContext.Request.Query["access_token"];
+            }
+
+            if (string.IsNullOrEmpty(token))
+            {
+                _logger.LogWarning("Token is missing from request headers or query string.");
+                return;
+            }
+
+            var userId = GetUserIdFromToken(token);
+
+            if (!userId.HasValue)
+            {
+                _logger.LogWarning("Failed to retrieve user ID. Token: {Token}", token);
+                Context.Abort();
                 return;
             }
 
             var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
-                predicate: x => x.Id.Equals(accountId) && x.IsActive);
+                predicate: x => x.Id.Equals(userId) && x.IsActive);
             if (account == null)
             {
-                Context.Abort(); // Ngắt kết nối nếu tài khoản không tồn tại
+                Context.Abort(); 
                 return;
             }
-            await _userStatusService.AddUserForBooking(accountId.ToString(), Context.ConnectionId);  // Khi user của booking kết nối -> Thêm vào danh sách theo accounId
+            await _userStatusService.AddUserForBooking(userId.ToString(), Context.ConnectionId);  // Khi user của booking kết nối -> Thêm vào danh sách theo accounId
         }
 
         public override async Task OnDisconnectedAsync(Exception? exception)
@@ -165,6 +190,23 @@ namespace Galini.API.ConfigHub
         public async Task SendCandidate(string targetConnectionId, string candidate)
         {
             await Clients.Client(targetConnectionId).SendAsync("ReceiveCandidate", Context.ConnectionId, candidate);
+        }
+
+        private Guid? GetUserIdFromToken(string token)
+        {
+            try
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+
+                var accountIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "accountId");
+                return accountIdClaim != null ? Guid.Parse(accountIdClaim.Value) : null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error decoding JWT token: {Message}", ex.Message);
+                return null;
+            }
         }
     }
 }
