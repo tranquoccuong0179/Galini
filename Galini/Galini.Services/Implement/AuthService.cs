@@ -35,7 +35,8 @@ namespace Galini.Services.Implement
                   p.Password.Equals(PasswordUtil.HashPassword(request.Password)) &&
                   (p.Role == RoleEnum.Customer.GetDescriptionFromEnum()||
                   p.Role == RoleEnum.Listener.GetDescriptionFromEnum() ||
-                  p.Role == RoleEnum.Admin.GetDescriptionFromEnum());
+                  p.Role == RoleEnum.Admin.GetDescriptionFromEnum()) &&
+                  p.IsActive;
             Account account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: searchFilter);
             if (account == null)
             {
