@@ -8,6 +8,7 @@ using Galini.Models.Payload.Request.UserInfo;
 using Galini.Models.Payload.Response;
 using Galini.Models.Payload.Response.Account;
 using Galini.Models.Payload.Response.Authentication;
+using Galini.Models.Payload.Response.FriendShip;
 using Galini.Models.Payload.Response.GoogleAuthentication;
 using Galini.Models.Payload.Response.UserCall;
 using Galini.Models.Payload.Response.WorkShift;
@@ -464,6 +465,29 @@ public class UserService : BaseService<UserService>, IUserService
                 message = "User account don't exists.",
                 data = null
             };
+        }
+
+        Guid? accountId = UserUtil.GetAccountId(_httpContextAccessor.HttpContext);
+        var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+            predicate: x => x.Id.Equals(id) && x.IsActive);
+
+        if (account == null)
+        {
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status404NotFound.ToString(),
+                message = "Tài khoản của chính bạn không tồn tại",
+                data = null
+            };
+        }
+
+        var friendShip = await _unitOfWork.GetRepository<FriendShip>().SingleOrDefaultAsync(
+                selector: a => _mapper.Map<CreateFriendShipResponse>(a),
+                predicate: a => a.IsActive && ((a.UserId == existingUser.Id && a.FriendId == account.Id) || (a.UserId == account.Id && a.FriendId == existingUser.Id)));
+
+        if (friendShip != null)
+        {
+            existingUser.Status = Enum.Parse<FriendShipEnum>(friendShip.Status);
         }
 
         return new BaseResponse

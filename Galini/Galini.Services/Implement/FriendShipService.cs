@@ -395,6 +395,20 @@ namespace Galini.Services.Implement
                 };
             }
 
+            var friendShip = await _unitOfWork.GetRepository<FriendShip>().SingleOrDefaultAsync(
+                selector: a => _mapper.Map<CreateFriendShipResponse>(a),
+                predicate: a => a.IsActive && ((a.UserId == account.Id && a.FriendId == id) || (a.UserId == id && a.FriendId == account.Id)) && a.Status == FriendShipEnum.Block.ToString());
+
+            if (friendShip != null)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status200OK.ToString(),
+                    message = "Tài khoản của bạn đã bị đối phương chặn, hoặc bạn đã chặn đối phương",
+                    data = null
+                };
+            }
+
             return new BaseResponse()
             {
                 status = StatusCodes.Status200OK.ToString(),
