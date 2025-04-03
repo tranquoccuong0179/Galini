@@ -69,18 +69,39 @@ namespace Galini.API.ConfigHub
 
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
-            Guid? accountId = UserUtil.GetAccountId(_httpContextAccessor.HttpContext);
-            if (accountId == null)
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext == null)
             {
-                Context.Abort(); // Ngắt kết nối nếu không có accountId
+                _logger.LogWarning("HttpContext is null. Connection cannot proceed.");
+                return;
+            }
+
+            var token = httpContext.Request.Headers["Authorization"].ToString();
+            if (string.IsNullOrEmpty(token))
+            {
+                token = httpContext.Request.Query["access_token"];
+            }
+
+            if (string.IsNullOrEmpty(token))
+            {
+                _logger.LogWarning("Token is missing from request headers or query string.");
+                return;
+            }
+
+            var userId = GetUserIdFromToken(token);
+
+            if (!userId.HasValue)
+            {
+                _logger.LogWarning("Failed to retrieve user ID. Token: {Token}", token);
+                Context.Abort();
                 return;
             }
 
             var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
-                predicate: x => x.Id.Equals(accountId) && x.IsActive);
+                predicate: x => x.Id.Equals(userId) && x.IsActive);
             if (account == null)
             {
-                Context.Abort(); // Ngắt kết nối nếu tài khoản không tồn tại
+                Context.Abort();
                 return;
             }
             await _userStatusService.RemoveUserForBooking(account.Id.ToString(), Context.ConnectionId); // Khi user ngắt kết nối -> Xóa khỏi danh sách
@@ -114,66 +135,129 @@ namespace Galini.API.ConfigHub
 
         public async Task AcceptCall(string accountId1, string callerConnectionId)
         {
-            Guid? accountId = UserUtil.GetAccountId(_httpContextAccessor.HttpContext);
-            if (accountId == null)
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext == null)
             {
-                Context.Abort(); // Ngắt kết nối nếu không có accountId
+                _logger.LogWarning("HttpContext is null. Connection cannot proceed.");
+                return;
+            }
+
+            var token = httpContext.Request.Headers["Authorization"].ToString();
+            if (string.IsNullOrEmpty(token))
+            {
+                token = httpContext.Request.Query["access_token"];
+            }
+
+            if (string.IsNullOrEmpty(token))
+            {
+                _logger.LogWarning("Token is missing from request headers or query string.");
+                return;
+            }
+
+            var userId = GetUserIdFromToken(token);
+
+            if (!userId.HasValue)
+            {
+                _logger.LogWarning("Failed to retrieve user ID. Token: {Token}", token);
+                Context.Abort();
                 return;
             }
 
             var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
-                predicate: x => x.Id.Equals(accountId) && x.IsActive);
+                predicate: x => x.Id.Equals(userId) && x.IsActive);
             if (account == null)
             {
-                Context.Abort(); // Ngắt kết nối nếu tài khoản không tồn tại
+                Context.Abort();
                 return;
             }
             await Clients.Client(callerConnectionId).SendAsync("CallAccepted", Context.ConnectionId);
             await Clients.Client(Context.ConnectionId).SendAsync("CallAccepted", callerConnectionId);
 
             await _userStatusService.RemoveUserForBooking(accountId1, callerConnectionId);
-            await _userStatusService.RemoveUserForBooking(accountId.ToString(), Context.ConnectionId);
+            await _userStatusService.RemoveUserForBooking(account.Id.ToString(), Context.ConnectionId);
         }
 
         public async Task RejectCall(string accountId1, string callerConnectionId) //accountId1 là người bị Reject, accountId2 là người bấm reject
         {
-            Guid? accountId = UserUtil.GetAccountId(_httpContextAccessor.HttpContext);
-            if (accountId == null)
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext == null)
             {
-                Context.Abort(); // Ngắt kết nối nếu không có accountId
+                _logger.LogWarning("HttpContext is null. Connection cannot proceed.");
+                return;
+            }
+
+            var token = httpContext.Request.Headers["Authorization"].ToString();
+            if (string.IsNullOrEmpty(token))
+            {
+                token = httpContext.Request.Query["access_token"];
+            }
+
+            if (string.IsNullOrEmpty(token))
+            {
+                _logger.LogWarning("Token is missing from request headers or query string.");
+                return;
+            }
+
+            var userId = GetUserIdFromToken(token);
+
+            if (!userId.HasValue)
+            {
+                _logger.LogWarning("Failed to retrieve user ID. Token: {Token}", token);
+                Context.Abort();
                 return;
             }
 
             var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
-                predicate: x => x.Id.Equals(accountId) && x.IsActive);
+                predicate: x => x.Id.Equals(userId) && x.IsActive);
             if (account == null)
             {
-                Context.Abort(); // Ngắt kết nối nếu tài khoản không tồn tại
+                Context.Abort();
                 return;
             }
             await Clients.Client(callerConnectionId).SendAsync("CallRejected");
             await _userStatusService.AddUserForBooking(accountId1, callerConnectionId);
-            await _userStatusService.AddUserForBooking(accountId.ToString(), Context.ConnectionId);
+            await _userStatusService.AddUserForBooking(account.Id.ToString(), Context.ConnectionId);
         }
 
         public async Task EndCall(string accountId1, string callerConnectionId) //accountId1 là người bị Reject, accountId2 là người bấm reject
         {
-            Guid? accountId = UserUtil.GetAccountId(_httpContextAccessor.HttpContext);
-            if (accountId == null)
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext == null)
             {
-                Context.Abort(); // Ngắt kết nối nếu không có accountId
+                _logger.LogWarning("HttpContext is null. Connection cannot proceed.");
+                return;
+            }
+
+            var token = httpContext.Request.Headers["Authorization"].ToString();
+            if (string.IsNullOrEmpty(token))
+            {
+                token = httpContext.Request.Query["access_token"];
+            }
+
+            if (string.IsNullOrEmpty(token))
+            {
+                _logger.LogWarning("Token is missing from request headers or query string.");
+                return;
+            }
+
+            var userId = GetUserIdFromToken(token);
+
+            if (!userId.HasValue)
+            {
+                _logger.LogWarning("Failed to retrieve user ID. Token: {Token}", token);
+                Context.Abort();
                 return;
             }
 
             var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
-                predicate: x => x.Id.Equals(accountId) && x.IsActive);
+                predicate: x => x.Id.Equals(userId) && x.IsActive);
             if (account == null)
             {
-                Context.Abort(); // Ngắt kết nối nếu tài khoản không tồn tại
+                Context.Abort();
                 return;
             }
             await _userStatusService.AddUserForBooking(accountId1, callerConnectionId);
-            await _userStatusService.AddUserForBooking(accountId.ToString(), Context.ConnectionId);
+            await _userStatusService.AddUserForBooking(account.Id.ToString(), Context.ConnectionId);
             await Clients.Client(Context.ConnectionId).SendAsync("CallEnded"); // Thông báo về FE
         }
 
