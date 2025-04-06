@@ -78,6 +78,7 @@ namespace Galini.Services.Implement
             var response = await _unitOfWork.GetRepository<Blog>().GetPagingListAsync(
                 selector: b => _mapper.Map<GetBlogResponse>(b),
                 predicate: b => b.IsActive,
+                orderBy: b => b.OrderByDescending(b => b.CreateAt),
                 page: page,
                 size: size);
 
@@ -385,7 +386,8 @@ namespace Galini.Services.Implement
 
             var blogs = await _unitOfWork.GetRepository<Blog>().GetListAsync(
                 selector: b => _mapper.Map<GetBlogResponse>(b),
-                predicate: b => b.AuthorId.Equals(userId) && b.IsActive);
+                predicate: b => b.AuthorId.Equals(userId) && b.IsActive,
+                orderBy: b => b.OrderByDescending(b => b.CreateAt));
 
             return new BaseResponse()
             {
