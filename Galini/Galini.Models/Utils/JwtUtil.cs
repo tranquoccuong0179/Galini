@@ -33,7 +33,8 @@ namespace Galini.Models.Utils
         new Claim(JwtRegisteredClaimNames.NameId, account.Id.ToString()),
         new Claim(JwtRegisteredClaimNames.Name, account.UserName.ToString()),
         new Claim("role", account.Role),
-        new Claim(ClaimTypes.Name, account.UserName)
+        new Claim(ClaimTypes.Name, account.UserName),
+        new Claim("fullName", account.FullName)
     };
 
             if (guidClaim != null)

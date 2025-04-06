@@ -9,13 +9,14 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Galini.API.ConfigHub
 {
     public sealed class ChatHub : Hub
     {
-        private static readonly ConcurrentDictionary<string, string> _userConnections = new(); // Lưu user online
+        private static readonly ConcurrentDictionary<string, string> _userConnections = new();
         private readonly ILogger<ChatHub> _logger;
         private readonly IMessageService _messageService;
         private readonly IUnitOfWork<HarmonContext> _unitOfWork;
@@ -80,15 +81,42 @@ namespace Galini.API.ConfigHub
             Console.WriteLine($"===> directChat ID: {directChat.Id}");
 
             var messages = await _unitOfWork.GetRepository<Message>()
-                      .GetListAsync(predicate: m => m.DirectChatId == directChat.Id,
-                      orderBy: q => q.OrderBy(m => m.CreateAt));
+                .GetListAsync(predicate: m => m.DirectChatId == directChat.Id,
+                              orderBy: q => q.OrderBy(m => m.CreateAt));
+            Console.WriteLine($"===> Found {messages.Count} messages");
+
+            var senderIds = messages.Select(m => m.SenderId).Distinct().ToList();
+            Console.WriteLine($"===> Sender IDs: {string.Join(", ", senderIds)}");
+
+            var accounts = await _unitOfWork.GetRepository<Account>()
+                .GetListAsync(predicate: a => senderIds.Contains(a.Id));
+            Console.WriteLine($"===> Found {accounts.Count} accounts for sender IDs");
+
+            var messagesWithFullName = messages.Select(m => new
+            {
+                m.SenderId,
+                SenderFullName = accounts.FirstOrDefault(a => a.Id == m.SenderId)?.FullName ?? "Unknown",
+                m.Content,
+                m.CreateAt
+            }).ToList();
+
+            Console.WriteLine("===> Messages with FullName:");
+            foreach (var msg in messagesWithFullName)
+            {
+                Console.WriteLine($"SenderId: {msg.SenderId}, SenderFullName: {msg.SenderFullName}, Content: {msg.Content}");
+            }
+
+            var currentAccount = await _unitOfWork.GetRepository<Account>()
+                .SingleOrDefaultAsync(predicate: a => a.Id.Equals(userId.Value));
+            Console.WriteLine($"===> Current User FullName: {currentAccount?.FullName ?? "Unknown"}");
 
             await base.OnConnectedAsync();
             Console.WriteLine("===> OnConnectedAsync FINISHED");
             await Groups.AddToGroupAsync(Context.ConnectionId, directChat.Id.ToString());
             await Clients.Caller.SendAsync("DirectChatId", directChat.Id.ToString());
             Context.Items["UserToken"] = token;
-            await Clients.Caller.SendAsync("ReceiveMessageThread", messages);
+            await Clients.Caller.SendAsync("ReceiveMessageThread", messagesWithFullName);
+            //await Clients.Caller.SendAsync("fullName", currentAccount?.FullName ?? "Unknown");
             Console.WriteLine("===> GetMessage Successful");
         }
 
@@ -96,6 +124,11 @@ namespace Galini.API.ConfigHub
         {
             try
             {
+                if (token.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+
                 var handler = new JwtSecurityTokenHandler();
                 var jwtToken = handler.ReadJwtToken(token);
 
@@ -115,15 +148,16 @@ namespace Galini.API.ConfigHub
 
             var directChat = await _unitOfWork.GetRepository<DirectChat>()
                 .SingleOrDefaultAsync(
-                predicate: d => d.DirectChatParticipants.Any(dc => dc.AccountId.Equals(callerId))
-                            && d.DirectChatParticipants.Any(dc => dc.AccountId.Equals(otherId))
-                            && d.IsActive);
+                    predicate: d => d.DirectChatParticipants.Any(dc => dc.AccountId.Equals(callerId))
+                                && d.DirectChatParticipants.Any(dc => dc.AccountId.Equals(otherId))
+                                && d.IsActive);
 
 
             if (directChat != null)
             {
                 return directChat;
             }
+
             var newDirectChat = new DirectChat
             {
                 Id = Guid.NewGuid(),
@@ -154,6 +188,7 @@ namespace Galini.API.ConfigHub
                     UpdateAt = TimeUtil.GetCurrentSEATime()
                 }
             };
+
             Console.WriteLine("directChat thất bại");
             newDirectChat.DirectChatParticipants = participants;
 
@@ -177,8 +212,7 @@ namespace Galini.API.ConfigHub
         {
 
             var token = Context.Items["UserToken"]?.ToString();
-            Console.WriteLine("===> Token: ", token);
-
+            Console.WriteLine("===> Token: " + token);
 
             if (!string.IsNullOrEmpty(token) && token.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
             {
@@ -223,7 +257,13 @@ namespace Galini.API.ConfigHub
             {
                 Console.WriteLine("===> Message Saved Successfully");
 
-                await Clients.Group(directChatId.ToString()).SendAsync("NewMessage", userId, message);
+                var senderAccount = await _unitOfWork.GetRepository<Account>()
+                    .SingleOrDefaultAsync(predicate: a => a.Id.Equals(userId.Value));
+                var senderFullName = senderAccount?.FullName ?? "Unknown";
+                Console.WriteLine($"===> Sender ID: {userId.Value}, Sender FullName: {senderFullName}");
+
+                await Clients.Group(directChatId.ToString())
+                    .SendAsync("NewMessage", userId.Value, message, senderFullName);
             }
             else
             {
