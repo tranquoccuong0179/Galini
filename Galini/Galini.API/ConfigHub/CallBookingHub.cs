@@ -177,46 +177,46 @@ namespace Galini.API.ConfigHub
             await _userStatusService.RemoveUserForBooking(account.Id.ToString(), Context.ConnectionId);
         }
 
-        public async Task RejectCall(string accountId1, string callerConnectionId) //accountId1 là người bị Reject, accountId2 là người bấm reject
+        public async Task RejectCall(string accountId1, string callerConnectionId, string accountId2) //accountId1 là người bị Reject, accountId2 là người bấm reject
         {
-            var httpContext = _httpContextAccessor.HttpContext;
-            if (httpContext == null)
-            {
-                _logger.LogWarning("HttpContext is null. Connection cannot proceed.");
-                return;
-            }
+            //var httpContext = _httpContextAccessor.HttpContext;
+            //if (httpContext == null)
+            //{
+            //    _logger.LogWarning("HttpContext is null. Connection cannot proceed.");
+            //    return;
+            //}
 
-            var token = httpContext.Request.Headers["Authorization"].ToString();
-            if (string.IsNullOrEmpty(token))
-            {
-                token = httpContext.Request.Query["access_token"];
-            }
+            //var token = httpContext.Request.Headers["Authorization"].ToString();
+            //if (string.IsNullOrEmpty(token))
+            //{
+            //    token = httpContext.Request.Query["access_token"];
+            //}
 
-            if (string.IsNullOrEmpty(token))
-            {
-                _logger.LogWarning("Token is missing from request headers or query string.");
-                return;
-            }
+            //if (string.IsNullOrEmpty(token))
+            //{
+            //    _logger.LogWarning("Token is missing from request headers or query string.");
+            //    return;
+            //}
 
-            var userId = GetUserIdFromToken(token);
+            //var userId = GetUserIdFromToken(token);
 
-            if (!userId.HasValue)
-            {
-                _logger.LogWarning("Failed to retrieve user ID. Token: {Token}", token);
-                Context.Abort();
-                return;
-            }
+            //if (!userId.HasValue)
+            //{
+            //    _logger.LogWarning("Failed to retrieve user ID. Token: {Token}", token);
+            //    Context.Abort();
+            //    return;
+            //}
 
-            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
-                predicate: x => x.Id.Equals(userId) && x.IsActive);
-            if (account == null)
-            {
-                Context.Abort();
-                return;
-            }
+            //var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+            //    predicate: x => x.Id.Equals(userId) && x.IsActive);
+            //if (account == null)
+            //{
+            //    Context.Abort();
+            //    return;
+            //}
             await Clients.Client(callerConnectionId).SendAsync("CallRejected");
             await _userStatusService.AddUserForBooking(accountId1, callerConnectionId);
-            await _userStatusService.AddUserForBooking(account.Id.ToString(), Context.ConnectionId);
+            await _userStatusService.AddUserForBooking(accountId2, Context.ConnectionId);
         }
 
         public async Task EndCall(string accountId1, string callerConnectionId) //accountId1 là người bị Reject, accountId2 là người bấm reject
