@@ -104,7 +104,7 @@ namespace Galini.API.ConfigHub
                 Context.Abort();
                 return;
             }
-            await _userStatusService.RemoveUserForBooking(account.Id.ToString(), Context.ConnectionId); // Khi user ngắt kết nối -> Xóa khỏi danh sách
+            await _userStatusService.RemoveUserForBooking(userId.ToString(), Context.ConnectionId); // Khi user ngắt kết nối -> Xóa khỏi danh sách
         }
 
         public async Task GetUserForBooking(string accountId) // Tìm connectionId của 1 người trong book (user hoặc listener) dựa vào accountId
@@ -256,8 +256,8 @@ namespace Galini.API.ConfigHub
                 Context.Abort();
                 return;
             }
-            await _userStatusService.AddUserForBooking(accountId1, callerConnectionId);
-            await _userStatusService.AddUserForBooking(account.Id.ToString(), Context.ConnectionId);
+            await _userStatusService.RemoveUserForBooking(accountId1, callerConnectionId);
+            await _userStatusService.RemoveUserForBooking(account.Id.ToString(), Context.ConnectionId);
             await Clients.Client(Context.ConnectionId).SendAsync("CallEnded"); // Thông báo về FE
         }
 
