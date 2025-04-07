@@ -257,6 +257,7 @@ namespace Galini.API.Constants
         {
             public const string DashboardEndPoint = ApiEndpoint + "/dashboard";
             public const string GetDashboard = DashboardEndPoint;
+            public const string GetDashboardListener = DashboardEndPoint + "/listener";
         }
     }
 }

@@ -44,5 +44,36 @@ namespace Galini.API.Controllers
             var response = await _dashboardService.GetDashboard();
             return StatusCode(int.Parse(response.status), response);
         }
+
+        /// <summary>
+        /// API lấy thông tin tổng quan của bảng điều khiển dành cho Listener.
+        /// </summary>
+        /// <remarks>
+        /// - Lấy dữ liệu tổng quan hiển thị trên dashboard của Listener, bao gồm số buổi tư vấn, số buổi bị hủy, điểm đánh giá trung bình và tổng số buổi.  
+        /// - Bao gồm cả dữ liệu biểu đồ (`ChartData`) thể hiện doanh thu theo từng tháng (2 năm gần nhất).  
+        /// - Kết quả trả về được bọc trong `BaseResponse`.  
+        /// </remarks>
+        /// <returns>
+        /// - `200 OK`: Lấy thông tin dashboard của Listener thành công.  
+        ///   Response sẽ chứa các thuộc tính sau:  
+        ///   - `TotalBookingSuccess` (int): Tổng số buổi tư vấn thành công.  
+        ///   - `TotalBookingCancel` (int): Tổng số buổi tư vấn bị hủy.  
+        ///   - `AverageStars` (float): Điểm đánh giá trung bình của Listener.  
+        ///   - `TotalBookings` (int): Tổng số buổi tư vấn đã thực hiện.  
+        ///   - `Chart` (`ChartData`): Dữ liệu biểu đồ thể hiện doanh thu theo tháng, bao gồm:  
+        ///     - `Labels` (List&lt;string&gt;): Danh sách nhãn (Tháng/Năm).  
+        ///     - `Values` (List&lt;int&gt;): Danh sách doanh thu tương ứng với các tháng (đơn vị: VNĐ).  
+        /// - `404 Not Found`: Không tìm thấy tài khoản Listener tương ứng.  
+        /// - `500 Internal Server Error`: Lỗi xảy ra trong quá trình xử lý (nếu có).  
+        /// </returns>
+
+        [HttpGet(ApiEndPointConstant.Dashboard.GetDashboardListener)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesErrorResponseType(typeof(ProblemDetails))]
+        public async Task<IActionResult> GetDashboardListener()
+        {
+            var response = await _dashboardService.GetDashboardListener();
+            return StatusCode(int.Parse(response.status), response);
+        }
     }
 }
