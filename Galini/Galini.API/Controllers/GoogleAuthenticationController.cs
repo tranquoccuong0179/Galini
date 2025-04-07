@@ -93,14 +93,21 @@ namespace Galini.API.Controllers
                     <html>
                     <body>
                     <script type='text/javascript'>
-                    window.opener.postMessage({{
-                        user: '{user}'
-                        accessToken: '{authResponse.Token}',
-                        refreshToken: '{authResponse.RefreshToken}'
-                    }}, '*');
-                    window.close();
+                    try {{
+                        window.opener.postMessage({{
+                            user: '{user}',
+                            accessToken: '{authResponse.Token}',
+                            refreshToken: '{authResponse.RefreshToken}'
+                        }}, '*');
+                        setTimeout(function() {{
+                            window.close();
+                        }}, 100);
+                    }} catch (e) {{
+                        console.error('Error:', e);
+                    }}
                     </script>
                     <p>Đang xử lý đăng nhập, vui lòng chờ...</p>
+                    <button onclick='window.close()'>Đóng cửa sổ</button>
                     </body>
                     </html>";
 
