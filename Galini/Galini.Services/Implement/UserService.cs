@@ -330,6 +330,11 @@ public class UserService : BaseService<UserService>, IUserService
 
         var response = new GoogleAuthResponse()
         {
+            Id = account.Id,
+            Username = account.UserName,
+            Role = account.Role,
+            Email = email,
+            FullName = account.FullName,
             Token = token,
             RefreshToken = refreshToken.Token
         };
