@@ -11,6 +11,7 @@ namespace Galini.Services.Interface
     public interface IDashboardService
     {
         Task<BaseResponse> GetDashboard();
+        Task<BaseResponse> GetDashboardListener();
 
     }
 }
