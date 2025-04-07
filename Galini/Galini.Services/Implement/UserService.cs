@@ -577,7 +577,7 @@ public class UserService : BaseService<UserService>, IUserService
                 FullName = a.FullName,
                 Phone = a.Phone,
             },
-            predicate: a => a.IsActive,
+            predicate: a => a.IsActive && a.Role.Equals(RoleEnum.Customer.GetDescriptionFromEnum()),
             orderBy: a => a.OrderByDescending(a => a.CreateAt),
             page: page,
             size: size);

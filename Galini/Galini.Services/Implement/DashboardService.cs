@@ -33,7 +33,7 @@ namespace Galini.Services.Implement
             var totalBlogs = await _unitOfWork.GetRepository<Blog>().CountAsync();
 
             var transactions = await _unitOfWork.GetRepository<Transaction>().GetListAsync(
-                predicate: t => t.IsActive);
+                predicate: t => t.IsActive && t.Type.Equals(TransactionTypeEnum.DEPOSIT.GetDescriptionFromEnum()));
             decimal totalTransaction = transactions.Sum(t => t.Amount);
 
             var transactionByYearMonth = transactions
