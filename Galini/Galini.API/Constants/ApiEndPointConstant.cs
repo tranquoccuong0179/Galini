@@ -250,5 +250,11 @@ namespace Galini.API.Constants
             public const string UpdateDirectChatParticipant = DirectChatParticipantEndPoint + "/{id}";
             public const string RemoveDirectChatParticipant = DirectChatParticipantEndPoint + "/{id}";
         }
+
+        public static class Dashboard
+        {
+            public const string DashboardEndPoint = ApiEndpoint + "/dashboard";
+            public const string GetDashboard = DashboardEndPoint;
+        }
     }
 }
