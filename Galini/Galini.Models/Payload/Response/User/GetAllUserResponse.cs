@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Galini.Models.Payload.Response.Account
+namespace Galini.Models.Payload.Response.User
 {
-    public class GetAccountResponse
+    public class GetAllUserResponse
     {
-        public Guid Id { get; set; }
+        public string? UserName { get; set; }
         public string? FullName { get; set; }
         public string? Email { get; set; }
         public string? Phone { get; set; }

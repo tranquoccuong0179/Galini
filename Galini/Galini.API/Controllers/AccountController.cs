@@ -186,4 +186,53 @@ public class AccountController : BaseController<AccountController>
 
         return StatusCode(int.Parse(response.status), response);
     }
+
+    /// <summary>
+    /// API lấy danh sách tất cả tài khoản người dùng với phân trang.
+    /// </summary>
+    /// <remarks>
+    /// - Trả về danh sách tài khoản người dùng hiện có trong hệ thống.  
+    /// - Hỗ trợ phân trang thông qua `page` và `size`. Nếu không truyền `page` hoặc `size`, giá trị mặc định sẽ được sử dụng (`page = 1`, `size = 10`).
+    /// - Kết quả trả về được bọc trong `BaseResponse`.
+    /// </remarks>
+    /// <param name="page">Trang hiện tại (mặc định là 1).</param>
+    /// <param name="size">Số lượng tài khoản trên mỗi trang (mặc định là 10).</param>
+    /// <returns>
+    /// - `200 OK`: Trả về danh sách tài khoản thành công.  
+    /// </returns>
+    [HttpGet(ApiEndPointConstant.User.GetAllAccount)]
+    [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+    [ProducesErrorResponseType(typeof(ProblemDetails))]
+    public async Task<IActionResult> GetAllAccount([FromQuery] int? page,
+                                                   [FromQuery] int? size)
+    {
+        int pageNumber = page ?? 1;
+        int pageSize = size ?? 10;
+        var response = await _userService.GetAllUser(pageNumber, pageSize);
+
+        return StatusCode(int.Parse(response.status), response);
+    }
+
+    /// <summary>
+    /// API xóa tài khoản người dùng theo ID.
+    /// </summary>
+    /// <remarks>
+    /// - Xóa vĩnh viễn tài khoản khỏi hệ thống dựa trên `id` cung cấp.  
+    /// - Kết quả trả về được bọc trong `BaseResponse`.
+    /// </remarks>
+    /// <param name="id">ID của tài khoản cần xóa.</param>
+    /// <returns>
+    /// - `200 OK`: Xóa tài khoản thành công.  
+    /// - `404 Not Found`: Không tìm thấy tài khoản với ID đã cung cấp.  
+    /// </returns>
+    [HttpDelete(ApiEndPointConstant.User.DeleteAccount)]
+    [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status404NotFound)]
+    [ProducesErrorResponseType(typeof(ProblemDetails))]
+    public async Task<IActionResult> DeleteAccount([FromRoute] Guid id)
+    {
+        var response = await _userService.DeleteUser(id);
+
+        return StatusCode(int.Parse(response.status), response);
+    }
 }
