@@ -19,6 +19,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static QRCoder.PayloadGenerator;
 
 namespace Galini.Services.Implement
 {
@@ -414,6 +415,57 @@ namespace Galini.Services.Implement
                 status = StatusCodes.Status200OK.ToString(),
                 message = "Lấy thông tin tài khoản thành công",
                 data = _mapper.Map<RegisterUserResponse>(account)
+            };
+        }
+
+        public async Task<BaseResponse> GetRequestList(int page, int size)
+        {
+            if (page < 1 || size < 1)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status400BadRequest.ToString(),
+                    message = "Page hoặc size không hợp lệ.",
+                    data = null
+                };
+            }
+
+            Guid? id = UserUtil.GetAccountId(_httpContextAccessor.HttpContext);
+            var accountExist = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+                predicate: x => x.Id.Equals(id) && x.IsActive);
+            if (accountExist == null)
+            {
+                _logger.LogWarning($"Không tìm thấy tài khoản có Id {id} .");
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status404NotFound.ToString(),
+                    message = "Tài khoản không tồn tại",
+                    data = null
+                };
+            }
+
+            var friendShip = await _unitOfWork.GetRepository<FriendShip>().GetPagingListAsync(
+                selector: a => new GetFriendShipResponse
+                {
+                    Id = a.Id,
+                    UserId = a.FriendId,
+                    FriendId = a.UserId,
+                    FriendFullName = a.User.FullName,
+                    FriendDateOfBirth = a.User.DateOfBirth,
+                    FriendGender = a.User.Gender,
+                    FriendAvatarUrl = a.User.AvatarUrl,
+                    Status = a.Status
+                },
+                predicate: a => a.IsActive && a.FriendId == accountExist.Id && a.Status == FriendShipEnum.Request.ToString(),
+                include: query => query.Include(a => a.Friend),
+                page: page,
+                size: size);
+
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status200OK.ToString(),
+                message = "Lấy thông tin mối quan hệ thành công",
+                data = friendShip
             };
         }
     }

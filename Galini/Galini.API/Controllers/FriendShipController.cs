@@ -190,6 +190,35 @@ namespace Galini.API.Controllers
         }
 
         /// <summary>
+        /// API lấy danh sách yêu cầu kết bạn gửi đến người dùng hiện tại (có phân trang).
+        /// </summary>
+        /// <remarks>
+        /// - Trả về danh sách các yêu cầu kết bạn mà người dùng hiện tại nhận được.  
+        /// - Hỗ trợ phân trang với hai tham số `page` và `size`.  
+        /// - Nếu không truyền `page` hoặc `size`, sẽ sử dụng giá trị mặc định (`page = 1`, `size = 10`).  
+        /// - Danh sách kết quả được bọc trong `BaseResponse`.  
+        /// - Kiểm tra hợp lệ cho `page` và `size`. Nếu giá trị không hợp lệ, trả về lỗi 400.  
+        /// </remarks>
+        /// <param name="page">Số trang hiện tại (mặc định là 1).</param>
+        /// <param name="size">Số lượng yêu cầu trên mỗi trang (mặc định là 10).</param>
+        /// <returns>
+        /// - `200 OK`: Trả về danh sách yêu cầu kết bạn thành công.  
+        /// - `400 Bad Request`: Tham số phân trang không hợp lệ.  
+        /// - `404 Not Found`: Không tìm thấy tài khoản người dùng.  
+        /// </returns>
+        [HttpGet(ApiEndPointConstant.FriendShip.GetRequestList)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesErrorResponseType(typeof(ProblemDetails))]
+        public async Task<IActionResult> GetRequestList([FromQuery] int? page, [FromQuery] int? size)
+        {
+            int pageNumber = page ?? 1;
+            int pageSize = size ?? 10;
+            var response = await _friendShipService.GetRequestList(pageNumber, pageSize);
+            return StatusCode(int.Parse(response.status), response);
+        }
+
+        /// <summary>
         /// API tìm kiếm bạn bè theo số điện thoại.
         /// </summary>
         /// <remarks>

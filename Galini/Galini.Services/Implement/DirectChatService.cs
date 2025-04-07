@@ -9,9 +9,11 @@ using Galini.Models.Paginate;
 using Galini.Models.Payload.Request.DirectChat;
 using Galini.Models.Payload.Response;
 using Galini.Models.Payload.Response.DirectChat;
+using Galini.Models.Utils;
 using Galini.Repository.Interface;
 using Galini.Services.Interface;
 using Galini.Utils;
+using MailKit.Search;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
@@ -71,6 +73,56 @@ namespace Galini.Services.Implement
                         TotalPages = totalPages,
                         Items = new List<DirectChat>()
                     }
+                };
+            }
+
+            return new BaseResponse
+            {
+                status = StatusCodes.Status200OK.ToString(),
+                message = "Danh sách direct chat",
+                data = response
+            };
+        }
+
+        public async Task<BaseResponse> GetAllDirectChatUser()
+        {
+            Guid? id = UserUtil.GetAccountId(_httpContextAccessor.HttpContext);
+            var accountExist = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+                predicate: x => x.Id.Equals(id) && x.IsActive);
+            if (accountExist == null)
+            {
+                _logger.LogWarning($"Không tìm thấy tài khoản có Id {id} .");
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status404NotFound.ToString(),
+                    message = "Tài khoản không tồn tại",
+                    data = null
+                };
+            }
+
+            var response = await _unitOfWork.GetRepository<DirectChat>().GetListAsync(
+                selector: d => new GetDirectChatResponse
+                {
+                    Id = d.Id,
+                    Name = d.Name,
+                    LatestMessage = d.Messages
+                        .OrderByDescending(a => a.CreateAt)
+                        .Select(a => a.Content)
+                        .FirstOrDefault(),
+                    Friend = d.DirectChatParticipants
+                        .Select(a => a.Account)
+                        .FirstOrDefault(a => !a.Id.Equals(id)),
+                },
+                predicate: a=> a.DirectChatParticipants.Any(dp => dp.AccountId == id)
+            );
+
+            if (response == null)
+            {
+                return new BaseResponse()
+                {
+                    status = StatusCodes.Status404NotFound.ToString(),
+                    message = "Không tìm thấy direct chat",
+                    data = null
                 };
             }
 

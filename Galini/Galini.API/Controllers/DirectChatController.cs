@@ -67,6 +67,29 @@ namespace Galini.API.Controllers
         }
 
         /// <summary>
+        /// API lấy danh sách tất cả các cuộc trò chuyện trực tiếp của người dùng.
+        /// </summary>
+        /// <remarks>
+        /// - Trả về danh sách các cuộc trò chuyện trực tiếp (direct chat) mà người dùng hiện tại tham gia.  
+        /// - Mỗi phần tử bao gồm thông tin tên cuộc trò chuyện, tin nhắn mới nhất và thông tin bạn chat.  
+        /// - Chỉ những cuộc trò chuyện có sự tham gia của người dùng đang đăng nhập mới được trả về.  
+        /// - Kết quả trả về được bọc trong `BaseResponse`.
+        /// </remarks>
+        /// <returns>
+        /// - `200 OK`: Lấy danh sách direct chat thành công.  
+        /// - `404 Not Found`: Không tìm thấy tài khoản hoặc không có cuộc trò chuyện nào.
+        /// </returns>
+        [HttpGet(ApiEndPointConstant.DirectChat.GetAllDirectChatUser)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesErrorResponseType(typeof(ProblemDetails))]
+        public async Task<IActionResult> GetAllDirectChatUser()
+        {
+            var response = await _directChat.GetAllDirectChatUser();
+
+            return StatusCode(int.Parse(response.status), response);
+        }
+
+        /// <summary>
         /// API lấy chi tiết một cuộc trò chuyện trực tiếp theo ID.
         /// </summary>
         /// <remarks>
