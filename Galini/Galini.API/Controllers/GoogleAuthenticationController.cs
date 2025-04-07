@@ -39,36 +39,87 @@ namespace Galini.API.Controllers
         [HttpGet(ApiEndPointConstant.GoogleAuthentication.GoogleSignIn)]
         public async Task<IActionResult> SignInGoogle()
         {
-            var googleAuthResponse = await _googleAuthenticationService.AuthenticateGoogleUser(HttpContext);
-            var checkAccount = await _userService.GetAccountByEmail(googleAuthResponse.Email);
-            if (!checkAccount)
+            try
             {
-                var response = await _userService.CreateNewUserAccountByGoogle(googleAuthResponse);
-                if (response == null)
+                var googleAuthResponse = await _googleAuthenticationService.AuthenticateGoogleUser(HttpContext);
+
+                var checkAccount = await _userService.GetAccountByEmail(googleAuthResponse.Email);
+                if (!checkAccount)
                 {
-                    return Problem("Tài khoản không tồn tại");
+                    var response = await _userService.CreateNewUserAccountByGoogle(googleAuthResponse);
+                    if (response == null)
+                    {
+                        string errorHtmlResponse = @"
+                            <html>
+                            <body>
+                            <script type='text/javascript'>
+                            window.opener.postMessage({ error: 'Tài khoản không tồn tại' }, '*');
+                            window.close();
+                            </script>
+                            <p>Tài khoản google không tồn tại. Đang đóng cửa sổ...</p>
+                            </body>
+                            </html>";
+                        return Content(errorHtmlResponse, "text/html");
+                    }
                 }
-            }
-            var authResponse = await _userService.CreateTokenByEmail(googleAuthResponse.Email);
-            googleAuthResponse.Token = authResponse.Token;
-            googleAuthResponse.RefreshToken = authResponse.RefreshToken;
 
-            if (authResponse == null || authResponse.Token == null || authResponse.RefreshToken == null)
-            {
-                return Ok(new BaseResponse()
+                var authResponse = await _userService.CreateTokenByEmail(googleAuthResponse.Email);
+                googleAuthResponse.Token = authResponse.Token;
+                googleAuthResponse.RefreshToken = authResponse.RefreshToken;
+
+                if (authResponse == null || authResponse.Token == null || authResponse.RefreshToken == null)
                 {
-                    status = StatusCodes.Status400BadRequest.ToString(),
-                    message = "Login faild",
-                    data = null
-                });
-            }
+                    string errorHtmlResponse = @"
+                        <html>
+                        <body>
+                        <script type='text/javascript'>
+                        window.opener.postMessage({ error: 'Đăng nhập thất bại' }, '*');
+                        window.close();
+                        </script>
+                        <p>Đăng nhập thất bại. Đang đóng cửa sổ...</p>
+                        </body>
+                        </html>";
+                    return Content(errorHtmlResponse, "text/html");
+                }
 
-            return Ok(new BaseResponse()
+                var user = new
+                {
+                    accountId = authResponse.Id,
+                    role = authResponse.Role,
+                    username = authResponse.Username
+                };
+
+                string htmlResponse = $@"
+                    <html>
+                    <body>
+                    <script type='text/javascript'>
+                    window.opener.postMessage({{
+                        user: '{user}'
+                        accessToken: '{authResponse.Token}',
+                        refreshToken: '{authResponse.RefreshToken}'
+                    }}, '*');
+                    window.close();
+                    </script>
+                    <p>Đang xử lý đăng nhập, vui lòng chờ...</p>
+                    </body>
+                    </html>";
+
+                return Content(htmlResponse, "text/html");
+            }
+            catch (Exception ex)
             {
-                status = StatusCodes.Status200OK.ToString(),
-                message = "Login successful",
-                data = googleAuthResponse
-            });
+                string errorHtmlResponse = $@"
+                    <html>
+                    <body>
+                    <script type='text/javascript'>
+                    window.opener.postMessage({{ error: 'Đã xảy ra lỗi: {ex.Message}' }}, '*');
+                    window.close();
+                    </script>
+                    <p>Đã xảy ra lỗi khi xử lý đăng nhập. Đang đóng cửa sổ...</p>
+                    </body>
+                    </html>";
+                return Content(errorHtmlResponse, "text/html");
+            }
         }
     }
 }
