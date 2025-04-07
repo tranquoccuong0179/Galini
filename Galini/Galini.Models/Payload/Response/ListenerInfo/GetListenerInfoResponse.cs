@@ -1,4 +1,7 @@
 ﻿using Galini.Models.Entity;
+using Galini.Models.Payload.Response.Account;
+using Galini.Models.Payload.Response.Review;
+using Galini.Models.Payload.Response.Topic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +19,9 @@ namespace Galini.Models.Payload.Response.ListenerInfo
         public string? FullName { get; set; }
         public string? AvatarUrl { get; set; }
         public string Gender { get; set; } = null!;
-        public Guid AccountId { get; set; }
+        //public Guid AccountId { get; set; }
+        public GetAccountResponse GetAccountResponse { get; set; }
+        public List<GetTopicResponse> GetTopicResponse { get; set; }
+        public List<CreateReviewResponse> CreateReviewResponses { get; set; }
     }
 }
