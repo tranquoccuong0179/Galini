@@ -1,8 +1,10 @@
 using System.Text.RegularExpressions;
 using AutoMapper;
+using Azure;
 using Azure.Messaging;
 using Galini.Models.Entity;
 using Galini.Models.Enum;
+using Galini.Models.Paginate;
 using Galini.Models.Payload.Request.User;
 using Galini.Models.Payload.Request.UserInfo;
 using Galini.Models.Payload.Response;
@@ -557,6 +559,86 @@ public class UserService : BaseService<UserService>, IUserService
             status = StatusCodes.Status200OK.ToString(),
             message = "Lấy account thành công.",
             data = existingUser
+        };
+    }
+
+    public async Task<BaseResponse> GetAllUser(int page, int size)
+    {
+        var account = await _unitOfWork.GetRepository<Account>().GetPagingListAsync(
+            selector: a => new GetAccountResponse
+            {
+                Id = a.Id,
+                Email = a.Email,
+                FullName = a.FullName,
+                Phone = a.Phone,
+            },
+            predicate: a => a.IsActive,
+            orderBy: a => a.OrderByDescending(a => a.CreateAt),
+            page: page,
+            size: size);
+
+        int totalItems = account.Total;
+        int totalPages = (int)Math.Ceiling((double)totalItems / size);
+
+        if (account == null)
+        {
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status200OK.ToString(),
+                message = "Danh sách người dùng",
+                data = new Paginate<Account>()
+                {
+                    Page = page,
+                    Size = size,
+                    Total = totalItems,
+                    TotalPages = totalPages,
+                    Items = new List<Account>()
+                }
+            };
+        }
+
+        return new BaseResponse
+        {
+            status = StatusCodes.Status200OK.ToString(),
+            message = "Danh sách người dùng",
+            data = account
+        };
+    }
+
+    public async Task<BaseResponse> DeleteUser(Guid id)
+    {
+        var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+            predicate: a => a.Id.Equals(id) && a.IsActive);
+
+        if (account == null)
+        {
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status404NotFound.ToString(),
+                message = "Không tìm thấy account",
+                data = null
+            };
+        }
+
+        account.IsActive = false;
+        account.UpdateAt = TimeUtil.GetCurrentSEATime();
+        _unitOfWork.GetRepository<Account>().UpdateAsync(account);
+        bool isSuccessfully = await _unitOfWork.CommitAsync() > 0;
+        if (isSuccessfully)
+        {
+            return new BaseResponse()
+            {
+                status = StatusCodes.Status200OK.ToString(),
+                message = "Xóa account thành công",
+                data = isSuccessfully
+            };
+        }
+
+        return new BaseResponse()
+        {
+            status = StatusCodes.Status400BadRequest.ToString(),
+            message = "Xóa account thất bại",
+            data = null
         };
     }
 }

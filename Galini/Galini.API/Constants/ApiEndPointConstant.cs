@@ -38,6 +38,8 @@ namespace Galini.API.Constants
             public const string UpdateDuration = UserEndPoint + "/update-duration/{id}";
             public const string GetAccountById = UserEndPoint + "/account/{id}";
             public const string GetFriendById = UserEndPoint + "/friend/{id}";
+            public const string GetAllAccount = UserEndPoint;
+            public const string DeleteAccount = UserEndPoint + "/{id}";
         }
 
         public static class Notification

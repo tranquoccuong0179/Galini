@@ -16,4 +16,6 @@ public interface IUserService
     Task<BaseResponse> UpdateDuration(Guid id, int duration);
     Task<BaseResponse> GetAccountById(Guid id);
     Task<BaseResponse> GetFriendById(Guid id);
+    Task<BaseResponse> GetAllUser(int page, int size);
+    Task<BaseResponse> DeleteUser(Guid id);
 }
