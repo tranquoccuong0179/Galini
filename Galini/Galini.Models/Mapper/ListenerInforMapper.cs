@@ -31,7 +31,8 @@ namespace Galini.Models.Mapper
                 .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.Account.FullName))
                 .ForMember(dest => dest.AvatarUrl, opt => opt.MapFrom(src => src.Account.AvatarUrl))
                 .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.Account.Gender))
-                .ForMember(dest => dest.AccountId, opt => opt.MapFrom(src => src.Account.Id));
+                .ForMember(dest => dest.GetAccountResponse, opt => opt.MapFrom(src => src.Account))
+                .ForMember(dest => dest.GetTopicResponse, opt => opt.MapFrom(src => src.Topics));
 
             CreateMap<UpdateListenerInfoRequest, ListenerInfo>()
                 .ForMember(dest => dest.Description, opt => opt.Condition(src => src.Description != null))

@@ -14,6 +14,7 @@ using Galini.Models.Payload.Request.User;
 using Galini.Models.Payload.Response;
 using Galini.Models.Payload.Response.Account;
 using Galini.Models.Payload.Response.ListenerInfo;
+using Galini.Models.Payload.Response.Review;
 using Galini.Repository.Interface;
 using Galini.Services.Interface;
 using Galini.Utils;
@@ -202,8 +203,8 @@ namespace Galini.Services.Implement
             var listenerInfo = await _unitOfWork.GetRepository<ListenerInfo>().SingleOrDefaultAsync(
                 predicate: l => l.Id.Equals(id) && l.IsActive == true,
                 include: l => l.Include(l => l.Account));
-
-            if(listenerInfo == null)
+            
+            if (listenerInfo == null)
             {
                 return new BaseResponse()
                 {
@@ -213,11 +214,17 @@ namespace Galini.Services.Implement
                 };
             }
 
+            var response = _mapper.Map<GetListenerInfoResponse>(listenerInfo); 
+            var reviews = await _unitOfWork.GetRepository<Review>().GetListAsync(
+                predicate: r => r.IsActive && r.ListenerId.Equals(id));
+
+            response.CreateReviewResponses = _mapper.Map<List<CreateReviewResponse>>(reviews);
+
             return new BaseResponse()
             {
                 status = StatusCodes.Status200OK.ToString(),
                 message = "Thông tin người nghe",
-                data = _mapper.Map<GetListenerInfoResponse>(listenerInfo)
+                data = response
             };
         }
 
