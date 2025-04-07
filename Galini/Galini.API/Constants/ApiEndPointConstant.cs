@@ -101,6 +101,7 @@ namespace Galini.API.Constants
             public const string GetFriendList = FriendShipEndPoint + "/friend-list";
             public const string GetFriendShipById = FriendShipEndPoint + "/{id}";
             public const string SearchFriendByPhone = FriendShipEndPoint + "/search";
+            public const string GetRequestList = FriendShipEndPoint + "/request";
             public const string GetFriendShipByAccountIdAndStatus = FriendShipEndPoint + "/account/{id}/status";
             public const string GetFriendByAccountId = FriendShipEndPoint + "/account/{id}";
             public const string UpdateFriendShip = FriendShipEndPoint + "/{id}";
