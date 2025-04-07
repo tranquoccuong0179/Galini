@@ -10,5 +10,7 @@ namespace Galini.Models.Payload.Response.DirectChat
     {
         public Guid? Id { get; set; }
         public string? Name { get; set; }
+        public string? LatestMessage { get; set; }
+        public Entity.Account? Friend {  get; set; }
     }
 }

@@ -235,6 +235,7 @@ namespace Galini.API.Constants
             public const string DirectChatEndPoint = ApiEndpoint + "/direct-chat";
             public const string CreateDirectChat = DirectChatEndPoint;
             public const string GetAllDirectChats = DirectChatEndPoint;
+            public const string GetAllDirectChatUser = DirectChatEndPoint + "/user";
             public const string GetDirectChatById = DirectChatEndPoint + "/{id}";
             public const string UpdateDirectChat = DirectChatEndPoint + "/{id}";
             public const string RemoveDirectChat = DirectChatEndPoint + "/{id}";

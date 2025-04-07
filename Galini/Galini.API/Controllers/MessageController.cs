@@ -141,7 +141,7 @@ namespace Galini.API.Controllers
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
         [ProducesErrorResponseType(typeof(ProblemDetails))]
-        public async Task<IActionResult> GetMessageByDirectChatId([FromRoute] Guid id, [FromBody] DateTime? beforeCursor)
+        public async Task<IActionResult> GetMessageByDirectChatId([FromRoute] Guid id, [FromQuery] DateTime? beforeCursor)
         {
             var response = await _messageService.GetMessageByDirectChatId(id, beforeCursor);
 

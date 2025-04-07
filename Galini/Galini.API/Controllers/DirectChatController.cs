@@ -66,6 +66,16 @@ namespace Galini.API.Controllers
             return StatusCode(int.Parse(response.status), response);
         }
 
+        [HttpGet(ApiEndPointConstant.DirectChat.GetAllDirectChatUser)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesErrorResponseType(typeof(ProblemDetails))]
+        public async Task<IActionResult> GetAllDirectChatUser()
+        {
+            var response = await _directChat.GetAllDirectChatUser();
+
+            return StatusCode(int.Parse(response.status), response);
+        }
+
         /// <summary>
         /// API lấy chi tiết một cuộc trò chuyện trực tiếp theo ID.
         /// </summary>
