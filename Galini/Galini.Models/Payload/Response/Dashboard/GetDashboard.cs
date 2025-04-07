@@ -20,4 +20,13 @@ namespace Galini.Models.Payload.Response.Dashboard
         public List<string> Labels { get; set; }
         public List<int> Values { get; set; }
     }
+
+    public class GetDashboardListener
+    {
+        public int TotalBookingSuccess { get; set; }
+        public int TotalBookingCancel { get; set; }
+        public double? AverageStars { get; set; }
+        public int TotalBookings { get; set; }
+        public ChartData Chart { get; set; }
+    }
 }
