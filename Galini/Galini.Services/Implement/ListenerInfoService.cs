@@ -214,7 +214,8 @@ namespace Galini.Services.Implement
                 };
             }
 
-            var response = _mapper.Map<GetListenerInfoResponse>(listenerInfo); 
+            var response = _mapper.Map<GetListenerInfoResponse>(listenerInfo);
+
             var reviews = await _unitOfWork.GetRepository<Review>().GetListAsync(
                 predicate: r => r.IsActive && r.ListenerId.Equals(id));
 
