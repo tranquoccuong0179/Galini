@@ -13,6 +13,7 @@ using Galini.Repository.Interface;
 using Galini.Services.Interface;
 using Galini.Utils;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Galini.Services.Implement
@@ -85,7 +86,8 @@ namespace Galini.Services.Implement
         {
             Guid? id = UserUtil.GetAccountId(_httpContextAccessor.HttpContext);
             var listener = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
-                predicate: x => x.Id.Equals(id) && x.IsActive);
+                predicate: x => x.Id.Equals(id) && x.IsActive,
+                include: x => x.Include(x => x.ListenerInfo));
             if (listener == null)
             {
                 _logger.LogWarning($"Không tìm thấy tài khoản có Id {id} .");
