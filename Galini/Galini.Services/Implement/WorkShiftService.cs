@@ -321,7 +321,7 @@ namespace Galini.Services.Implement
 
             var bookings = await _unitOfWork.GetRepository<Booking>().GetListAsync(
             predicate: q => q.IsActive && q.WorkShiftId.Equals(id) && DateTime.Now.Date <= q.Date.Date);
-            if (bookings != null)
+            if (bookings.Count() != 0)
             {
                 return new BaseResponse()
                 {
@@ -331,11 +331,11 @@ namespace Galini.Services.Implement
                 };
             }
 
-            _mapper.Map(request, workShift);
-
             if (day != DayEnum.None)
             {
                 workShift.Day = day.ToString();
+                workShift.EndTime = request.EndTime;
+                workShift.StartTime = request.StartTime;
             }
 
             _unitOfWork.GetRepository<WorkShift>().UpdateAsync(workShift);
