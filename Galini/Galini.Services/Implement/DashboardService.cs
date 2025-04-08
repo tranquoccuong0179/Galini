@@ -27,15 +27,19 @@ namespace Galini.Services.Implement
         public async Task<BaseResponse> GetDashboard()
         {
             var totalUsers = await _unitOfWork.GetRepository<Account>().CountAsync(
-                predicate: u => u.IsActive && u.Role.Equals(RoleEnum.Customer.GetDescriptionFromEnum()));
+                predicate: u => u.IsActive 
+                                && u.Role.Equals(RoleEnum.Customer.GetDescriptionFromEnum()));
 
             var totalListeners = await _unitOfWork.GetRepository<Account>().CountAsync(
-                predicate: u => u.IsActive && u.Role.Equals(RoleEnum.Listener.GetDescriptionFromEnum()));
+                predicate: u => u.IsActive 
+                                && u.Role.Equals(RoleEnum.Listener.GetDescriptionFromEnum()));
 
             var totalBlogs = await _unitOfWork.GetRepository<Blog>().CountAsync();
 
             var transactions = await _unitOfWork.GetRepository<Transaction>().GetListAsync(
-                predicate: t => t.IsActive && t.Type.Equals(TransactionTypeEnum.DEPOSIT.GetDescriptionFromEnum()));
+                predicate: t => t.IsActive 
+                && t.Type.Equals(TransactionTypeEnum.DEPOSIT.GetDescriptionFromEnum()) 
+                && t.Status.Equals(TransactionStatusEnum.SUCCESS.GetDescriptionFromEnum()));
             decimal totalTransaction = transactions.Sum(t => t.Amount);
 
             var transactionByYearMonth = transactions
